@@ -3,8 +3,10 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let PromoSchema = new Schema({
-    header : String,
-    description : String,
+    multilang : {
+        type : Schema.Types.ObjectId,
+        rel: 'Multilang'
+    },
     author : {
         type : Schema.Types.ObjectId,
         rel : 'Department'

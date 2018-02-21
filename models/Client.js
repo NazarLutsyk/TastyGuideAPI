@@ -10,7 +10,7 @@ let ClientSchema = new Schema({
     city : String,
     phone : String,
     email : String,
-    role : String,
+    roles : [String],
     applications : [{
         type : Schema.Types.ObjectId,
         rel : 'Application'

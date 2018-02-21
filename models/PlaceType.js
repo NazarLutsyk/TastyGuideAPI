@@ -3,7 +3,10 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let PlaceTypeSchema = new Schema({
-    name : String
+    multilang : {
+        type : Schema.Types.ObjectId,
+        rel: 'Multilang'
+    },
 },{
     timestamps : true,
 });

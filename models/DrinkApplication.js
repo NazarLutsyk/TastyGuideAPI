@@ -2,7 +2,7 @@ let mongoose = require('mongoose');
 
 let Schema = mongoose.Schema;
 
-let ApplicationSchema = new Schema({
+let DrinkApplicationSchema = new Schema({
     friends : String,
     goal : String,
     budged : Number,
@@ -23,4 +23,4 @@ let ApplicationSchema = new Schema({
     timestamps : true,
 });
 
-module.exports = mongoose.model('Application',ApplicationSchema);
+module.exports = mongoose.model('DrinkApplication',DrinkApplicationSchema);

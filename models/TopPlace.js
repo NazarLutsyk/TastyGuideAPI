@@ -2,7 +2,7 @@ let mongoose = require('mongoose');
 
 let Schema = mongoose.Schema;
 
-let MajorPlaceSchema = new Schema({
+let TopPlaceSchema = new Schema({
     startDate : Date,
     endDate : Date,
     price : Number,
@@ -14,4 +14,4 @@ let MajorPlaceSchema = new Schema({
     timestamps : true,
 });
 
-module.exports = mongoose.model('MajorPlace',MajorPlaceSchema);
+module.exports = mongoose.model('TopPlace',TopPlaceSchema);

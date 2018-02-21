@@ -2,12 +2,13 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 let Multilang = require('./Multilang');
 
-module.exports = Multilang.discriminator('PlaceMultilang', new Schema({
-    name : String,
+module.exports = Multilang.discriminator('BonuseMultilang', new Schema({
+    header : String,
     description : String,
-    place : {
+    conditions : String,
+    bonuse : {
         type : Schema.Types.ObjectId,
-        rel : 'Place'
+        rel : 'Bonuse'
     },
 }, {
     discriminatorKey: 'kind'

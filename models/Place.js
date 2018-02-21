@@ -3,8 +3,7 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let PlaceSchema = new Schema({
-    posRating: Number,
-    negRating: Number,
+    ratingScore: Number,
     phone: String,
     location: {
         ltg: Number,
@@ -25,9 +24,9 @@ let PlaceSchema = new Schema({
         type: Schema.Types.ObjectId,
         rel: 'Complaint'
     }],
-    applications : [{
+    drinkApplications : [{
         type: Schema.Types.ObjectId,
-        rel: 'Application'
+        rel: 'DrinkApplication'
     }],
     ratings : [{
         type: Schema.Types.ObjectId,
@@ -37,13 +36,17 @@ let PlaceSchema = new Schema({
         type: Schema.Types.ObjectId,
         rel: 'Department'
     }],
-    placeMultilang : {
+    multilang : {
         type : Schema.Types.ObjectId,
-        rel: 'PlaceMultilang'
+        rel: 'Multilang'
     },
     days : [{
         type : Schema.Types.ObjectId,
         rel : 'Day'
+    }],
+    hashTags : [{
+        type : Schema.Types.ObjectId,
+        rel : 'HashTag'
     }]
 }, {
     timestamps: true,

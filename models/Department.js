@@ -3,7 +3,7 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let DepartmentSchema = new Schema({
-    role : String,
+    roles : [String],
     client : {
         type : Schema.Types.ObjectId,
         rel : 'Client'
