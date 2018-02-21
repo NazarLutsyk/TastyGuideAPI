@@ -7,11 +7,11 @@ let RatingSchema = new Schema({
     comment : String,
     client : {
         type : Schema.Types.ObjectId,
-        rel : 'Client'
+        ref : 'Client'
     },
     place : {
         type : Schema.Types.ObjectId,
-        rel : 'Place'
+        ref : 'Place'
     },
 },{
     timestamps : true,

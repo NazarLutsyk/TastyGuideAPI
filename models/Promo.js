@@ -3,13 +3,13 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let PromoSchema = new Schema({
-    multilang : {
+    multilang : [{
         type : Schema.Types.ObjectId,
-        rel: 'Multilang'
-    },
+        ref: 'Multilang'
+    }],
     author : {
         type : Schema.Types.ObjectId,
-        rel : 'Department'
+        ref : 'Department'
     },
 },{
     timestamps : true,

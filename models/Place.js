@@ -14,39 +14,39 @@ let PlaceSchema = new Schema({
     reviews: Number,
     types: [{
         type: Schema.Types.ObjectId,
-        rel: 'PlaceType'
+        ref: 'PlaceType'
     }],
     promos : [{
         type: Schema.Types.ObjectId,
-        rel: 'Promo'
+        ref: 'Promo'
     }],
     complaints : [{
         type: Schema.Types.ObjectId,
-        rel: 'Complaint'
+        ref: 'Complaint'
     }],
     drinkApplications : [{
         type: Schema.Types.ObjectId,
-        rel: 'DrinkApplication'
+        ref: 'DrinkApplication'
     }],
     ratings : [{
         type: Schema.Types.ObjectId,
-        rel: 'Rating'
+        ref: 'Rating'
     }],
     departments : [{
         type: Schema.Types.ObjectId,
-        rel: 'Department'
+        ref: 'Department'
     }],
-    multilang : {
+    multilang : [{
         type : Schema.Types.ObjectId,
-        rel: 'Multilang'
-    },
+        ref: 'Multilang'
+    }],
     days : [{
         type : Schema.Types.ObjectId,
-        rel : 'Day'
+        ref : 'Day'
     }],
     hashTags : [{
         type : Schema.Types.ObjectId,
-        rel : 'HashTag'
+        ref : 'HashTag'
     }]
 }, {
     timestamps: true,

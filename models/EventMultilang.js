@@ -7,7 +7,7 @@ module.exports = Multilang.discriminator('EventMultilang', new Schema({
     description : String,
     event : {
         type : Schema.Types.ObjectId,
-        rel : 'Event'
+        ref : 'Event'
     },
 }, {
     discriminatorKey: 'kind'

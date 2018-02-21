@@ -8,7 +8,7 @@ module.exports = Multilang.discriminator('BonuseMultilang', new Schema({
     conditions : String,
     bonuse : {
         type : Schema.Types.ObjectId,
-        rel : 'Bonuse'
+        ref : 'Bonuse'
     },
 }, {
     discriminatorKey: 'kind'

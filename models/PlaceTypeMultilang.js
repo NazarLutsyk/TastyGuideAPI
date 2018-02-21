@@ -6,7 +6,7 @@ module.exports = Multilang.discriminator('PlaceTypeMultilang', new Schema({
     name : String,
     placeType : {
         type : Schema.Types.ObjectId,
-        rel: 'PlaceType'
+        ref: 'PlaceType'
     },
 }, {
     discriminatorKey: 'kind'

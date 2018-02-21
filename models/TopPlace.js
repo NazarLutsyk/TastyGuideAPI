@@ -8,7 +8,7 @@ let TopPlaceSchema = new Schema({
     price : Number,
     place : {
         type : Schema.Types.ObjectId,
-        rel : 'Place'
+        ref : 'Place'
     },
 },{
     timestamps : true,

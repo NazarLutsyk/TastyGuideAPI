@@ -6,15 +6,15 @@ let DepartmentSchema = new Schema({
     roles : [String],
     client : {
         type : Schema.Types.ObjectId,
-        rel : 'Client'
+        ref : 'Client'
     },
     place : {
         type : Schema.Types.ObjectId,
-        rel : 'Place'
+        ref : 'Place'
     },
     promos : [{
         type : Schema.Types.ObjectId,
-        rel : 'Promo'
+        ref : 'Promo'
     }]
 },{
     timestamps : true,

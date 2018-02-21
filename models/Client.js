@@ -11,25 +11,25 @@ let ClientSchema = new Schema({
     phone : String,
     email : String,
     roles : [String],
-    applications : [{
+    drinkApplications : [{
         type : Schema.Types.ObjectId,
-        rel : 'Application'
+        ref : 'DrinkApplication'
     }],
     ratings : [{
         type : Schema.Types.ObjectId,
-        rel : 'Rating'
+        ref : 'Rating'
     }],
     complaints : [{
         type : Schema.Types.ObjectId,
-        rel : 'Complaint'
+        ref : 'Complaint'
     }],
     departments : [{
         type : Schema.Types.ObjectId,
-        rel : 'Department'
+        ref : 'Department'
     }],
     favoritePlaces : [{
         type : Schema.Types.ObjectId,
-        rel : 'Place'
+        ref : 'Place'
     }],
 },{
     timestamps : true,

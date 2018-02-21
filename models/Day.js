@@ -9,7 +9,7 @@ let DaySchema = new Schema({
     holiday : Boolean,
     place : {
         type : Schema.Types.ObjectId,
-        rel : 'Place'
+        ref : 'Place'
     }
 },{
     timestamps : true,

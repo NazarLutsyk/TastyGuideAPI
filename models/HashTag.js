@@ -6,7 +6,7 @@ let HashTagSchema = new Schema({
     value : String,
     places : [{
         type : Schema.Types.ObjectId,
-        rel: 'Place'
+        ref: 'Place'
     }],
 },{
     timestamps : true,
