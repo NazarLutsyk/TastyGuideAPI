@@ -13,5 +13,13 @@ let TopPlaceSchema = new Schema({
 },{
     timestamps : true,
 });
-
 module.exports = mongoose.model('TopPlace',TopPlaceSchema);
+
+let Place = require('./Place');
+TopPlaceSchema.pre('remove',async function (next) {
+    await Place.update(
+        {tops: this._id},
+        {$pull: {tops: this._id}},
+        {multi: true});
+    next();
+});

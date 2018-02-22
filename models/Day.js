@@ -14,5 +14,13 @@ let DaySchema = new Schema({
 },{
     timestamps : true,
 });
-
 module.exports = mongoose.model('Day',DaySchema);
+
+let Place = require('./Place');
+DaySchema.pre('remove',async function (next) {
+    await Place.update(
+        {days: this._id},
+        {$pull: {days: this._id}},
+        {multi: true});
+    next();
+});

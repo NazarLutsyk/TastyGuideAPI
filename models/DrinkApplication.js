@@ -1,6 +1,3 @@
-let Place = require('../models/Place');
-let Client = require('../models/Client');
-
 let mongoose = require('mongoose');
 
 let Schema = mongoose.Schema;
@@ -25,23 +22,19 @@ let DrinkApplicationSchema = new Schema({
 },{
     timestamps : true,
 });
+module.exports = mongoose.model('DrinkApplication',DrinkApplicationSchema);
 
-DrinkApplicationSchema.pre('remove', async function (next) {
-    try {
-        await Client.update(
-            {drinkApplications: this._id},
-            {$pull: {drinkApplications: this._id}},
-            {multi: true})
-            .exec();
-        await Place.update(
-            {drinkApplications: this._id},
-            {$pull: {drinkApplications: this._id}},
-            {multi: true})
-            .exec();
-        next();
-    } catch (e) {
-        next(e);
-    }
+let Place = require('./Place');
+let Client = require('./Client');
+DrinkApplicationSchema.pre('remove',async function (next) {
+    await Client.update(
+        {drinkApplications: this._id},
+        {$pull: {drinkApplications: this._id}},
+        {multi: true});
+    await Place.update(
+        {drinkApplications: this._id},
+        {$pull: {drinkApplications: this._id}},
+        {multi: true});
+    next();
 });
 
-module.exports = mongoose.model('DrinkApplication',DrinkApplicationSchema);
