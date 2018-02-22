@@ -6,7 +6,7 @@ module.exports = {
             let events = await Event.find({});
             res.json(events);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getEventById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let event = await Event.findById(eventId);
             res.json(event);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createEvent(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let event = await Event.create(req.body);
             res.json(event);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateEvent(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let event = await Event.findByIdAndUpdate(eventId, req.body,{new : true});
             res.json(event);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeEvent(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             event = await event.remove();
             res.json(event);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

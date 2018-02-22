@@ -6,7 +6,7 @@ module.exports = {
             let clients = await Client.find({});
             res.json(clients);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getClientById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let client = await Client.findById(clientId);
             res.json(client);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createClient(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let client = await Client.create(req.body);
             res.json(client);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateClient(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let updatedClient = await Client.findByIdAndUpdate(clientId, req.body,{new : true});
             res.json(updatedClient);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeClient(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             removedClient = await removedClient.remove();
             res.json(removedClient);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

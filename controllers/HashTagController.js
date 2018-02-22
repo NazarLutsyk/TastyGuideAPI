@@ -6,7 +6,7 @@ module.exports = {
             let hashTags = await HashTag.find({});
             res.json(hashTags);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getHashTagById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let hashTag = await HashTag.findById(hashTagId);
             res.json(hashTag);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createHashTag(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let hashTag = await HashTag.create(req.body);
             res.json(hashTag);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateHashTag(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let hashTag = await HashTag.findByIdAndUpdate(hashTagId, req.body,{new : true});
             res.json(hashTag);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeHashTag(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             hashTag = await hashTag.remove();
             res.json(hashTag);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

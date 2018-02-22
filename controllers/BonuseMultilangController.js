@@ -6,7 +6,7 @@ module.exports = {
             let bonuseMultilangs = await BonuseMultilang.find({});
             res.json(bonuseMultilangs);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getBonuseMultilangById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let bonuseMultilang = await BonuseMultilang.findById(bonuseMultilangId);
             res.json(bonuseMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createBonuseMultilang(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let bonuseMultilang = await BonuseMultilang.create(req.body);
             res.json(bonuseMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateBonuseMultilang(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let bonuseMultilang = await BonuseMultilang.findByIdAndUpdate(bonuseMultilangId, req.body,{new : true});
             res.json(bonuseMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeBonuseMultilang(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             bonuseMultilang = await bonuseMultilang.remove();
             res.json(bonuseMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

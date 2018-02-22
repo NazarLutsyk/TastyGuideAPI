@@ -3,12 +3,22 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let TopPlaceSchema = new Schema({
-    startDate : Date,
-    endDate : Date,
-    price : Number,
+    startDate : {
+        type: Date,
+        required : true
+    },
+    endDate : {
+        type: Date,
+        required : true
+    },
+    price : {
+        type: Number,
+        required : true
+    },
     place : {
         type : Schema.Types.ObjectId,
-        ref : 'Place'
+        ref : 'Place',
+        required : true
     },
 },{
     timestamps : true,
@@ -22,4 +32,17 @@ TopPlaceSchema.pre('remove',async function (next) {
         {$pull: {tops: this._id}},
         {multi: true});
     next();
+});
+TopPlaceSchema.pre('save', async function (next) {
+    let place = await Place.findById(this.place);
+    if (place) {
+        place.tops.push(this);
+        place.save();
+        next();
+    }
+    let msg = 'Not found model:';
+    if (!place){
+        msg += 'Place';
+    }
+    next(new Error(msg));
 });

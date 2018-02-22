@@ -6,7 +6,7 @@ module.exports = {
             let departments = await Department.find({});
             res.json(departments);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getDepartmentById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let department = await Department.findById(departmentId);
             res.json(department);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createDepartment(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let department = await Department.create(req.body);
             res.json(department);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateDepartment(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let department = await Department.findByIdAndUpdate(departmentId, req.body,{new : true});
             res.json(department);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeDepartment(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             department = await department.remove();
             res.json(department);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

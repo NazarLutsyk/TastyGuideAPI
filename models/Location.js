@@ -2,22 +2,14 @@ let mongoose = require('mongoose');
 
 let Schema = mongoose.Schema;
 
-let DaySchema = new Schema({
-    date : {
-        type : Date,
+let LocationSchema = new Schema({
+    ltg : {
+        type : Number,
         required : true
     },
-    startTime : {
-        type : Date,
+    lng : {
+        type : Number,
         required : true
-    },
-    endTime : {
-        type : Date,
-        required : true
-    },
-    holiday : {
-        type : Boolean,
-        default : false
     },
     place : {
         type : Schema.Types.ObjectId,
@@ -27,20 +19,20 @@ let DaySchema = new Schema({
 },{
     timestamps : true,
 });
-module.exports = mongoose.model('Day',DaySchema);
+module.exports = mongoose.model('Location',LocationSchema);
 
 let Place = require('./Place');
-DaySchema.pre('remove',async function (next) {
+LocationSchema.pre('remove',async function (next) {
     await Place.update(
-        {days: this._id},
-        {$pull: {days: this._id}},
+        {locations: this._id},
+        {$pull: {locations: this._id}},
         {multi: true});
     next();
 });
-DaySchema.pre('save', async function (next) {
+LocationSchema.pre('save', async function (next) {
     let place = await Place.findById(this.place);
     if (place) {
-        place.days.push(this);
+        place.location.push(this);
         place.save();
         next();
     }

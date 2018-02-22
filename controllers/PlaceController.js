@@ -6,7 +6,7 @@ module.exports = {
             let places = await Place.find({});
             res.json(places);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getPlaceById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let place = await Place.findById(placeId).populate();
             res.json(place);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createPlace(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let place = await Place.create(req.body);
             res.json(place);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updatePlace(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let updatedPlace = await Place.findByIdAndUpdate(placeId, req.body,{new : true});
             res.json(updatedPlace);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removePlace(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             removedPlace = await removedPlace.remove();
             res.json(removedPlace);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

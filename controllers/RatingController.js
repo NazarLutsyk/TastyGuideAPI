@@ -6,7 +6,7 @@ module.exports = {
             let ratings = await Rating.find({});
             res.json(ratings);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getRatingById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let rating = await Rating.findById(ratingId);
             res.json(rating);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createRating(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let rating = await Rating.create(req.body);
             res.json(rating);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateRating(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let rating = await Rating.findByIdAndUpdate(ratingId, req.body,{new : true});
             res.json(rating);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeRating(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             rating = await rating.remove();
             res.json(rating);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

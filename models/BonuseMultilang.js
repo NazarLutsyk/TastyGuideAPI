@@ -3,12 +3,22 @@ let Schema = mongoose.Schema;
 let Multilang = require('./Multilang');
 
 let BonuseMultilangSchema = new Schema({
-    header : String,
-    description : String,
-    conditions : String,
+    header : {
+        type : String,
+        required : true
+    },
+    description : {
+        type : String,
+        required : true
+    },
+    conditions : {
+        type : String,
+        required : true
+    },
     bonuse : {
         type : Schema.Types.ObjectId,
-        ref : 'Bonuse'
+        ref : 'Bonuse',
+        required : true
     },
 }, {
     discriminatorKey: 'kind'
@@ -22,4 +32,17 @@ BonuseMultilangSchema.pre('remove',async function (next) {
         {$pull: {multilang: this._id}},
         {multi: true});
     next();
+});
+BonuseMultilangSchema.pre('save', async function (next) {
+    let promo = await Promo.findById(this.bonuse);
+    if (promo) {
+        promo.multilang.push(this);
+        promo.save();
+        next();
+    }
+    let msg = 'Not found model:';
+    if (!promo){
+        msg += 'Bonuse ';
+    }
+    next(new Error(msg));
 });

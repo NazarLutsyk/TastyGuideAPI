@@ -3,7 +3,10 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let CurrencySchema = new Schema({
-    value : String,
+    value : {
+        type : String,
+        required : true
+    },
 },{
     timestamps : true,
 });

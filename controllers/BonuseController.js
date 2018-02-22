@@ -6,7 +6,7 @@ module.exports = {
             let bonuses = await Bonuse.find({});
             res.json(bonuses);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getBonuseById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let bonuse = await Bonuse.findById(bonuseId);
             res.json(bonuse);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createBonuse(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let bonuse = await Bonuse.create(req.body);
             res.json(bonuse);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateBonuse(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let bonuse = await Bonuse.findByIdAndUpdate(bonuseId, req.body,{new : true});
             res.json(bonuse);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeBonuse(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             bonuse = await bonuse.remove();
             res.json(bonuse);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

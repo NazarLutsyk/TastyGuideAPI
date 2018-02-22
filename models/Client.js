@@ -1,16 +1,40 @@
 let mongoose = require('mongoose');
-
+let config = require('../config/config');
 let Schema = mongoose.Schema;
 
 let ClientSchema = new Schema({
-    name : String,
-    surname : String,
-    login : String,
-    password : String,
-    city : String,
-    phone : String,
-    email : String,
-    roles : [String],
+    name : {
+        type : String,
+        required : true
+    },
+    surname : {
+        type : String,
+        required : true
+    },
+    login : {
+        type : String,
+        required : true
+    },
+    password : {
+        type : String,
+        required : true
+    },
+    city : {
+        type : String,
+        required : true
+    },
+    phone : {
+        type : String,
+        required : true
+    },
+    email : {
+        type : String,
+        required : true
+    },
+    roles : [{
+        type : String,
+        default : config.ROLES.USER_ROLE
+    }],
     drinkApplications : [{
         type : Schema.Types.ObjectId,
         ref : 'DrinkApplication'

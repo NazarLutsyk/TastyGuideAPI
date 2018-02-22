@@ -9,11 +9,13 @@ let PromoSchema = new Schema({
     }],
     author : {
         type : Schema.Types.ObjectId,
-        ref : 'Department'
+        ref : 'Department',
+        required : true
     },
     place : {
         type : Schema.Types.ObjectId,
-        ref : 'Place'
+        ref : 'Place',
+        required : true
     },
 },{
     timestamps : true,
@@ -38,4 +40,23 @@ PromoSchema.pre('remove',async function (next) {
         mult.remove();
     });
     next();
+});
+PromoSchema.pre('save', async function (next) {
+    let client = await Department.findById(this.author);
+    let place = await Place.findById(this.place);
+    if (client && place) {
+        client.promos.push(this);
+        place.promos.push(this);
+        client.save();
+        place.save();
+        next();
+    }
+    let msg = 'Not found model:';
+    if (!client){
+        msg += 'Department ';
+    }
+    if (!place){
+        msg += 'Place';
+    }
+    next(new Error(msg));
 });

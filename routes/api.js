@@ -18,6 +18,7 @@ const PlaceTypeMultilangRouter = require('./placeTypeMultilang');
 const NewsMultilangRouter = require('./newsMultilang');
 const BonuseMultilangRouter = require('./bonuseMultilang');
 const EventMultilangRouter = require('./eventMultilang');
+const LocationRouter = require('./location');
 
 const express = require('express');
 const router = express.Router();
@@ -42,5 +43,6 @@ router.use('/placeTypeMultilang', PlaceTypeMultilangRouter);
 router.use('/newsMultilang', NewsMultilangRouter);
 router.use('/bonuseMultilang', BonuseMultilangRouter);
 router.use('/eventMultilang', EventMultilangRouter);
+router.use('/location', LocationRouter);
 
 module.exports = router;

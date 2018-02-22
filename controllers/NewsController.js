@@ -6,7 +6,7 @@ module.exports = {
             let news = await News.find({});
             res.json(news);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getNewsById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let news = await News.findById(newsId);
             res.json(news);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createNews(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let news = await News.create(req.body);
             res.json(news);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateNews(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let news = await News.findByIdAndUpdate(newsId, req.body,{new : true});
             res.json(news);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeNews(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             news = await news.remove();
             res.json(news);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

@@ -6,7 +6,7 @@ module.exports = {
             let drinkApplications = await DrinkApplication.find({});
             res.json(drinkApplications);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getDrinkApplicationById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let drinkApplication = await DrinkApplication.findById(drinkApplicationId);
             res.json(drinkApplication);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createDrinkApplication(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let drinkApplication = await DrinkApplication.create(req.body);
             res.json(drinkApplication);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateDrinkApplication(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let drinkApplication = await DrinkApplication.findByIdAndUpdate(drinkApplicationId, req.body,{new : true});
             res.json(drinkApplication);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeDrinkApplication(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             drinkApplication = await drinkApplication.remove();
             res.json(drinkApplication);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

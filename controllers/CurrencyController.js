@@ -6,7 +6,7 @@ module.exports = {
             let currencies = await Currency.find({});
             res.json(currencys);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getCurrencyById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let currency = await Currency.findById(currencyId);
             res.json(currency);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createCurrency(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let currency = await Currency.create(req.body);
             res.json(currency);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateCurrency(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let currency = await Currency.findByIdAndUpdate(currencyId, req.body,{new : true});
             res.json(currency);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeCurrency(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             currency = await currency.remove();
             res.json(currency);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

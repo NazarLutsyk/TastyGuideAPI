@@ -6,7 +6,7 @@ module.exports = {
             let langs = await Lang.find({});
             res.json(langs);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getLangById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let lang = await Lang.findById(langId);
             res.json(lang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createLang(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let lang = await Lang.create(req.body);
             res.json(lang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateLang(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let lang = await Lang.findByIdAndUpdate(langId, req.body,{new : true});
             res.json(lang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeLang(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             lang = await lang.remove();
             res.json(lang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

@@ -6,7 +6,7 @@ module.exports = {
             let newsMultilangs = await NewsMultilang.find({});
             res.json(newsMultilangs);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getNewsMultilangById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let newsMultilang = await NewsMultilang.findById(newsMultilangId);
             res.json(newsMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createNewsMultilang(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let newsMultilang = await NewsMultilang.create(req.body);
             res.json(newsMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updateNewsMultilang(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let newsMultilang = await NewsMultilang.findByIdAndUpdate(newsMultilangId, req.body,{new : true});
             res.json(newsMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removeNewsMultilang(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             newsMultilang = await newsMultilang.remove();
             res.json(newsMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

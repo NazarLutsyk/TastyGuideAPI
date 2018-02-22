@@ -3,8 +3,14 @@ let Schema = mongoose.Schema;
 let Promo = require('./Promo');
 
 module.exports = Promo.discriminator('Bonuse', new Schema({
-    startDate : Date,
-    endDate : Date,
+    startDate: {
+        type: Date,
+        required: true
+    },
+    endDate: {
+        type: Date,
+        required: true
+    },
 }, {
     discriminatorKey: 'kind'
 }));

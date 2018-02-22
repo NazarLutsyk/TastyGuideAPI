@@ -6,7 +6,7 @@ module.exports = {
             let placeMultilangs = await PlaceMultilang.find({});
             res.json(placeMultilangs);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async getPlaceMultilangById(req, res) {
@@ -15,7 +15,7 @@ module.exports = {
             let placeMultilang = await PlaceMultilang.findById(placeMultilangId);
             res.json(placeMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async createPlaceMultilang(req, res) {
@@ -23,7 +23,7 @@ module.exports = {
             let placeMultilang = await PlaceMultilang.create(req.body);
             res.json(placeMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async updatePlaceMultilang(req, res) {
@@ -32,7 +32,7 @@ module.exports = {
             let placeMultilang = await PlaceMultilang.findByIdAndUpdate(placeMultilangId, req.body,{new : true});
             res.json(placeMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     },
     async removePlaceMultilang(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             placeMultilang = await placeMultilang.remove();
             res.json(placeMultilang);
         } catch (e) {
-            res.json(e);
+            res.send(e.toString());
         }
     }
 };

@@ -3,7 +3,10 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let HashTagSchema = new Schema({
-    value : String,
+    value : {
+        type: String,
+        required : true
+    },
     places : [{
         type : Schema.Types.ObjectId,
         ref: 'Place'

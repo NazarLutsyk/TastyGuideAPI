@@ -5,15 +5,12 @@ let Schema = mongoose.Schema;
 let MultilangSchema = new Schema({
     lang : {
         type : Schema.Types.ObjectId,
-        ref : 'Lang'
+        ref : 'Lang',
+        required : true
     },
 },{
     timestamps : true,
     discriminatorKey : 'kind'
-});
-
-MultilangSchema.pre('find',function () {
-    console.log(arguments);
 });
 
 module.exports = mongoose.model('Multilang',MultilangSchema);
