@@ -1,0 +1,83 @@
+<component name="libraryTable">
+  <library name="Generated files" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/dist/app.js" />
+        <item url="file://$PROJECT_DIR$/dist/controllers/ClientController.js" />
+        <item url="file://$PROJECT_DIR$/dist/controllers/LangController.js" />
+        <item url="file://$PROJECT_DIR$/dist/controllers/PlaceController.js" />
+        <item url="file://$PROJECT_DIR$/dist/controllers/PlaceTypeController.js" />
+        <item url="file://$PROJECT_DIR$/dist/controllers/TopPlaceController.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Bonuse.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/BonuseMultilang.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Client.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Complaint.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Day.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Department.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/DrinkApplication.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Event.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/EventMultilang.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/HashTag.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Multilang.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/News.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/NewsMultilang.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Place.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/PlaceMultilang.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/PlaceType.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/PlaceTypeMultilang.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Promo.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/Rating.js" />
+        <item url="file://$PROJECT_DIR$/dist/models/TopPlace.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/api.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/client.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/index.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/lang.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/place.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/placeType.js" />
+        <item url="file://$PROJECT_DIR$/dist/routes/topPlace.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/dist/models/Application.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Bonus.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Currency.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Lang.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/MajorPlace.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/TypeMultilang.js" />
+      <root url="file://$PROJECT_DIR$/dist/app.js" />
+      <root url="file://$PROJECT_DIR$/dist/controllers/ClientController.js" />
+      <root url="file://$PROJECT_DIR$/dist/controllers/LangController.js" />
+      <root url="file://$PROJECT_DIR$/dist/controllers/PlaceController.js" />
+      <root url="file://$PROJECT_DIR$/dist/controllers/PlaceTypeController.js" />
+      <root url="file://$PROJECT_DIR$/dist/controllers/TopPlaceController.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Bonuse.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/BonuseMultilang.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Client.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Complaint.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Day.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Department.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/DrinkApplication.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Event.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/EventMultilang.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/HashTag.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Multilang.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/News.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/NewsMultilang.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Place.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/PlaceMultilang.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/PlaceType.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/PlaceTypeMultilang.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Promo.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/Rating.js" />
+      <root url="file://$PROJECT_DIR$/dist/models/TopPlace.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/api.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/client.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/index.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/lang.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/place.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/placeType.js" />
+      <root url="file://$PROJECT_DIR$/dist/routes/topPlace.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

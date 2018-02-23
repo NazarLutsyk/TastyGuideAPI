@@ -3,7 +3,16 @@ let EventMultilang = require('../models/EventMultilang');
 module.exports = {
     async getEventMultilangs(req, res) {
         try {
-            let eventMultilangs = await EventMultilang.find({});
+            let eventMultilangQuery = await EventMultilang
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    eventMultilangQuery.populate(populateField);
+                }
+            }
+            let eventMultilangs = await eventMultilangQuery.exec();
             res.json(eventMultilangs);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getEventMultilangById(req, res) {
         let eventMultilangId = req.params.id;
         try {
-            let eventMultilang = await EventMultilang.findById(eventMultilangId);
+            let eventMultilangQuery = EventMultilang.find({_id: eventMultilangId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    eventMultilangQuery.populate(populateField);
+                }
+            }
+            let eventMultilang = await eventMultilangQuery.exec();
             res.json(eventMultilang);
         } catch (e) {
             res.send(e.toString());

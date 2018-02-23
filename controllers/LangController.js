@@ -3,7 +3,16 @@ let Lang = require('../models/Lang');
 module.exports = {
     async getLangs(req, res) {
         try {
-            let langs = await Lang.find({});
+            let langQuery = Lang
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    langQuery.populate(populateField);
+                }
+            }
+            let langs = await langQuery.exec();
             res.json(langs);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getLangById(req, res) {
         let langId = req.params.id;
         try {
-            let lang = await Lang.findById(langId);
+            let langQuery = Lang.find({_id: langId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    langQuery.populate(populateField);
+                }
+            }
+            let lang = await langQuery.exec();
             res.json(lang);
         } catch (e) {
             res.send(e.toString());

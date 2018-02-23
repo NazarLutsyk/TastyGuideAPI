@@ -15,6 +15,10 @@ let PlaceSchema = new Schema({
     image: String,
     averagePrice: String,
     reviews: Number,
+    boss: {
+        type: Schema.Types.ObjectId,
+        ref: 'Client'
+    },
     types: [{
         type: Schema.Types.ObjectId,
         ref: 'PlaceType'
@@ -71,6 +75,8 @@ let Promo = require('./Promo');
 let HashTag = require('./HashTag');
 let Multilang = require('./Multilang');
 let Location = require('./Location');
+let Client = require('./Client');
+let Config = require('../config/config');
 
 PlaceSchema.pre('remove', async function (next) {
     let complaints = await Complaint.find({place: this._id});
@@ -80,7 +86,7 @@ PlaceSchema.pre('remove', async function (next) {
     let topPlaces = await TopPlace.find({place: this._id});
     let days = await Day.find({place: this._id});
     let promos = await Promo.find({place: this._id});
-    let locations = await Location.find({location : this._id});
+    let locations = await Location.find({location: this._id});
 
     complaints.forEach(function (complaint) {
         complaint.remove();
@@ -113,6 +119,10 @@ PlaceSchema.pre('remove', async function (next) {
     await HashTag.update(
         {places: this._id},
         {$pull: {places: this._id}},
+        {multi: true});
+    await Client.update(
+        {ownPlaces: this._id},
+        {$pull: {ownPlaces: this._id}},
         {multi: true});
     next();
 });

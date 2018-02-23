@@ -3,7 +3,16 @@ let News = require('../models/News');
 module.exports = {
     async getNews(req, res) {
         try {
-            let news = await News.find({});
+            let newsQuery = News
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    newsQuery.populate(populateField);
+                }
+            }
+            let news = await newsQuery.exec();
             res.json(news);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getNewsById(req, res) {
         let newsId = req.params.id;
         try {
-            let news = await News.findById(newsId);
+            let newsQuery = News.find({_id: newsId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    newsQuery.populate(populateField);
+                }
+            }
+            let news = await newsQuery.exec();
             res.json(news);
         } catch (e) {
             res.send(e.toString());
@@ -29,7 +45,7 @@ module.exports = {
     async updateNews(req, res) {
         let newsId = req.params.id;
         try {
-            let news = await News.findByIdAndUpdate(newsId, req.body,{new : true});
+            let news = await News.findByIdAndUpdate(newsId, req.body, {new: true});
             res.json(news);
         } catch (e) {
             res.send(e.toString());

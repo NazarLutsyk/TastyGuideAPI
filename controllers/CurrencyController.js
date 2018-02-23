@@ -3,8 +3,17 @@ let Currency = require('../models/Currency');
 module.exports = {
     async getCurrencys(req, res) {
         try {
-            let currencies = await Currency.find({});
-            res.json(currencys);
+            let currencyQuery = Currency
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    currencyQuery.populate(populateField);
+                }
+            }
+            let currencies = await currencyQuery.exec();
+            res.json(currencies);
         } catch (e) {
             res.send(e.toString());
         }
@@ -12,7 +21,14 @@ module.exports = {
     async getCurrencyById(req, res) {
         let currencyId = req.params.id;
         try {
-            let currency = await Currency.findById(currencyId);
+            let currenccyQuery = Currency.find({_id: currencyId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    currenccyQuery.populate(populateField);
+                }
+            }
+            let currency = await currenccyQuery.exec();
             res.json(currency);
         } catch (e) {
             res.send(e.toString());

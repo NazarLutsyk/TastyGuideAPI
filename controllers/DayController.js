@@ -3,7 +3,16 @@ let Day = require('../models/Day');
 module.exports = {
     async getDays(req, res) {
         try {
-            let days = await Day.find({});
+            let dayQuery = Day
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    dayQuery.populate(populateField);
+                }
+            }
+            let days = await dayQuery.exec();
             res.json(days);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getDayById(req, res) {
         let dayId = req.params.id;
         try {
-            let day = await Day.findById(dayId);
+            let dayQuery = Day.find({_id: dayId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    dayQuery.populate(populateField);
+                }
+            }
+            let day = await dayQuery.exec();
             res.json(day);
         } catch (e) {
             res.send(e.toString());

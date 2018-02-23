@@ -3,7 +3,16 @@ let Rating = require('../models/Rating');
 module.exports = {
     async getRatings(req, res) {
         try {
-            let ratings = await Rating.find({});
+            let ratingQuery = Rating
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    ratingQuery.populate(populateField);
+                }
+            }
+            let ratings = await ratingQuery.exec();
             res.json(ratings);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getRatingById(req, res) {
         let ratingId = req.params.id;
         try {
-            let rating = await Rating.findById(ratingId);
+            let ratingQuery = Rating.find({_id: ratingId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    ratingQuery.populate(populateField);
+                }
+            }
+            let rating = await ratingQuery.exec();
             res.json(rating);
         } catch (e) {
             res.send(e.toString());

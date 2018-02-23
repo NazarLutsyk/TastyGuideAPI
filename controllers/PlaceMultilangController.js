@@ -3,7 +3,16 @@ let PlaceMultilang = require('../models/PlaceMultilang');
 module.exports = {
     async getPlaceMultilangs(req, res) {
         try {
-            let placeMultilangs = await PlaceMultilang.find({});
+            let placeMultilangQuery = PlaceMultilang
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    placeMultilangQuery.populate(populateField);
+                }
+            }
+            let placeMultilangs = await placeMultilangQuery.exec();
             res.json(placeMultilangs);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getPlaceMultilangById(req, res) {
         let placeMultilangId = req.params.id;
         try {
-            let placeMultilang = await PlaceMultilang.findById(placeMultilangId);
+            let placeMultilangQuery = PlaceMultilang.find({_id: placeMultilangId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    placeMultilangQuery.populate(populateField);
+                }
+            }
+            let placeMultilang = await placeMultilangQuery.exec();
             res.json(placeMultilang);
         } catch (e) {
             res.send(e.toString());

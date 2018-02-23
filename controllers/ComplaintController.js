@@ -3,7 +3,16 @@ let Complaint = require('../models/Complaint');
 module.exports = {
     async getComplaints(req, res) {
         try {
-            let complaints = await Complaint.find({});
+            let complaintQuery = Complaint
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    complaintQuery.populate(populateField);
+                }
+            }
+            let complaints = await complaintQuery.exec();
             res.json(complaints);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getComplaintById(req, res) {
         let complaintId = req.params.id;
         try {
-            let complaint = await Complaint.findById(complaintId);
+            let complaintQuery = Complaint.find({_id: complaintId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    complaintQuery.populate(populateField);
+                }
+            }
+            let complaint = await complaintQuery.exec();
             res.json(complaint);
         } catch (e) {
             res.send(e.toString());

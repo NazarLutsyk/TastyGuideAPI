@@ -3,8 +3,17 @@ let BonuseMultilang = require('../models/BonuseMultilang');
 module.exports = {
     async getBonuseMultilangs(req, res) {
         try {
-            let bonuseMultilangs = await BonuseMultilang.find({});
-            res.json(bonuseMultilangs);
+            let bonuseMultilangQuery = BonuseMultilang
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    bonuseMultilangQuery.populate(populateField);
+                }
+            }
+            let bonuseMultilang = await bonuseMultilangQuery.exec();
+            res.json(bonuseMultilang);
         } catch (e) {
             res.send(e.toString());
         }
@@ -12,7 +21,14 @@ module.exports = {
     async getBonuseMultilangById(req, res) {
         let bonuseMultilangId = req.params.id;
         try {
-            let bonuseMultilang = await BonuseMultilang.findById(bonuseMultilangId);
+            let bonuseMultilangQuery = BonuseMultilang.find({_id: bonuseMultilangId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    bonuseMultilangQuery.populate(populateField);
+                }
+            }
+            let bonuseMultilang = await bonuseMultilangQuery.exec();
             res.json(bonuseMultilang);
         } catch (e) {
             res.send(e.toString());

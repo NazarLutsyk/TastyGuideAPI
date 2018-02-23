@@ -3,7 +3,16 @@ let Location = require('../models/Location');
 module.exports = {
     async getLocations(req, res) {
         try {
-            let locations = await Location.find({});
+            let locationQuery = Location
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    locationQuery.populate(populateField);
+                }
+            }
+            let locations = await locationQuery.exec();
             res.json(locations);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getLocationById(req, res) {
         let locationId = req.params.id;
         try {
-            let location = await Location.findById(locationId);
+            let locationQuery = Location.find({_id: locationId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    locationQuery.populate(populateField);
+                }
+            }
+            let location = await locationQuery.exec();
             res.json(location);
         } catch (e) {
             res.send(e.toString());

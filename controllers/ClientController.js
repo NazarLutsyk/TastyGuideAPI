@@ -3,7 +3,16 @@ let Client = require('../models/Client');
 module.exports = {
     async getClients(req, res) {
         try {
-            let clients = await Client.find({});
+            let clientsQuery = Client
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    clientsQuery.populate(populateField);
+                }
+            }
+            let clients = await clientsQuery.exec();
             res.json(clients);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getClientById(req, res) {
         let clientId = req.params.id;
         try {
-            let client = await Client.findById(clientId);
+            let clientQuery = Client.find({_id: clientId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    clientQuery.populate(populateField);
+                }
+            }
+            let client = await clientQuery.exec();
             res.json(client);
         } catch (e) {
             res.send(e.toString());
@@ -29,7 +45,7 @@ module.exports = {
     async updateClient(req, res) {
         let clientId = req.params.id;
         try {
-            let updatedClient = await Client.findByIdAndUpdate(clientId, req.body,{new : true});
+            let updatedClient = await Client.findByIdAndUpdate(clientId, req.body, {new: true});
             res.json(updatedClient);
         } catch (e) {
             res.send(e.toString());

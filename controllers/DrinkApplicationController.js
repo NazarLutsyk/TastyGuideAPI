@@ -3,7 +3,16 @@ let DrinkApplication = require('../models/DrinkApplication');
 module.exports = {
     async getDrinkApplications(req, res) {
         try {
-            let drinkApplications = await DrinkApplication.find({});
+            let drinkApplicationsQuery = DrinkApplication
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    drinkApplicationsQuery.populate(populateField);
+                }
+            }
+            let drinkApplications = await drinkApplicationsQuery.exec();
             res.json(drinkApplications);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getDrinkApplicationById(req, res) {
         let drinkApplicationId = req.params.id;
         try {
-            let drinkApplication = await DrinkApplication.findById(drinkApplicationId);
+            let drinkApplicationQuery = DrinkApplication.find({_id: drinkApplicationId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    drinkApplicationQuery.populate(populateField);
+                }
+            }
+            let drinkApplication = await drinkApplicationQuery.exec();
             res.json(drinkApplication);
         } catch (e) {
             res.send(e.toString());

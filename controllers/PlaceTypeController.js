@@ -3,7 +3,16 @@ let PlaceType = require('../models/PlaceType');
 module.exports = {
     async getPlaceTypes(req, res) {
         try {
-            let placeTypes = await PlaceType.find({});
+            let placeTypeQuery = PlaceType
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    placeTypeQuery.populate(populateField);
+                }
+            }
+            let placeTypes = await placeTypeQuery.exec();
             res.json(placeTypes);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getPlaceTypeById(req, res) {
         let placeTypeId = req.params.id;
         try {
-            let placeType = await PlaceType.findById(placeTypeId).populate('multilang').exec();
+            let placeTypeQuery = PlaceType.find({_id: placeTypeId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    placeTypeQuery.populate(populateField);
+                }
+            }
+            let placeType = await placeTypeQuery.exec();
             res.json(placeType);
         } catch (e) {
             res.send(e.toString());

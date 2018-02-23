@@ -3,7 +3,16 @@ let Event = require('../models/Event');
 module.exports = {
     async getEvents(req, res) {
         try {
-            let events = await Event.find({});
+            let eventQuery = Event
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    eventQuery.populate(populateField);
+                }
+            }
+            let events = await eventQuery.exec();
             res.json(events);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getEventById(req, res) {
         let eventId = req.params.id;
         try {
-            let event = await Event.findById(eventId);
+            let eventQuery = Event.find({_id: eventId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    eventQuery.populate(populateField);
+                }
+            }
+            let event = await eventQuery.exec();
             res.json(event);
         } catch (e) {
             res.send(e.toString());

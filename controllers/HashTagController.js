@@ -3,7 +3,16 @@ let HashTag = require('../models/HashTag');
 module.exports = {
     async getHashTags(req, res) {
         try {
-            let hashTags = await HashTag.find({});
+            let hashTagQuery = HashTag
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    hashTagQuery.populate(populateField);
+                }
+            }
+            let hashTags = await hashTagQuery.exec();
             res.json(hashTags);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getHashTagById(req, res) {
         let hashTagId = req.params.id;
         try {
-            let hashTag = await HashTag.findById(hashTagId);
+            let hashTagQuery = HashTag.find({_id: hashTagId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    hashTagQuery.populate(populateField);
+                }
+            }
+            let hashTag = await hashTagQuery.exec();
             res.json(hashTag);
         } catch (e) {
             res.send(e.toString());

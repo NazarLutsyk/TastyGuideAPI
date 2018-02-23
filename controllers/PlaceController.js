@@ -3,7 +3,16 @@ let Place = require('../models/Place');
 module.exports = {
     async getPlaces(req, res) {
         try {
-            let places = await Place.find({});
+            let placeQuery = Place
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    placeQuery.populate(populateField);
+                }
+            }
+            let places = await placeQuery.exec();
             res.json(places);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getPlaceById(req, res) {
         let placeId = req.params.id;
         try {
-            let place = await Place.findById(placeId).populate();
+            let PlaceQuery = Place.find({_id: placeId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    PlaceQuery.populate(populateField);
+                }
+            }
+            let place = await PlaceQuery.exec();
             res.json(place);
         } catch (e) {
             res.send(e.toString());

@@ -35,6 +35,10 @@ let ClientSchema = new Schema({
         type : String,
         default : config.ROLES.USER_ROLE
     }],
+    ownPlaces : [{
+        type : Schema.Types.ObjectId,
+        ref : 'Place'
+    }],
     drinkApplications : [{
         type : Schema.Types.ObjectId,
         ref : 'DrinkApplication'
@@ -62,6 +66,7 @@ module.exports = mongoose.model('Client',ClientSchema);
 
 let Complaint = require('./Complaint');
 let DrinkApplication = require('./DrinkApplication');
+let Place = require('./Place');
 let Rating = require('./Rating');
 let Department = require('./Department');
 ClientSchema.pre('remove', async function (next) {
@@ -69,6 +74,7 @@ ClientSchema.pre('remove', async function (next) {
     let drinkApplications = await DrinkApplication.find({client : this._id});
     let ratings = await Rating.find({client : this._id});
     let departments = await Department.find({client : this._id});
+    let ownPlaces = await Place.find({boss : this._id});
 
     complaints.forEach(function (complaint){
         complaint.remove();
@@ -81,6 +87,10 @@ ClientSchema.pre('remove', async function (next) {
     });
     departments.forEach(function (department){
         department.remove();
+    });
+    ownPlaces.forEach(function (place){
+        place.boss = null;
+        place.save();
     });
     next();
 });

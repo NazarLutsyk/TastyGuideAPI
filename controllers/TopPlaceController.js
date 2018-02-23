@@ -3,7 +3,16 @@ let TopPlace = require('../models/TopPlace');
 module.exports = {
     async getTopPlaces(req, res) {
         try {
-            let topPlaces = await TopPlace.find({});
+            let topPlaceQuery = TopPlace
+                .find(req.query.query)
+                .sort(req.query.sort)
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    topPlaceQuery.populate(populateField);
+                }
+            }
+            let topPlaces = await topPlaceQuery.exec();
             res.json(topPlaces);
         } catch (e) {
             res.send(e.toString());
@@ -12,7 +21,14 @@ module.exports = {
     async getTopPlaceById(req, res) {
         let topPlaceId = req.params.id;
         try {
-            let topPlace = await TopPlace.findById(topPlaceId);
+            let topPlaceQuery = TopPlace.find({_id: topPlaceId})
+                .select(req.query.fields);
+            if (req.query.populate) {
+                for (let populateField of req.query.populate) {
+                    topPlaceQuery.populate(populateField);
+                }
+            }
+            let topPlace = await topPlaceQuery.exec();
             res.json(topPlace);
         } catch (e) {
             res.send(e.toString());

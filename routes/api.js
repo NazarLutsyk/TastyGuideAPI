@@ -19,10 +19,34 @@ const NewsMultilangRouter = require('./newsMultilang');
 const BonuseMultilangRouter = require('./bonuseMultilang');
 const EventMultilangRouter = require('./eventMultilang');
 const LocationRouter = require('./location');
+let QueryHelper = require('../helpers/queryHelper');
 
 const express = require('express');
 const router = express.Router();
 
+router.use(function (req, res, next) {
+    if (req.method.toLocaleLowerCase() === 'get') {
+        try {
+            let fields = req.query.fields;
+            let sort = req.query.sort;
+            let query = req.query.query;
+            let populate = req.query.populate;
+            req.query.fields = fields ? QueryHelper.toSelect(fields) : {};
+            req.query.sort = sort ? QueryHelper.toSort(sort) : {};
+            req.query.query = query ? JSON.parse(query) : {};
+            req.query.populate = populate ? QueryHelper.toPopulate(populate) : '';
+            console.log(req.query.fields);
+            console.log(req.query.sort);
+            console.log(req.query.query);
+            console.log(req.query.populate);
+            return next();
+        } catch (e) {
+            return next(e);
+        }
+    }
+    return next();
+
+});
 router.use('/place', PlaceRouter);
 router.use('/client', ClientRouter);
 router.use('/lang', LangRouter);
