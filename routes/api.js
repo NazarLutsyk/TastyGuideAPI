@@ -19,13 +19,15 @@ const NewsMultilangRouter = require('./newsMultilang');
 const BonuseMultilangRouter = require('./bonuseMultilang');
 const EventMultilangRouter = require('./eventMultilang');
 const LocationRouter = require('./location');
+const RelationRouter = require('./relation');
+const MessageRouter = require('./message');
 let QueryHelper = require('../helpers/queryHelper');
 
 const express = require('express');
 const router = express.Router();
 
 router.use(function (req, res, next) {
-    if (req.method.toLocaleLowerCase() === 'get') {
+    if (req.method.toLowerCase() === 'get') {
         try {
             let fields = req.query.fields;
             let sort = req.query.sort;
@@ -47,26 +49,28 @@ router.use(function (req, res, next) {
     return next();
 
 });
-router.use('/place', PlaceRouter);
-router.use('/client', ClientRouter);
-router.use('/lang', LangRouter);
-router.use('/placeType', PlaceTypeRouter);
-router.use('/topPlace', TopPlaceRouter);
-router.use('/hashTag', HashTagRouter);
-router.use('/department', DepartmentRouter);
-router.use('/rating', RatingRouter);
-router.use('/drinkApplication', DrinkApplicationRouter);
-router.use('/currency', CurrencyRouter);
-router.use('/complaint', ComplaintRouter);
-router.use('/day', DayRouter);
+router.use('/places', PlaceRouter);
+router.use('/clients', ClientRouter);
+router.use('/langs', LangRouter);
+router.use('/placeTypes', PlaceTypeRouter);
+router.use('/topPlaces', TopPlaceRouter);
+router.use('/hashTags', HashTagRouter);
+router.use('/departments', DepartmentRouter);
+router.use('/ratings', RatingRouter);
+router.use('/drinkApplications', DrinkApplicationRouter);
+router.use('/currencies', CurrencyRouter);
+router.use('/complaints', ComplaintRouter);
+router.use('/days', DayRouter);
 router.use('/news', NewsRouter);
-router.use('/bonuse', BonuseRouter);
-router.use('/event', EventRouter);
-router.use('/placeMultilang', PlaceMultilangRouter);
-router.use('/placeTypeMultilang', PlaceTypeMultilangRouter);
-router.use('/newsMultilang', NewsMultilangRouter);
-router.use('/bonuseMultilang', BonuseMultilangRouter);
-router.use('/eventMultilang', EventMultilangRouter);
-router.use('/location', LocationRouter);
+router.use('/bonuses', BonuseRouter);
+router.use('/events', EventRouter);
+router.use('/placeMultilangs', PlaceMultilangRouter);
+router.use('/placeTypeMultilangs', PlaceTypeMultilangRouter);
+router.use('/newsMultilangs', NewsMultilangRouter);
+router.use('/bonuseMultilangs', BonuseMultilangRouter);
+router.use('/eventMultilangs', EventMultilangRouter);
+router.use('/locations', LocationRouter);
+router.use('/relations', RelationRouter);
+router.use('/messages', MessageRouter);
 
 module.exports = router;

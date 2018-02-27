@@ -17,6 +17,9 @@ let PromoSchema = new Schema({
         ref : 'Place',
         required : true
     },
+    image  : {
+        type : String
+    }
 },{
     timestamps : true,
     discriminatorKey : 'kind'

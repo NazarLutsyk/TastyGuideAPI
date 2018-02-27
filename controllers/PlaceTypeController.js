@@ -15,7 +15,7 @@ module.exports = {
             let placeTypes = await placeTypeQuery.exec();
             res.json(placeTypes);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getPlaceTypeById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let placeType = await placeTypeQuery.exec();
             res.json(placeType);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createPlaceType(req, res) {
         try {
             let placeType = await PlaceType.create(req.body);
-            res.json(placeType);
+            res.status(201).json(placeType);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updatePlaceType(req, res) {
         let placeTypeId = req.params.id;
         try {
             let placeType = await PlaceType.findByIdAndUpdate(placeTypeId, req.body,{new : true});
-            res.json(placeType);
+            res.status(201).json(placeType);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removePlaceType(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let placeType = await PlaceType.findById(placeTypeId);
             placeType = await placeType.remove();
-            res.json(placeType);
+            res.status(204).json(placeType);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

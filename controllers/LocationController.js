@@ -15,7 +15,7 @@ module.exports = {
             let locations = await locationQuery.exec();
             res.json(locations);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getLocationById(req, res) {
@@ -31,33 +31,33 @@ module.exports = {
             let location = await locationQuery.exec();
             res.json(location);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createLocation(req, res) {
         try {
             let location = await Location.create(req.body);
-            res.json(location);
+            res.status(201).json(location);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateLocation(req, res) {
         let locationId = req.params.id;
         try {
             let location = await Location.findByIdAndUpdate(locationId, req.body,{new : true});
-            res.json(location);
+            res.status(201).json(location);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeLocation(req, res) {
         let locationId = req.params.id;
         try {
             let location = await Location.findByIdAndRemove(locationId);
-            res.json(location);
+            res.status(204).json(location);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

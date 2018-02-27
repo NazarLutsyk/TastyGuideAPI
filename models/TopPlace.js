@@ -5,7 +5,13 @@ let Schema = mongoose.Schema;
 let TopPlaceSchema = new Schema({
     startDate : {
         type: Date,
-        required : true
+        required : true,
+        validate : {
+            validator : function (){
+                return this.startDate < this.endDate;
+            },
+            message : 'Start date must be smaller than end date!'
+        }
     },
     endDate : {
         type: Date,
@@ -24,25 +30,3 @@ let TopPlaceSchema = new Schema({
     timestamps : true,
 });
 module.exports = mongoose.model('TopPlace',TopPlaceSchema);
-
-let Place = require('./Place');
-TopPlaceSchema.pre('remove',async function (next) {
-    await Place.update(
-        {tops: this._id},
-        {$pull: {tops: this._id}},
-        {multi: true});
-    next();
-});
-TopPlaceSchema.pre('save', async function (next) {
-    let place = await Place.findById(this.place);
-    if (place) {
-        place.tops.push(this);
-        place.save();
-        next();
-    }
-    let msg = 'Not found model:';
-    if (!place){
-        msg += 'Place';
-    }
-    next(new Error(msg));
-});

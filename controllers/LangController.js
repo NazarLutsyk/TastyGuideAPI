@@ -15,7 +15,7 @@ module.exports = {
             let langs = await langQuery.exec();
             res.json(langs);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getLangById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let lang = await langQuery.exec();
             res.json(lang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createLang(req, res) {
         try {
             let lang = await Lang.create(req.body);
-            res.json(lang);
+            res.status(201).json(lang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateLang(req, res) {
         let langId = req.params.id;
         try {
             let lang = await Lang.findByIdAndUpdate(langId, req.body,{new : true});
-            res.json(lang);
+            res.status(201).json(lang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeLang(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let lang = await Lang.findById(langId);
             lang = await lang.remove();
-            res.json(lang);
+            res.status(204).json(lang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

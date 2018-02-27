@@ -10,5 +10,4 @@ router.route('/:id')
     .get(ClientController.getClientById)
     .put(ClientController.updateClient)
     .delete(ClientController.removeClient);
-
 module.exports = router;

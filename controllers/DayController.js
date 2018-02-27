@@ -15,7 +15,7 @@ module.exports = {
             let days = await dayQuery.exec();
             res.json(days);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getDayById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let day = await dayQuery.exec();
             res.json(day);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createDay(req, res) {
         try {
             let day = await Day.create(req.body);
-            res.json(day);
+            res.status(201).json(day);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateDay(req, res) {
         let dayId = req.params.id;
         try {
             let day = await Day.findByIdAndUpdate(dayId, req.body,{new : true});
-            res.json(day);
+            res.status(201).json(day);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeDay(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let day = await Day.findById(dayId);
             day = await day.remove();
-            res.json(day);
+            res.status(204).json(day);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

@@ -15,7 +15,7 @@ module.exports = {
             let eventMultilangs = await eventMultilangQuery.exec();
             res.json(eventMultilangs);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getEventMultilangById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let eventMultilang = await eventMultilangQuery.exec();
             res.json(eventMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createEventMultilang(req, res) {
         try {
             let eventMultilang = await EventMultilang.create(req.body);
-            res.json(eventMultilang);
+            res.status(201).json(eventMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateEventMultilang(req, res) {
         let eventMultilangId = req.params.id;
         try {
             let eventMultilang = await EventMultilang.findByIdAndUpdate(eventMultilangId, req.body,{new : true});
-            res.json(eventMultilang);
+            res.status(201).json(eventMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeEventMultilang(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let eventMultilang = await EventMultilang.findById(eventMultilangId);
             eventMultilang = await eventMultilang.remove();
-            res.json(eventMultilang);
+            res.status(204).json(eventMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

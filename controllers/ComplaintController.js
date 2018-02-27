@@ -15,7 +15,7 @@ module.exports = {
             let complaints = await complaintQuery.exec();
             res.json(complaints);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getComplaintById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let complaint = await complaintQuery.exec();
             res.json(complaint);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createComplaint(req, res) {
         try {
             let complaint = await Complaint.create(req.body);
-            res.json(complaint);
+            res.status(201).json(complaint);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateComplaint(req, res) {
         let complaintId = req.params.id;
         try {
             let complaint = await Complaint.findByIdAndUpdate(complaintId, req.body,{new : true});
-            res.json(complaint);
+            res.status(201).json(complaint);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeComplaint(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let complaint = await Complaint.findById(complaintId);
             complaint = await complaint.remove();
-            res.json(complaint);
+            res.status(204).json(complaint);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

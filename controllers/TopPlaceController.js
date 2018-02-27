@@ -15,7 +15,7 @@ module.exports = {
             let topPlaces = await topPlaceQuery.exec();
             res.json(topPlaces);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getTopPlaceById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let topPlace = await topPlaceQuery.exec();
             res.json(topPlace);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createTopPlace(req, res) {
         try {
             let topPlace = await TopPlace.create(req.body);
-            res.json(topPlace);
+            res.status(201).json(topPlace);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateTopPlace(req, res) {
         let topPlaceId = req.params.id;
         try {
             let topPlace = await TopPlace.findByIdAndUpdate(topPlaceId, req.body,{new : true});
-            res.json(topPlace);
+            res.status(201).json(topPlace);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeTopPlace(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let topPlace = await TopPlace.findById(topPlaceId);
             topPlace = await topPlace.remove();
-            res.json(topPlace);
+            res.status(204).json(topPlace);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

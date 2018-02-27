@@ -15,7 +15,7 @@ module.exports = {
             let clients = await clientsQuery.exec();
             res.json(clients);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getClientById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let client = await clientQuery.exec();
             res.json(client);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createClient(req, res) {
         try {
             let client = await Client.create(req.body);
-            res.json(client);
+            res.status(201).json(client);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateClient(req, res) {
         let clientId = req.params.id;
         try {
             let updatedClient = await Client.findByIdAndUpdate(clientId, req.body, {new: true});
-            res.json(updatedClient);
+            res.status(201).json(updatedClient);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeClient(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let removedClient = await Client.findById(clientId);
             removedClient = await removedClient.remove();
-            res.json(removedClient);
+            res.status(204).json(removedClient);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

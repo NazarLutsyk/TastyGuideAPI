@@ -15,7 +15,7 @@ module.exports = {
             let news = await newsQuery.exec();
             res.json(news);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getNewsById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let news = await newsQuery.exec();
             res.json(news);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createNews(req, res) {
         try {
             let news = await News.create(req.body);
-            res.json(news);
+            res.status(201).json(news);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateNews(req, res) {
         let newsId = req.params.id;
         try {
             let news = await News.findByIdAndUpdate(newsId, req.body, {new: true});
-            res.json(news);
+            res.status(201).json(news);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeNews(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let news = await News.findById(newsId);
             news = await news.remove();
-            res.json(news);
+            res.status(204).json(news);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

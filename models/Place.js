@@ -3,18 +3,47 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let PlaceSchema = new Schema({
-    ratingScore: Number,
+    ratingScore: Number,//todo get set
     phone: {
         type: String,
-        required: true
+        required: true,
+        match: /^(1[ \-\+]{0,3}|\+1[ -\+]{0,3}|\+1|\+)?((\(\+?1-[2-9][0-9]{1,2}\))|(\(\+?[2-8][0-9][0-9]\))|(\(\+?[1-9][0-9]\))|(\(\+?[17]\))|(\([2-9][2-9]\))|([ \-\.]{0,3}[0-9]{2,4}))?([ \-\.][0-9])?([ \-\.]{0,3}[0-9]{2,4}){2,3}$/
+    },
+    email: {
+        type: String,
+        required: true,
+        match: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     },
     locations: [{
         type: Schema.Types.ObjectId,
         ref: 'Location',
     }],
     image: String,
-    averagePrice: String,
-    reviews: Number,
+    averagePrice: {
+        type: Number,
+        default: 0,
+        validate: {
+            validator: function () {
+                return this.averagePrice >= 0;
+            },
+            message: 'Min avaragePrive eq 0'
+        }
+    },
+    reviews: {
+        type: Number,
+        default: 0,
+        validate: {
+            validator: function () {
+                return this.reviews >= 0;
+            },
+            message: 'Min reviews eq 0'
+        }
+    },
+    allowed : {
+        type : Boolean,
+        required : true,
+        default : false,
+    },
     boss: {
         type: Schema.Types.ObjectId,
         ref: 'Client'
@@ -125,4 +154,29 @@ PlaceSchema.pre('remove', async function (next) {
         {$pull: {ownPlaces: this._id}},
         {multi: true});
     next();
+});
+
+PlaceSchema.pre('save', async function (next) {
+    if (this.boss) {
+        let boss = await Client.findById(this.boss);
+        if (boss) {
+            boss.ownPlaces.push(this);
+            boss.save();
+        } else {
+            return next(new Error('Model not found: Client'));
+        }
+    }
+    if (this.hashTags) {
+        let hashTags = await HashTag.find({_id: this.hashTags});
+        if (hashTags) {
+            let self = this;
+            hashTags.forEach(function (hashTag) {
+                hashTag.places.push(self);
+                hashTag.save();
+            });
+        } else {
+            return next(new Error('Model not found: HashTag'));
+        }
+    }
+    return next();
 });

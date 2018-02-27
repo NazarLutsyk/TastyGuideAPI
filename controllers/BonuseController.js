@@ -15,7 +15,7 @@ module.exports = {
             let bonuses = await bonuseQuery.exec();
             res.json(bonuses);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getBonuseById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let bonuse = await bonuseQuery.exec();
             res.json(bonuse);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createBonuse(req, res) {
         try {
             let bonuse = await Bonuse.create(req.body);
-            res.json(bonuse);
+            res.status(201).json(bonuse);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateBonuse(req, res) {
         let bonuseId = req.params.id;
         try {
             let bonuse = await Bonuse.findByIdAndUpdate(bonuseId, req.body, {new: true});
-            res.json(bonuse);
+            res.status(201).json(bonuse);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeBonuse(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let bonuse = await Bonuse.findById(bonuseId);
             bonuse = await bonuse.remove();
-            res.json(bonuse);
+            res.status(204).json(bonuse);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

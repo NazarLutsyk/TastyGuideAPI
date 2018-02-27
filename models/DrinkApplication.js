@@ -13,7 +13,13 @@ let DrinkApplicationSchema = new Schema({
     },
     budged: {
         type: String,
-        default: 0
+        default: 0,
+        validate : {
+            validator : function (){
+                return this.budged >= 0;
+            },
+            message : 'Min budget eq 0'
+        }
     },
     date: {
         type: Date,

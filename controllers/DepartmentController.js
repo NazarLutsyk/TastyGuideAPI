@@ -15,7 +15,7 @@ module.exports = {
             let departments = await departmentQuery.exec();
             res.json(departments);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getDepartmentById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let department = await departmentQuery.exec();
             res.json(department);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createDepartment(req, res) {
         try {
             let department = await Department.create(req.body);
-            res.json(department);
+            res.status(201).json(department);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateDepartment(req, res) {
         let departmentId = req.params.id;
         try {
             let department = await Department.findByIdAndUpdate(departmentId, req.body,{new : true});
-            res.json(department);
+            res.status(201).json(department);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeDepartment(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let department = await Department.findById(departmentId);
             department = await department.remove();
-            res.json(department);
+            res.status(204).json(department);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

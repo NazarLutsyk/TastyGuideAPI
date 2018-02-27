@@ -15,7 +15,7 @@ module.exports = {
             let newsMultilangs = await newsMultilangQuery.exec();
             res.json(newsMultilangs);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getNewsMultilangById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let newsMultilang = await newsMultilangQuery.exec();
             res.json(newsMultilang);
         }catch (e){
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createNewsMultilang(req, res) {
         try {
             let newsMultilang = await NewsMultilang.create(req.body);
-            res.json(newsMultilang);
+            res.status(201).json(newsMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateNewsMultilang(req, res) {
         let newsMultilangId = req.params.id;
         try {
             let newsMultilang = await NewsMultilang.findByIdAndUpdate(newsMultilangId, req.body, {new: true});
-            res.json(newsMultilang);
+            res.status(201).json(newsMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeNewsMultilang(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let newsMultilang = await NewsMultilang.findById(newsMultilangId);
             newsMultilang = await newsMultilang.remove();
-            res.json(newsMultilang);
+            res.status(204).json(newsMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

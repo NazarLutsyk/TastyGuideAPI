@@ -9,7 +9,13 @@ let DaySchema = new Schema({
     },
     startTime : {
         type : Date,
-        required : true
+        required : true,
+        validate : {
+            validator : function (){
+                return this.startTime < this.endTime;
+            },
+            message : 'Start date must be smaller than end date!'
+        }
     },
     endTime : {
         type : Date,

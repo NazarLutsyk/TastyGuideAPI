@@ -5,9 +5,20 @@ let Schema = mongoose.Schema;
 let RatingSchema = new Schema({
     value: {
         type: Number,
-        required: true
+        required: true,
+        default : 0,
+        validate: {
+            validator: function () {
+                return this.value >= 0 && this.value <= 5;
+            },
+            message: 'Reviews[min = 0,max = 5]'
+        }
     },
     comment: String,
+    price : {
+        type : Number
+    },
+
     client: {
         type: Schema.Types.ObjectId,
         ref: 'Client',

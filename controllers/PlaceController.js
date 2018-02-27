@@ -15,7 +15,7 @@ module.exports = {
             let places = await placeQuery.exec();
             res.json(places);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getPlaceById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let place = await PlaceQuery.exec();
             res.json(place);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createPlace(req, res) {
         try {
             let place = await Place.create(req.body);
-            res.json(place);
+            res.status(201).json(place);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updatePlace(req, res) {
         let placeId = req.params.id;
         try {
             let updatedPlace = await Place.findByIdAndUpdate(placeId, req.body,{new : true});
-            res.json(updatedPlace);
+            res.status(201).json(updatedPlace);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removePlace(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let removedPlace = await Place.findById(placeId);
             removedPlace = await removedPlace.remove();
-            res.json(removedPlace);
+            res.status(204).json(removedPlace);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

@@ -15,7 +15,7 @@ module.exports = {
             let placeTypeMultilangs = await placeTypeMultilangQuery.exec();
             res.json(placeTypeMultilangs);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getPlaceTypeMultilangById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let placeTypeMultilang = await placeTypeMultilangQuery.exec();
             res.json(placeTypeMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createPlaceTypeMultilang(req, res) {
         try {
             let placeTypeMultilang = await PlaceTypeMultilang.create(req.body);
-            res.json(placeTypeMultilang);
+            res.status(201).json(placeTypeMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updatePlaceTypeMultilang(req, res) {
         let placeTypeMultilangId = req.params.id;
         try {
             let placeTypeMultilang = await PlaceTypeMultilang.findByIdAndUpdate(placeTypeMultilangId, req.body,{new : true});
-            res.json(placeTypeMultilang);
+            res.status(201).json(placeTypeMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removePlaceTypeMultilang(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let placeTypeMultilang = await PlaceTypeMultilang.findById(placeTypeMultilangId);
             placeTypeMultilang = await placeTypeMultilang.remove();
-            res.json(placeTypeMultilang);
+            res.status(204).json(placeTypeMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

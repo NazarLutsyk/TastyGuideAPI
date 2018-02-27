@@ -15,7 +15,7 @@ module.exports = {
             let bonuseMultilang = await bonuseMultilangQuery.exec();
             res.json(bonuseMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getBonuseMultilangById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let bonuseMultilang = await bonuseMultilangQuery.exec();
             res.json(bonuseMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createBonuseMultilang(req, res) {
         try {
             let bonuseMultilang = await BonuseMultilang.create(req.body);
-            res.json(bonuseMultilang);
+            res.status(201).json(bonuseMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateBonuseMultilang(req, res) {
         let bonuseMultilangId = req.params.id;
         try {
             let bonuseMultilang = await BonuseMultilang.findByIdAndUpdate(bonuseMultilangId, req.body,{new : true});
-            res.json(bonuseMultilang);
+            res.status(201).json(bonuseMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeBonuseMultilang(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let bonuseMultilang = await BonuseMultilang.findById(bonuseMultilangId);
             bonuseMultilang = await bonuseMultilang.remove();
-            res.json(bonuseMultilang);
+            res.status(204).json(bonuseMultilang);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

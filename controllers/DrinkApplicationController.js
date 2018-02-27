@@ -15,7 +15,7 @@ module.exports = {
             let drinkApplications = await drinkApplicationsQuery.exec();
             res.json(drinkApplications);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async getDrinkApplicationById(req, res) {
@@ -31,24 +31,24 @@ module.exports = {
             let drinkApplication = await drinkApplicationQuery.exec();
             res.json(drinkApplication);
         } catch (e) {
-            res.send(e.toString());
+            res.status(404).send(e.toString());
         }
     },
     async createDrinkApplication(req, res) {
         try {
             let drinkApplication = await DrinkApplication.create(req.body);
-            res.json(drinkApplication);
+            res.status(201).json(drinkApplication);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async updateDrinkApplication(req, res) {
         let drinkApplicationId = req.params.id;
         try {
             let drinkApplication = await DrinkApplication.findByIdAndUpdate(drinkApplicationId, req.body,{new : true});
-            res.json(drinkApplication);
+            res.status(201).json(drinkApplication);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeDrinkApplication(req, res) {
@@ -56,9 +56,9 @@ module.exports = {
         try {
             let drinkApplication = await DrinkApplication.findById(drinkApplicationId);
             drinkApplication = await drinkApplication.remove();
-            res.json(drinkApplication);
+            res.status(204).json(drinkApplication);
         } catch (e) {
-            res.send(e.toString());
+            res.status(400).send(e.toString());
         }
     }
 };

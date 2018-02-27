@@ -1,68 +1,84 @@
 let mongoose = require('mongoose');
 let config = require('../config/config');
+let bcrypt = require('bcrypt-nodejs');
 let Schema = mongoose.Schema;
 
 let ClientSchema = new Schema({
-    name : {
-        type : String,
-        required : true
+    name: {
+        type: String,
+        required: true
     },
-    surname : {
-        type : String,
-        required : true
+    surname: {
+        type: String,
+        required: true
     },
-    login : {
-        type : String,
-        required : true
+    login: {
+        type: String,
+        required: true
     },
-    password : {
-        type : String,
-        required : true
+    password: {
+        type: String,
+        required: true,
+        validate : {
+            validator : function (){
+                return this.password.length >= 4;
+            },
+            message : 'Password min length eq 4'
+        }
     },
-    city : {
-        type : String,
-        required : true
+    city: {
+        type: String,
+        required: true
     },
-    phone : {
-        type : String,
-        required : true
+    phone: {
+        type: String,
+        required: true,
+        match : /^(1[ \-\+]{0,3}|\+1[ -\+]{0,3}|\+1|\+)?((\(\+?1-[2-9][0-9]{1,2}\))|(\(\+?[2-8][0-9][0-9]\))|(\(\+?[1-9][0-9]\))|(\(\+?[17]\))|(\([2-9][2-9]\))|([ \-\.]{0,3}[0-9]{2,4}))?([ \-\.][0-9])?([ \-\.]{0,3}[0-9]{2,4}){2,3}$/
     },
-    email : {
-        type : String,
-        required : true
+    email: {
+        type: String,
+        required: true,
+        match : /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     },
-    roles : [{
-        type : String,
-        default : config.ROLES.USER_ROLE
+    roles: [{
+        type: String,
+        default: config.ROLES.USER_ROLE
     }],
-    ownPlaces : [{
-        type : Schema.Types.ObjectId,
-        ref : 'Place'
+    ownPlaces: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Place'
     }],
-    drinkApplications : [{
-        type : Schema.Types.ObjectId,
-        ref : 'DrinkApplication'
+    drinkApplications: [{
+        type: Schema.Types.ObjectId,
+        ref: 'DrinkApplication'
     }],
-    ratings : [{
-        type : Schema.Types.ObjectId,
-        ref : 'Rating'
+    ratings: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Rating'
     }],
-    complaints : [{
-        type : Schema.Types.ObjectId,
-        ref : 'Complaint'
+    complaints: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Complaint'
     }],
-    departments : [{
-        type : Schema.Types.ObjectId,
-        ref : 'Department'
+    departments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Department'
     }],
-    favoritePlaces : [{
-        type : Schema.Types.ObjectId,
-        ref : 'Place'
+    favoritePlaces: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Place'
     }],
-},{
-    timestamps : true,
+}, {
+    timestamps: true,
 });
-module.exports = mongoose.model('Client',ClientSchema);
+ClientSchema.methods.encryptPassword = function(password) {
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(5), null);
+};
+ClientSchema.methods.validPassword = function(password) {
+    return bcrypt.compareSync(password, this.password);
+};
+
+module.exports = mongoose.model('Client', ClientSchema);
 
 let Complaint = require('./Complaint');
 let DrinkApplication = require('./DrinkApplication');
@@ -70,27 +86,47 @@ let Place = require('./Place');
 let Rating = require('./Rating');
 let Department = require('./Department');
 ClientSchema.pre('remove', async function (next) {
-    let complaints = await Complaint.find({client : this._id});
-    let drinkApplications = await DrinkApplication.find({client : this._id});
-    let ratings = await Rating.find({client : this._id});
-    let departments = await Department.find({client : this._id});
-    let ownPlaces = await Place.find({boss : this._id});
+    let complaints = await Complaint.find({client: this._id});
+    let drinkApplications = await DrinkApplication.find({client: this._id});
+    let ratings = await Rating.find({client: this._id});
+    let departments = await Department.find({client: this._id});
+    let ownPlaces = await Place.find({boss: this._id});
 
-    complaints.forEach(function (complaint){
+    complaints.forEach(function (complaint) {
         complaint.remove();
     });
-    drinkApplications.forEach(function (drinkApplication){
+    drinkApplications.forEach(function (drinkApplication) {
         drinkApplication.remove();
     });
-    ratings.forEach(function (rating){
+    ratings.forEach(function (rating) {
         rating.remove();
     });
-    departments.forEach(function (department){
+    departments.forEach(function (department) {
         department.remove();
     });
-    ownPlaces.forEach(function (place){
+    ownPlaces.forEach(function (place) {
         place.boss = null;
         place.save();
     });
     next();
+});
+
+ClientSchema.pre('save', async function (next) {
+    if (this.ownPlaces) {
+        let places = await Place.find({_id: this.ownPlaces});
+        if (places) {
+            places.forEach(function (place) {
+                place.boss = this;
+                place.save();
+            });
+            next();
+        }
+        let msg = 'Not found model:';
+        if (!places) {
+            msg += 'Places';
+        }
+        next(new Error(msg));
+    }else {
+        return next();
+    }
 });
