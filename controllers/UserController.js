@@ -36,6 +36,25 @@ module.exports = {
             });
         })(req, res, next);
     },
+    facebookAuth(req, res) {
+        if (req.user) {
+            return res.status(200).json({
+                user: req.user
+            });
+        }else {
+            return res.sendStatus(400);
+        }
+    },
+    googleAuth(req, res) {
+        console.log('controller');
+        if (req.user) {
+            return res.status(200).json({
+                user: req.user
+            });
+        }else {
+            return res.sendStatus(400);
+        }
+    },
     logout(req, res, next) {
         req.logout();
         res.sendStatus(200);

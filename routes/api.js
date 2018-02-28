@@ -37,10 +37,6 @@ router.use(function (req, res, next) {
             req.query.sort = sort ? QueryHelper.toSort(sort) : {};
             req.query.query = query ? JSON.parse(query) : {};
             req.query.populate = populate ? QueryHelper.toPopulate(populate) : '';
-            console.log(req.query.fields);
-            console.log(req.query.sort);
-            console.log(req.query.query);
-            console.log(req.query.populate);
             return next();
         } catch (e) {
             return next(e);

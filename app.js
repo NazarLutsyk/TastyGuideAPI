@@ -7,17 +7,20 @@ const mongoose = require('mongoose');
 let session = require('express-session');
 let MongoStorage = require('connect-mongo')(session);
 let passport = require('passport');
-require('./config/passport');
+require('./config/passport/index');
 
 const passportMiddleware = require('./middleware/passport');
 const index = require('./routes/index');
 const api = require('./routes/api');
 const user = require('./routes/user');
+const mail = require('./routes/mail');
 
 const app = express();
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/drinker');
+
+app.use(express.static(path.join(__dirname,'public')));
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -36,7 +39,8 @@ app.use(passport.session());
 
 app.use('/', index);
 app.use('/api',passportMiddleware.isLoggedIn, api);
-app.use('/user',user);
+app.use('/auth',user);
+app.use('/mail',mail);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -56,3 +60,11 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
+
+//todo authorization
+//todo image upload
+//todo change global config
+//todo add process env
+//todo refactoring
+
+

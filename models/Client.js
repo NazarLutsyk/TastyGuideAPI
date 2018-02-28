@@ -14,11 +14,9 @@ let ClientSchema = new Schema({
     },
     login: {
         type: String,
-        required: true
     },
     password: {
         type: String,
-        required: true,
         validate : {
             validator : function (){
                 return this.password.length >= 4;
@@ -26,20 +24,20 @@ let ClientSchema = new Schema({
             message : 'Password min length eq 4'
         }
     },
+    facebookId : String,
+    googleId : String,
     city: {
         type: String,
-        required: true
     },
     phone: {
         type: String,
-        required: true,
         match : /^(1[ \-\+]{0,3}|\+1[ -\+]{0,3}|\+1|\+)?((\(\+?1-[2-9][0-9]{1,2}\))|(\(\+?[2-8][0-9][0-9]\))|(\(\+?[1-9][0-9]\))|(\(\+?[17]\))|(\([2-9][2-9]\))|([ \-\.]{0,3}[0-9]{2,4}))?([ \-\.][0-9])?([ \-\.]{0,3}[0-9]{2,4}){2,3}$/
     },
     email: {
         type: String,
-        required: true,
         match : /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     },
+    image : String,
     roles: [{
         type: String,
         default: config.ROLES.USER_ROLE
