@@ -1,5 +1,5 @@
 let Event = require('../models/Event');
-
+let path = require('path');
 module.exports = {
     async getEvents(req, res) {
         try {
@@ -45,8 +45,8 @@ module.exports = {
     async updateEvent(req, res) {
         let eventId = req.params.id;
         try {
-            let event = await Event.findByIdAndUpdate(eventId, req.body,{new : true});
-            res.status(201).json(event);
+            let updatedEvent = await Event.findByIdAndUpdate(eventId, req.body, {new: true});
+            res.status(201).json(updatedEvent);
         } catch (e) {
             res.status(400).send(e.toString());
         }

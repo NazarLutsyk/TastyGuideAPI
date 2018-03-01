@@ -21,6 +21,7 @@ const EventMultilangRouter = require('./eventMultilang');
 const LocationRouter = require('./location');
 const RelationRouter = require('./relation');
 const MessageRouter = require('./message');
+const ImageRouter = require('./image');
 let QueryHelper = require('../helpers/queryHelper');
 
 const express = require('express');
@@ -68,5 +69,6 @@ router.use('/eventMultilangs', EventMultilangRouter);
 router.use('/locations', LocationRouter);
 router.use('/relations', RelationRouter);
 router.use('/messages', MessageRouter);
+router.use('/images', ImageRouter);
 
 module.exports = router;

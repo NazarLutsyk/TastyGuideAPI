@@ -9,6 +9,6 @@ router.route('/')
 router.route('/:id')
     .get(BonuseMultilangController.getBonuseMultilangById)
     .put(BonuseMultilangController.updateBonuseMultilang)
-    .delete(BonuseMultilangController.removeBonuseMultilang);
+    .delete(BonuseMultilangController.removeImage);
 
 module.exports = router;

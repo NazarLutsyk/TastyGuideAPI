@@ -15,18 +15,23 @@ exports.Auth = new GoogleStrategy({
             let user = await Client.findOne({
                 googleId: profile.id
             });
+            user.name = profile.name.givenName;
+            user.surname = profile.name.familyName;
+            user.email = profile.emails[0].value || '';
+            user.avatar = profile._json.image.url;
+            user = await user.save();
             return cb(null, user);
         } else {
             let user = await Client.create({
                 name: profile.name.givenName,
                 surname: profile.name.familyName,
                 googleId: profile.id,
-                email: profile.emails[0].value || ''
+                email: profile.emails[0].value || '',
+                avatar : profile._json.image.url
             });
             return cb(null, user);
         }
     } catch (e) {
-        console.log(e);
         cb(e);
     }
 });

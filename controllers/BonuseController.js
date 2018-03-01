@@ -1,4 +1,5 @@
 let Bonuse = require('../models/Bonuse');
+let path = require('path');
 
 module.exports = {
     async getBonuses(req, res) {
@@ -45,8 +46,8 @@ module.exports = {
     async updateBonuse(req, res) {
         let bonuseId = req.params.id;
         try {
-            let bonuse = await Bonuse.findByIdAndUpdate(bonuseId, req.body, {new: true});
-            res.status(201).json(bonuse);
+            let updatedBonuse = await Bonuse.findByIdAndUpdate(bonuseId, req.body, {new: true});
+            res.status(201).json(updatedBonuse);
         } catch (e) {
             res.status(400).send(e.toString());
         }

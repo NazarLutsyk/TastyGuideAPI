@@ -5,7 +5,7 @@ let UserController = require('../controllers/UserController');
 
 router.post('/local/signup', PassportMiddleware.notLoggedIn, UserController.signUp);
 router.post('/local/signin', PassportMiddleware.notLoggedIn, UserController.signIn);
-router.post('/logout', PassportMiddleware.isLoggedIn, UserController.logout);
+router.get('/logout', PassportMiddleware.isLoggedIn, UserController.logout);//todo
 
 router.get('/facebook', passport.authenticate('facebook'));
 router.get('/facebook/callback',

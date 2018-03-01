@@ -8,7 +8,6 @@ exports.Auth = new FacebookStrategy({
     callbackURL: config.FACEBOOK.CALLBACK_URL,
     profileFields: ['id', 'name', 'email','photos']
 }, async function (accessToken, refreshToken, profile, cb) {
-    console.log(profile._json.picture.data);
     try {
         let isExists = await Client.count({
             facebookId: profile.id
@@ -17,13 +16,19 @@ exports.Auth = new FacebookStrategy({
             let user = await Client.findOne({
                 facebookId: profile.id
             });
+            user.name = profile.name.givenName;
+            user.surname = profile.name.familyName;
+            user.email = profile.email || '';
+            user.avatar = profile._json.picture.data.url;
+            user = await user.save();
             return cb(null, user);
         } else {
             let user = await Client.create({
                 name: profile.name.givenName,
                 surname: profile.name.familyName,
                 facebookId: profile.id,
-                email: profile.email || ''
+                email: profile.email || '',
+                avatar : profile._json.picture.data.url
             });
             return cb(null, user);
         }

@@ -1,4 +1,5 @@
 let News = require('../models/News');
+let path = require('path');
 
 module.exports = {
     async getNews(req, res) {
@@ -45,8 +46,8 @@ module.exports = {
     async updateNews(req, res) {
         let newsId = req.params.id;
         try {
-            let news = await News.findByIdAndUpdate(newsId, req.body, {new: true});
-            res.status(201).json(news);
+            let newsBonuse = await News.findByIdAndUpdate(newsId, req.body, {new: true});
+            res.status(201).json(newsBonuse);
         } catch (e) {
             res.status(400).send(e.toString());
         }

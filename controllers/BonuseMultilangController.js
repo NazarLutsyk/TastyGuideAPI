@@ -51,7 +51,7 @@ module.exports = {
             res.status(400).send(e.toString());
         }
     },
-    async removeBonuseMultilang(req, res) {
+    async removeImage(req, res) {
         let bonuseMultilangId = req.params.id;
         try {
             let bonuseMultilang = await BonuseMultilang.findById(bonuseMultilangId);

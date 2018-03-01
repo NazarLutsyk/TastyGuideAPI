@@ -1,5 +1,5 @@
 let Place = require('../models/Place');
-
+let path = require('path');
 module.exports = {
     async getPlaces(req, res) {
         try {
@@ -45,7 +45,7 @@ module.exports = {
     async updatePlace(req, res) {
         let placeId = req.params.id;
         try {
-            let updatedPlace = await Place.findByIdAndUpdate(placeId, req.body,{new : true});
+            let updatedPlace = await Place.findByIdAndUpdate(placeId, req.body, {new: true});
             res.status(201).json(updatedPlace);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -56,7 +56,7 @@ module.exports = {
         try {
             let removedPlace = await Place.findById(placeId);
             removedPlace = await removedPlace.remove();
-            res.status(204).json(removedPlace);
+            res.sendStatus(204);
         } catch (e) {
             res.status(400).send(e.toString());
         }

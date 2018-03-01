@@ -1,4 +1,5 @@
 let mongoose = require('mongoose');
+let path = require('path');
 
 let Schema = mongoose.Schema;
 
@@ -18,7 +19,22 @@ let PlaceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Location',
     }],
-    image: String,
+    avatar: {
+        type: String,
+        default: 'default.jpg'
+    },
+    images: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Image'
+        }],
+        validate: {
+            validator: function () {
+                return this.images.length <= 4;
+            },
+            message: '{PATH} exceeds the limit of 4'
+        }
+    },
     averagePrice: {
         type: Number,
         default: 0,
@@ -39,10 +55,9 @@ let PlaceSchema = new Schema({
             message: 'Min reviews eq 0'
         }
     },
-    allowed : {
-        type : Boolean,
-        required : true,
-        default : false,
+    allowed: {
+        type: Boolean,
+        default: false,
     },
     boss: {
         type: Schema.Types.ObjectId,
@@ -180,3 +195,4 @@ PlaceSchema.pre('save', async function (next) {
     }
     return next();
 });
+

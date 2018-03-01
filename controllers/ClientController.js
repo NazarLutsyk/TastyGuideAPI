@@ -34,14 +34,14 @@ module.exports = {
             res.status(404).send(e.toString());
         }
     },
-    async createClient(req, res) {
+    /*async createClient(req, res) {
         try {
             let client = await Client.create(req.body);
             res.status(201).json(client);
         } catch (e) {
             res.status(400).send(e.toString());
         }
-    },
+    },*/
     async updateClient(req, res) {
         let clientId = req.params.id;
         try {

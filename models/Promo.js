@@ -3,33 +3,35 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let PromoSchema = new Schema({
-    multilang : [{
-        type : Schema.Types.ObjectId,
+    multilang: [{
+        type: Schema.Types.ObjectId,
         ref: 'Multilang'
     }],
-    author : {
-        type : Schema.Types.ObjectId,
-        ref : 'Department',
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'Department',
         required : true
     },
-    place : {
-        type : Schema.Types.ObjectId,
-        ref : 'Place',
+    place: {
+        type: Schema.Types.ObjectId,
+        ref: 'Place',
         required : true
     },
-    image  : {
-        type : String
+    image: {
+        type: Schema.Types.ObjectId,
+        ref : 'Image'
     }
-},{
-    timestamps : true,
-    discriminatorKey : 'kind'
+}, {
+    timestamps: true,
+    discriminatorKey: 'kind'
 });
-module.exports = mongoose.model('Promo',PromoSchema);
+module.exports = mongoose.model('Promo', PromoSchema);
 
 let Place = require('./Place');
 let Multilang = require('./Multilang');
 let Department = require('./Department');
-PromoSchema.pre('remove',async function (next) {
+let path = require('path');
+PromoSchema.pre('remove', async function (next) {
     await Place.update(
         {promos: this._id},
         {$pull: {promos: this._id}},
@@ -44,6 +46,7 @@ PromoSchema.pre('remove',async function (next) {
     });
     next();
 });
+
 PromoSchema.pre('save', async function (next) {
     let client = await Department.findById(this.author);
     let place = await Place.findById(this.place);
@@ -63,3 +66,4 @@ PromoSchema.pre('save', async function (next) {
     }
     next(new Error(msg));
 });
+

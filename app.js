@@ -38,7 +38,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', index);
-app.use('/api',passportMiddleware.isLoggedIn, api);
+app.use('/api'/*,passportMiddleware.isLoggedIn*/, api);//todo
 app.use('/auth',user);
 app.use('/mail',mail);
 
@@ -60,11 +60,5 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
-
-//todo authorization
-//todo image upload
-//todo change global config
-//todo add process env
-//todo refactoring
 
 

@@ -1,0 +1,14 @@
+//todo authorization
+    //global roles
+    //place roles
+//todo image upload
+    //+place multi images 4
+    //+promo single
+    //+client url
+    //+delete update in file system
+//todo stack of places
+//todo top place planning
+//todo paths
+//todo change global config
+//todo add process env
+//todo refactoring
