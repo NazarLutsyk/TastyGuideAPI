@@ -42,7 +42,7 @@ module.exports = {
             res.status(400).send(e.toString());
         }
     },
-    async updateComplaint(req, res) {
+    async deleteMessage(req, res) {
         let complaintId = req.params.id;
         try {
             let complaint = await Complaint.findByIdAndUpdate(complaintId, req.body,{new : true});

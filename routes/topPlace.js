@@ -1,14 +1,15 @@
 const TopPlaceController = require('../controllers/TopPlaceController');
 const express = require('express');
+let permission = require('../middleware/authorizarion/index');
 
 const router = express.Router();
 
 router.route('/')
     .get(TopPlaceController.getTopPlaces)
-    .post(TopPlaceController.createTopPlace);
+    .post(permission(),TopPlaceController.createTopPlace);
 router.route('/:id')
     .get(TopPlaceController.getTopPlaceById)
-    .put(TopPlaceController.updateTopPlace)
-    .delete(TopPlaceController.removeTopPlace);
+    .put(permission(),TopPlaceController.updateTopPlace)
+    .delete(permission(),TopPlaceController.removeTopPlace);
 
 module.exports = router;

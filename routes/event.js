@@ -1,14 +1,16 @@
 const EventController = require('../controllers/EventController');
+let permission = require('../middleware/authorizarion/index');
+let Rule = require('../middleware/authorizarion/rules/Promo');
 const express = require('express');
 
 const router = express.Router();
 
 router.route('/')
     .get(EventController.getEvents)
-    .post(EventController.createEvent);
+    .post(permission(Rule.updatePromo),EventController.createEvent);
 router.route('/:id')
     .get(EventController.getEventById)
-    .put(EventController.updateEvent)
-    .delete(EventController.removeEvent);
+    .put(permission(Rule.updatePromo),EventController.updateEvent)
+    .delete(permission(Rule.updatePromo),EventController.removeEvent);
 
 module.exports = router;

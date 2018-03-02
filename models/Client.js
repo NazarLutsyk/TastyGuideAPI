@@ -1,7 +1,7 @@
 let mongoose = require('mongoose');
-let config = require('../config/config');
 let bcrypt = require('bcrypt-nodejs');
 let path = require('path');
+let ROLES = require('../config/roles');
 let Schema = mongoose.Schema;
 
 let ClientSchema = new Schema({
@@ -44,7 +44,7 @@ let ClientSchema = new Schema({
     },
     roles: {
         type: Array,
-        default: [config.ROLES.USER_ROLE]
+        default: [ROLES.GLOBAL_ROLES.USER_ROLE]
     },
     ownPlaces: [{
         type: Schema.Types.ObjectId,

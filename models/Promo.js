@@ -7,7 +7,7 @@ let PromoSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Multilang'
     }],
-    author: {
+    client: {
         type: Schema.Types.ObjectId,
         ref: 'Department',
         required : true
@@ -48,7 +48,7 @@ PromoSchema.pre('remove', async function (next) {
 });
 
 PromoSchema.pre('save', async function (next) {
-    let client = await Department.findById(this.author);
+    let client = await Department.findById(this.client);
     let place = await Place.findById(this.place);
     if (client && place) {
         client.promos.push(this);

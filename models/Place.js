@@ -20,8 +20,8 @@ let PlaceSchema = new Schema({
         ref: 'Location',
     }],
     avatar: {
-        type: String,
-        default: 'default.jpg'
+        type: Schema.Types.ObjectId,
+        ref: 'Image'
     },
     images: {
         type: [{
@@ -120,7 +120,6 @@ let HashTag = require('./HashTag');
 let Multilang = require('./Multilang');
 let Location = require('./Location');
 let Client = require('./Client');
-let Config = require('../config/config');
 
 PlaceSchema.pre('remove', async function (next) {
     let complaints = await Complaint.find({place: this._id});

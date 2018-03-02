@@ -38,7 +38,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', index);
-app.use('/api'/*,passportMiddleware.isLoggedIn*/, api);//todo
+app.use('/api',/*passportMiddleware.isLoggedIn, */api);//todo
 app.use('/auth',user);
 app.use('/mail',mail);
 

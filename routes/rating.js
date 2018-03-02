@@ -1,6 +1,9 @@
 const RatingController = require('../controllers/RatingController');
 const express = require('express');
 
+let permission = require('../middleware/authorizarion/index');
+let Rule = require('../middleware/authorizarion/rules/Rating');
+
 const router = express.Router();
 
 router.route('/')
@@ -8,7 +11,7 @@ router.route('/')
     .post(RatingController.createRating);
 router.route('/:id')
     .get(RatingController.getRatingById)
-    .put(RatingController.updateRating)
-    .delete(RatingController.removeRating);
+    .put(permission(Rule.updateRating),RatingController.updateRating)
+    .delete(permission(Rule.updateRating),RatingController.removeRating);
 
 module.exports = router;

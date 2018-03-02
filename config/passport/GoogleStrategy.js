@@ -1,11 +1,11 @@
 let GoogleStrategy = require('passport-google-oauth20').Strategy;
 let Client = require('../../models/Client');
-let config = require('../config');
+let SOCIAL = require('../social');
 
 exports.Auth = new GoogleStrategy({
-    clientID: config.GOOGLE.CLIENT_ID,
-    clientSecret: config.GOOGLE.CLIENT_SECRET,
-    callbackURL: config.GOOGLE.CALLBACK_URL,
+    clientID: SOCIAL.GOOGLE.CLIENT_ID,
+    clientSecret: SOCIAL.GOOGLE.CLIENT_SECRET,
+    callbackURL: SOCIAL.GOOGLE.CALLBACK_URL,
 }, async function (accessToken, refreshToken, profile, cb) {
     try {
         let isExists = await Client.count({

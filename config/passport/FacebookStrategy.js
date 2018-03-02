@@ -1,11 +1,11 @@
 let FacebookStrategy = require('passport-facebook').Strategy;
 let Client = require('../../models/Client');
-let config = require('../config');
+let SOCIAL = require('../social');
 
 exports.Auth = new FacebookStrategy({
-    clientID: config.FACEBOOK.CLIENT_ID,
-    clientSecret: config.FACEBOOK.CLIENT_SECRET,
-    callbackURL: config.FACEBOOK.CALLBACK_URL,
+    clientID: SOCIAL.FACEBOOK.CLIENT_ID,
+    clientSecret: SOCIAL.FACEBOOK.CLIENT_SECRET,
+    callbackURL: SOCIAL.FACEBOOK.CALLBACK_URL,
     profileFields: ['id', 'name', 'email','photos']
 }, async function (accessToken, refreshToken, profile, cb) {
     try {

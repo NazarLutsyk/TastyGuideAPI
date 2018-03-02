@@ -5,7 +5,7 @@ let Schema = mongoose.Schema;
 let DepartmentSchema = new Schema({
     roles: [{
         type: String,
-        required : true
+        required : true//todo enum
     }],
     client: {
         type: Schema.Types.ObjectId,
@@ -38,7 +38,7 @@ DepartmentSchema.pre('remove', async function (next) {
         {departments: this._id},
         {$pull: {departments: this._id}},
         {multi: true});
-    let promos = await Promo.find({author: this._id});
+    let promos = await Promo.find({client: this._id});
     promos.forEach(function (promo) {
         promo.remove();
     });

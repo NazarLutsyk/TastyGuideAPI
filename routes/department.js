@@ -1,14 +1,17 @@
 const DepartmentController = require('../controllers/DepartmentController');
 const express = require('express');
 
+let permission = require('../middleware/authorizarion/index');
+let Rule = require('../middleware/authorizarion/rules/Depatment');
+
 const router = express.Router();
 
 router.route('/')
     .get(DepartmentController.getDepartments)
-    .post(DepartmentController.createDepartment);
+    .post(permission(Rule.updateDepartment),DepartmentController.createDepartment);
 router.route('/:id')
     .get(DepartmentController.getDepartmentById)
-    .put(DepartmentController.updateDepartment)
-    .delete(DepartmentController.removeDepartment);
+    .put(permission(Rule.updateDepartment),DepartmentController.updateDepartment)
+    .delete(permission(Rule.updateDepartment),DepartmentController.removeDepartment);
 
 module.exports = router;

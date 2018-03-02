@@ -1,6 +1,9 @@
 const ComplaintController = require('../controllers/ComplaintController');
 const express = require('express');
 
+let permission = require('../middleware/authorizarion/index');
+let Rule = require('../middleware/authorizarion/rules/Complaint');
+
 const router = express.Router();
 
 router.route('/')
@@ -8,7 +11,7 @@ router.route('/')
     .post(ComplaintController.createComplaint);
 router.route('/:id')
     .get(ComplaintController.getComplaintById)
-    .put(ComplaintController.updateComplaint)
-    .delete(ComplaintController.removeComplaint);
+    .put(permission(Rule.deleteMessage),ComplaintController.deleteMessage)
+    .delete(permission(Rule.deleteMessage),ComplaintController.removeComplaint);
 
 module.exports = router;

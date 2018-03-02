@@ -1,5 +1,5 @@
 let nodemailer = require('nodemailer');
-let config = require('../config/config');
+let MAIL = require('../config/mail');
 
 //todo normal message format
 module.exports = {
@@ -7,13 +7,13 @@ module.exports = {
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: config.CONTACT_US.EMAIL,
-                pass: config.CONTACT_US.PASS
+                user: MAIL.BROKER.EMAIL,
+                pass: MAIL.BROKER.PASS
             }
         });
         transporter.sendMail({
-            from: config.CONTACT_US.EMAIL,
-            to: config.ADMIN_EMAIL,
+            from: MAIL.BROKER.EMAIL,
+            to: MAIL.ADMIN_EMAIL,
             subject: 'Message',
             text: 'I hope this message gets through!',
         }, (error, info) => {
