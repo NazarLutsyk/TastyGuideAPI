@@ -1,4 +1,6 @@
 let Event = require('../models/Event');
+let relationHelper = require('../helpers/relationHelper');
+
 let path = require('path');
 module.exports = {
     async getEvents(req, res) {
@@ -60,5 +62,36 @@ module.exports = {
         } catch (e) {
             res.status(400).send(e.toString());
         }
+    },
+    async addMultilang(req, res) {
+        let modelId = req.params.id;
+        let multilangId = req.params.idMultilang;
+        try {
+            if (modelId && multilangId) {
+                await relationHelper.addRelation
+                ('Event', 'EventMultilang', modelId, multilangId, 'multilang', 'event');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeMultilang(req, res) {
+        let modelId = req.params.id;
+        let multilangId = req.params.idMultilang;
+        try {
+            if (modelId && multilangId) {
+                await relationHelper.removeRelation
+                ('Event', 'EventMultilang', modelId, multilangId, 'multilang', 'event');
+                res.sendStatus(204);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
     }
+
 };

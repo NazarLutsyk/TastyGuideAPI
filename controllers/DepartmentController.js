@@ -1,4 +1,5 @@
 let Department = require('../models/Department');
+require('../helpers/relationHelper');
 
 module.exports = {
     async getDepartments(req, res) {
@@ -45,7 +46,7 @@ module.exports = {
     async updateDepartment(req, res) {
         let departmentId = req.params.id;
         try {
-            let department = await Department.findByIdAndUpdate(departmentId, req.body,{new : true});
+            let department = await Department.findByIdAndUpdate(departmentId, req.body, {new: true});
             res.status(201).json(department);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -57,6 +58,36 @@ module.exports = {
             let department = await Department.findById(departmentId);
             department = await department.remove();
             res.status(204).json(department);
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addPromo(req, res) {
+        let modelId = req.params.id;
+        let promoId = req.params.idPromo;
+        try {
+            if (modelId && promoId) {
+                await relationHelper.addRelation
+                ('Department', 'Promo', modelId, promoId, 'promos', 'author');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removePromo(req, res) {
+        let modelId = req.params.id;
+        let promoId = req.params.idPromo;
+        try {
+            if (modelId && promoId) {
+                await relationHelper.removeRelation
+                ('Department', 'Promo', modelId, promoId, 'promos', 'author');
+                res.sendStatus(204);
+            } else {
+                throw new Error('Id in path eq null');
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

@@ -5,17 +5,17 @@ let Schema = mongoose.Schema;
 let DepartmentSchema = new Schema({
     roles: [{
         type: String,
-        required : true//todo enum
+        required: true//todo enum
     }],
     client: {
         type: Schema.Types.ObjectId,
         ref: 'Client',
-        required: true
+        // required: true
     },
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',
-        required : true
+        // required : true
     },
     promos: [{
         type: Schema.Types.ObjectId,
@@ -52,21 +52,21 @@ DepartmentSchema.pre('save', async function (next) {
         place.departments.push(this);
         client.save();
         place.save();
-        if (this.promos){
+        if (this.promos) {
             this.promos.forEach(async function (promoId) {
                 let promo = await Promo.findById(promoId);
                 promo.departments.push(this);
-                promo.save();
+                await promo.save();
             });
         }
-        next();
     }
-    let msg = 'Not found model:';
-    if (!client){
-        msg += 'Client ';
-    }
-    if (!place){
-        msg += 'Place';
-    }
-    next(new Error(msg));
+    next();
+    // let msg = 'Not found model:';
+    // if (!client){
+    //     msg += 'Client ';
+    // }
+    // if (!place){
+    //     msg += 'Place';
+    // }
+    // next(new Error(msg));
 });

@@ -3,23 +3,18 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let PromoSchema = new Schema({
-    multilang: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Multilang'
-    }],
-    client: {
+    author: {
         type: Schema.Types.ObjectId,
         ref: 'Department',
-        required : true
     },
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',
-        required : true
+        // required : true
     },
     image: {
         type: Schema.Types.ObjectId,
-        ref : 'Image'
+        ref: 'Image'
     }
 }, {
     timestamps: true,
@@ -53,17 +48,17 @@ PromoSchema.pre('save', async function (next) {
     if (client && place) {
         client.promos.push(this);
         place.promos.push(this);
-        client.save();
-        place.save();
-        next();
+        await client.save();
+        await place.save();
     }
-    let msg = 'Not found model:';
-    if (!client){
-        msg += 'Department ';
-    }
-    if (!place){
-        msg += 'Place';
-    }
-    next(new Error(msg));
+    next();
+    // let msg = 'Not found model:';
+    // if (!client){
+    //     msg += 'Department ';
+    // }
+    // if (!place){
+    //     msg += 'Place';
+    // }
+    // next(new Error(msg));
 });
 

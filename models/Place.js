@@ -89,7 +89,7 @@ let PlaceSchema = new Schema({
     }],
     multilang: [{
         type: Schema.Types.ObjectId,
-        ref: 'Multilang',
+        ref: 'PlaceMultilang',
     }],
     days: [{
         type: Schema.Types.ObjectId,

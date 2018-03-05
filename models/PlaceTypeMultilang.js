@@ -10,7 +10,6 @@ let PlaceTypeMultilangSchema = new Schema({
     placeType : {
         type : Schema.Types.ObjectId,
         ref: 'PlaceType',
-        required: true
     },
 }, {
     discriminatorKey: 'kind'
@@ -29,12 +28,13 @@ PlaceTypeMultilangSchema.pre('save', async function (next) {
     let placeType = await PlaceType.findById(this.placeType);
     if (placeType) {
         placeType.multilang.push(this);
-        placeType.save();
+        await placeType.save();
         next();
     }
-    let msg = 'Not found model:';
-    if (!placeType){
-        msg += 'PlaceType ';
-    }
-    next(new Error(msg));
+    next();
+    // let msg = 'Not found model:';
+    // if (!placeType){
+    //     msg += 'PlaceType ';
+    // }
+    // next(new Error(msg));
 });

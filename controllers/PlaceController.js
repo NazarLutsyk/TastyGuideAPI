@@ -1,4 +1,6 @@
 let Place = require('../models/Place');
+let relationHelper = require('../helpers/relationHelper');
+
 let path = require('path');
 module.exports = {
     async getPlaces(req, res) {
@@ -60,5 +62,305 @@ module.exports = {
         } catch (e) {
             res.status(400).send(e.toString());
         }
-    }
+    },
+    async addPlaceType(req, res) {
+        let modelId = req.params.id;
+        let typeId = req.params.idType;
+        try {
+            if (modelId && typeId) {
+                await relationHelper.addRelation
+                ('Place', 'PlaceType', modelId, typeId, 'types');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removePlaceType(req, res) {
+        let modelId = req.params.id;
+        let typeId = req.params.idType;
+        try {
+            if (modelId && typeId) {
+                await relationHelper.removeRelation
+                ('Place', 'PlaceType', modelId, typeId, 'types');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addPromo(req, res) {
+        let modelId = req.params.id;
+        let promoId = req.params.idPromo;
+        try {
+            if (modelId && promoId) {
+                await relationHelper.addRelation
+                ('Place', 'Promo', modelId, promoId, 'promos', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removePromo(req, res) {
+        let modelId = req.params.id;
+        let promoId = req.params.idPromo;
+        try {
+            if (modelId && promoId) {
+                await relationHelper.removeRelation
+                ('Place', 'Promo', modelId, promoId, 'promos', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addComplaint(req, res) {
+        let modelId = req.params.id;
+        let complaintId = req.params.idComplaint;
+        try {
+            if (modelId && complaintId) {
+                await relationHelper.addRelation
+                ('Place', 'Complaint', modelId, complaintId, 'complaints', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeComplaint(req, res) {
+        let modelId = req.params.id;
+        let complaintId = req.params.idComplaint;
+        try {
+            if (modelId && complaintId) {
+                await relationHelper.removeRelation
+                ('Place', 'Complaint', modelId, complaintId, 'complaints', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addDrinkApp(req, res) {
+        let modelId = req.params.id;
+        let appId = req.params.idApp;
+        try {
+            if (modelId && appId) {
+                await relationHelper.addRelation
+                ('Place', 'DrinkApplication', modelId, appId, 'drinkApplications', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeDrinkApp(req, res) {
+        let modelId = req.params.id;
+        let appId = req.params.idApp;
+        try {
+            if (modelId && appId) {
+                await relationHelper.removeRelation
+                ('Place', 'DrinkApplication', modelId, appId, 'drinkApplications', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addRating(req, res) {
+        let modelId = req.params.id;
+        let ratingId = req.params.idRating;
+        try {
+            if (modelId && ratingId) {
+                await relationHelper.addRelation
+                ('Place', 'Rating', modelId, ratingId, 'ratings', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeRating(req, res) {
+        let modelId = req.params.id;
+        let ratingId = req.params.idRating;
+        try {
+            if (modelId && ratingId) {
+                await relationHelper.removeRelation
+                ('Place', 'Rating', modelId, ratingId, 'ratings', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addDepartment(req, res) {
+        let modelId = req.params.id;
+        let departmentId = req.params.idDepartment;
+        try {
+            if (modelId && departmentId) {
+                await relationHelper.addRelation
+                ('Place', 'Department', modelId, departmentId, 'departments', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeDepartment(req, res) {
+        let modelId = req.params.id;
+        let departmentId = req.params.idDepartment;
+        try {
+            if (modelId && departmentId) {
+                await relationHelper.removeRelation
+                ('Place', 'Department', modelId, departmentId, 'departments', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addMultilang(req, res) {
+        let modelId = req.params.id;
+        let multilangId = req.params.idMultilang;
+        try {
+            if (modelId && multilangId) {
+                await relationHelper.addRelation
+                ('Place', 'PlaceMultilang', modelId, multilangId, 'multilang', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeMultilang(req, res) {
+        let modelId = req.params.id;
+        let multilangId = req.params.idMultilang;
+        try {
+            if (modelId && multilangId) {
+                await relationHelper.removeRelation
+                ('Place', 'PlaceMultilang', modelId, multilangId, 'multilang', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addDay(req, res) {
+        let modelId = req.params.id;
+        let dayId = req.params.idDay;
+        try {
+            if (modelId && dayId) {
+                await relationHelper.addRelation
+                ('Place', 'Day', modelId, dayId, 'days', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeDay(req, res) {
+        let modelId = req.params.id;
+        let dayId = req.params.idDay;
+        try {
+            if (modelId && dayId) {
+                await relationHelper.removeRelation
+                ('Place', 'Day', modelId, dayId, 'days', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addHashTag(req, res) {
+        let modelId = req.params.id;
+        let hashTagId = req.params.idHashTag;
+        try {
+            if (modelId && hashTagId) {
+                await relationHelper.addRelation
+                ('Place', 'HashTag', modelId, hashTagId, 'hashTags', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeHashTag(req, res) {
+        let modelId = req.params.id;
+        let hashTagId = req.params.idHashTag;
+        try {
+            if (modelId && hashTagId) {
+                await relationHelper.removeRelation
+                ('Place', 'HashTag', modelId, hashTagId, 'hashTags', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addTop(req, res) {
+        let modelId = req.params.id;
+        let topId = req.params.idTop;
+        try {
+            if (modelId && topId) {
+                await relationHelper.addRelation
+                ('Place', 'TopPlace', modelId, topId, 'tops', 'place');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeTop(req, res) {
+        let modelId = req.params.id;
+        let topId = req.params.idTop;
+        try {
+            if (modelId && topId) {
+                await relationHelper.removeRelation
+                ('Place', 'TopPlace', modelId, topId, 'tops', 'place');
+                res.sendStatus(204);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
 };

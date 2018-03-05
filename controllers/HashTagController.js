@@ -1,4 +1,5 @@
 let HashTag = require('../models/HashTag');
+let relationHelper = require('../helpers/relationHelper');
 
 module.exports = {
     async getHashTags(req, res) {
@@ -57,6 +58,36 @@ module.exports = {
             let hashTag = await HashTag.findById(hashTagId);
             hashTag = await hashTag.remove();
             res.status(204).json(hashTag);
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addPlace(req, res) {
+        let modelId = req.params.id;
+        let placeId = req.params.idPlace;
+        try {
+            if (modelId && placeId) {
+                await relationHelper.addRelation
+                ('HashTag', 'Place', modelId, placeId, 'places', 'hashTags');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removePlace(req, res) {
+        let modelId = req.params.id;
+        let placeId = req.params.idPlace;
+        try {
+            if (modelId && placeId) {
+                await relationHelper.removeRelation
+                ('HashTag', 'Place', modelId, placeId, 'places', 'hashTags');
+                res.sendStatus(204);
+            } else {
+                throw new Error('Id in path eq null');
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

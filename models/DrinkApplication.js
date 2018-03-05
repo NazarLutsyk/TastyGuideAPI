@@ -14,11 +14,11 @@ let DrinkApplicationSchema = new Schema({
     budged: {
         type: String,
         default: 0,
-        validate : {
-            validator : function (){
+        validate: {
+            validator: function () {
                 return this.budged >= 0;
             },
-            message : 'Min budget eq 0'
+            message: 'Min budget eq 0'
         }
     },
     date: {
@@ -28,12 +28,12 @@ let DrinkApplicationSchema = new Schema({
     organizer: {
         type: Schema.Types.ObjectId,
         ref: 'Client',
-        required: true
+        // required: true
     },
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',
-        required: true
+        // required: true
     },
     currency: {
         type: Schema.Types.ObjectId,
@@ -63,17 +63,17 @@ DrinkApplicationSchema.pre('save', async function (next) {
     if (client && place) {
         client.drinkApplications.push(this);
         place.drinkApplications.push(this);
-        client.save();
-        place.save();
-        next();
+        await client.save();
+        await place.save();
     }
-    let msg = 'Not found model:';
-    if (!client){
-        msg += 'Client ';
-    }
-    if (!place){
-        msg += 'Place';
-    }
-    next(new Error(msg));
+    next();
+    // let msg = 'Not found model:';
+    // if (!client){
+    //     msg += 'Client ';
+    // }
+    // if (!place){
+    //     msg += 'Place';
+    // }
+    // next(new Error(msg));
 });
 

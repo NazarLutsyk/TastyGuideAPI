@@ -1,4 +1,5 @@
 let News = require('../models/News');
+let relationHelper = require('../helpers/relationHelper');
 let path = require('path');
 
 module.exports = {
@@ -58,6 +59,36 @@ module.exports = {
             let news = await News.findById(newsId);
             news = await news.remove();
             res.status(204).json(news);
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async addMultilang(req, res) {
+        let modelId = req.params.id;
+        let multilangId = req.params.idMultilang;
+        try {
+            if (modelId && multilangId) {
+                await relationHelper.addRelation
+                ('News', 'NewsMultilang', modelId, multilangId, 'multilang', 'news');
+                res.sendStatus(201);
+            } else {
+                throw new Error('Id in path eq null');
+            }
+        } catch (e) {
+            res.status(400).send(e.toString());
+        }
+    },
+    async removeMultilang(req, res) {
+        let modelId = req.params.id;
+        let multilangId = req.params.idMultilang;
+        try {
+            if (modelId && multilangId) {
+                await relationHelper.removeRelation
+                ('News', 'NewsMultilang', modelId, multilangId, 'multilang', 'news');
+                res.sendStatus(204);
+            } else {
+                throw new Error('Id in path eq null');
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

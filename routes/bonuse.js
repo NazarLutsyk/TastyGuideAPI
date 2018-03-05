@@ -12,5 +12,7 @@ router.route('/:id')
     .get(BonuseController.getBonuseById)
     .put(permission(Rule.updatePromo),BonuseController.updateBonuse)
     .delete(permission(Rule.updatePromo),BonuseController.removeBonuse);
-
+router.route('/:id/multilangs/:idMultilang')
+    .put(permission(),BonuseController.addMultilang)
+    .delete(permission(),BonuseController.removeMultilang);
 module.exports = router;

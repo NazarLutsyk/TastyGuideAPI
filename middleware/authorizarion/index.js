@@ -1,5 +1,6 @@
 let ROLES = require('../../config/roles');
 module.exports = function (rule, ...allowed) {
+
     function isAllowed(roles) {
         for (let role of roles) {
             if (allowed.indexOf(role) != -1) {

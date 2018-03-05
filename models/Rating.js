@@ -6,7 +6,7 @@ let RatingSchema = new Schema({
     value: {
         type: Number,
         required: true,
-        default : 0,
+        default: 0,
         validate: {
             validator: function () {
                 return this.value >= 0 && this.value <= 5;
@@ -15,19 +15,19 @@ let RatingSchema = new Schema({
         }
     },
     comment: String,
-    price : {
-        type : Number
+    price: {
+        type: Number
     },
 
     client: {
         type: Schema.Types.ObjectId,
         ref: 'Client',
-        required: true
+        // required: true
     },
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',
-        required: true
+        // required: true
     },
 }, {
     timestamps: true,
@@ -53,16 +53,16 @@ RatingSchema.pre('save', async function (next) {
     if (client && place) {
         client.ratings.push(this);
         place.ratings.push(this);
-        client.save();
-        place.save();
-        next();
+        await client.save();
+        await place.save();
     }
-    let msg = 'Not found model:';
-    if (!client){
-        msg += 'Client ';
-    }
-    if (!place){
-        msg += 'Place';
-    }
-    next(new Error(msg));
+    next();
+    // let msg = 'Not found model:';
+    // if (!client){
+    //     msg += 'Client ';
+    // }
+    // if (!place){
+    //     msg += 'Place';
+    // }
+    // next(new Error(msg));
 });

@@ -1,17 +1,19 @@
-//todo authorization
+//+authorization
     //+global roles
     //+place roles
-    //todo push pull relations
-//todo change push pull relations
-//todo image upload
+    //+push pull relations
+//+change push pull relations
+//+image upload
     //+place multi images 4
     //+promo single
     //+client url
     //+delete update in file system
     //+place avatar
+//check cascades
 //todo stack of places
 //todo top place planning
 //todo paths
 //todo change global config
 //todo add process env
 //todo refactoring
+//todo model relation required

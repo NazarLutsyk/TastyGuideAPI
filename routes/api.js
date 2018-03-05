@@ -19,7 +19,6 @@ const NewsMultilangRouter = require('./newsMultilang');
 const BonuseMultilangRouter = require('./bonuseMultilang');
 const EventMultilangRouter = require('./eventMultilang');
 const LocationRouter = require('./location');
-const RelationRouter = require('./relation');
 const MessageRouter = require('./message');
 const ImageRouter = require('./image');
 let query = require('../middleware/query');
@@ -50,7 +49,6 @@ router.use('/newsMultilangs', NewsMultilangRouter);
 router.use('/bonuseMultilangs', BonuseMultilangRouter);
 router.use('/eventMultilangs', EventMultilangRouter);
 router.use('/locations', LocationRouter);
-router.use('/relations', RelationRouter);
 router.use('/messages', MessageRouter);
 router.use('/images', ImageRouter);
 

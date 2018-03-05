@@ -10,12 +10,10 @@ let ComplaintSchema = new Schema({
     client: {
         type: Schema.Types.ObjectId,
         ref: 'Client',
-        required: true
     },
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',
-        required: true
     }
 }, {
     timestamps: true,
@@ -42,18 +40,18 @@ ComplaintSchema.pre('save', async function (next) {
     if (client && place) {
         client.complaints.push(this);
         place.complaints.push(this);
-        client.save();
-        place.save();
-        next();
+        await client.save();
+        await place.save();
     }
-    let msg = 'Not found model:';
-    if (!client){
-        msg += 'Client ';
-    }
-    if (!place){
-        msg += 'Place';
-    }
-    next(new Error(msg));
+    next();
+    // let msg = 'Not found model:';
+    // if (!client){
+    //     msg += 'Client ';
+    // }
+    // if (!place){
+    //     msg += 'Place';
+    // }
+    // next(new Error(msg));
 });
 
 

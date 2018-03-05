@@ -24,7 +24,6 @@ let TopPlaceSchema = new Schema({
     place : {
         type : Schema.Types.ObjectId,
         ref : 'Place',
-        required : true
     },
 },{
     timestamps : true,
