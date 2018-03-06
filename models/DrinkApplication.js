@@ -46,34 +46,36 @@ module.exports = mongoose.model('DrinkApplication', DrinkApplicationSchema);
 
 let Place = require('./Place');
 let Client = require('./Client');
-DrinkApplicationSchema.pre('remove', async function (next) {
-    await Client.update(
-        {drinkApplications: this._id},
-        {$pull: {drinkApplications: this._id}},
-        {multi: true});
-    await Place.update(
-        {drinkApplications: this._id},
-        {$pull: {drinkApplications: this._id}},
-        {multi: true});
-    next();
+DrinkApplicationSchema.pre('remove',async function (next) {
+    try {
+        await Client.update(
+            {drinkApplications: this._id},
+            {$pull: {drinkApplications: this._id}},
+            {multi: true});
+        await Place.update(
+            {drinkApplications: this._id},
+            {$pull: {drinkApplications: this._id}},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 DrinkApplicationSchema.pre('save', async function (next) {
-    let client = await Client.findById(this.organizer);
-    let place = await Place.findById(this.place);
-    if (client && place) {
-        client.drinkApplications.push(this);
-        place.drinkApplications.push(this);
-        await client.save();
-        await place.save();
+    try {
+        let client = await Client.findById(this.organizer);
+        let place = await Place.findById(this.place);
+        this.organizer = client ? client._id : '';
+        this.place = place ? place._id : '';
+        if (client && client.drinkApplications.indexOf(this._id) == -1) {
+            return await Client.findByIdAndUpdate(client._id,{$push : {drinkApplications : this}});
+        }
+        if (place && place.drinkApplications.indexOf(this._id) == -1) {
+            return await Place.findByIdAndUpdate(place._id,{$push : {drinkApplications : this}});
+        }
+        return next();
+    } catch (e) {
+        return next(e);
     }
-    next();
-    // let msg = 'Not found model:';
-    // if (!client){
-    //     msg += 'Client ';
-    // }
-    // if (!place){
-    //     msg += 'Place';
-    // }
-    // next(new Error(msg));
 });
 

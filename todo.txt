@@ -9,11 +9,15 @@
     //+client url
     //+delete update in file system
     //+place avatar
-//check cascades
+    //todo image extension check
+//+check cascades
+//todo check update contollers
+//todo change add relation
+//todo model relation required
 //todo stack of places
 //todo top place planning
+//todo mongoose timezone
 //todo paths
 //todo change global config
 //todo add process env
 //todo refactoring
-//todo model relation required

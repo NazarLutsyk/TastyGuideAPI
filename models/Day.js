@@ -36,22 +36,25 @@ module.exports = mongoose.model('Day', DaySchema);
 
 let Place = require('./Place');
 DaySchema.pre('remove', async function (next) {
-    await Place.update(
-        {days: this._id},
-        {$pull: {days: this._id}},
-        {multi: true});
-    next();
+    try {
+        await Place.update(
+            {days: this._id},
+            {$pull: {days: this._id}},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 DaySchema.pre('save', async function (next) {
-    let place = await Place.findById(this.place);
-    if (place) {
-        place.days.push(this);
-        await place.save();
+    try {
+        let place = await Place.findById(this.place);
+        this.place = place ? place._id : '';
+        if (place && place.days.indexOf(this._id) == -1) {
+            return await Place.findByIdAndUpdate(place._id,{$push : {days : this}});
+        }
+        return next();
+    } catch (e) {
+        return next(e);
     }
-    next();
-    // let msg = 'Not found model:';
-    // if (!place){
-    //     msg += 'Place';
-    // }
-    // next(new Error(msg));
 });

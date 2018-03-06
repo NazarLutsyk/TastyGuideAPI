@@ -29,3 +29,28 @@ let TopPlaceSchema = new Schema({
     timestamps : true,
 });
 module.exports = mongoose.model('TopPlace',TopPlaceSchema);
+
+let Place = require('./Place');
+TopPlaceSchema.pre('remove', async function (next) {
+    try {
+        await Place.update(
+            {tops: this._id},
+            {$pull: {tops: this._id}},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
+});
+TopPlaceSchema.pre('save', async function (next) {
+    try {
+        let place = await Place.findById(this.place);
+        this.place = place ? place._id : '';
+        if (place && place.tops.indexOf(this._id) == -1) {
+            return await Place.findByIdAndUpdate(place._id,{$push : {tops : this}});
+        }
+        return next();
+    } catch (e) {
+        return next(e);
+    }
+});

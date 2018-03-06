@@ -23,22 +23,27 @@ module.exports = mongoose.model('Location', LocationSchema);
 
 let Place = require('./Place');
 LocationSchema.pre('remove', async function (next) {
-    await Place.update(
-        {locations: this._id},
-        {$pull: {locations: this._id}},
-        {multi: true});
-    next();
+    try {
+        await Place.update(
+            {locations: this._id},
+            {$pull: {locations: this._id}},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 LocationSchema.pre('save', async function (next) {
-    let place = await Place.findById(this.place);
-    if (place) {
-        place.location.push(this);
-        await place.save();
+    try {
+        let place = await Place.findById(this.place);
+        this.place = place ? place._id : '';
+        if (place && !place.location) {
+            return await Place.findByIdAndUpdate(place._id, {location: this});
+        }else {
+            this.place = null;
+        }
+        return next();
+    } catch (e) {
+        return next(e);
     }
-    next();
-    // let msg = 'Not found model:';
-    // if (!place){
-    //     msg += 'Place';
-    // }
-    // next(new Error(msg));
 });

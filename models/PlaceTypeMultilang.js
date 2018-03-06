@@ -18,23 +18,25 @@ module.exports = Multilang.discriminator('PlaceTypeMultilang', PlaceTypeMultilan
 
 let PlaceType = require('./PlaceType');
 PlaceTypeMultilangSchema.pre('remove',async function (next) {
-    await PlaceType.update(
-        {multilang: this._id},
-        {$pull: {multilang: this._id}},
-        {multi: true});
-    next();
+    try {
+        await PlaceType.update(
+            {multilang: this._id},
+            {$pull: {multilang: this._id}},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 PlaceTypeMultilangSchema.pre('save', async function (next) {
-    let placeType = await PlaceType.findById(this.placeType);
-    if (placeType) {
-        placeType.multilang.push(this);
-        await placeType.save();
+    try {
+        let placeType = await PlaceType.findById(this.placeType);
+        this.placeType = placeType ? placeType._id : '';
+        if (placeType  && placeType .multilang.indexOf(this._id) == -1) {
+            return await PlaceType.findByIdAndUpdate(placeType ._id,{$push : {multilang : this}});
+        }
         next();
+    } catch (e) {
+        return next(e);
     }
-    next();
-    // let msg = 'Not found model:';
-    // if (!placeType){
-    //     msg += 'PlaceType ';
-    // }
-    // next(new Error(msg));
 });

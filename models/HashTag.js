@@ -18,28 +18,35 @@ module.exports = mongoose.model('HashTag', HashTagSchema);
 
 let Place = require('./Place');
 HashTagSchema.pre('remove', async function (next) {
-    await Place.update(
-        {hashTags: this._id},
-        {$pull: {hashTags: this._id}},
-        {multi: true});
-    next();
+    try {
+        await Place.update(
+            {hashTags: this._id},
+            {$pull: {hashTags: this._id}},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 HashTagSchema.pre('save', async function (next) {
-    if (this.places) {
+    let self = this;
+    try {
         let places = await Place.find({_id: this.places});
+        this.places = [];
         if (places) {
             places.forEach(function (place) {
-                place.hashTags.push(this);
-                place.save();
+                self.places.push(place._id);
             });
-            next();
+            places.forEach(async function (place) {
+                if (place.hashTags.indexOf(self._id) == -1) {
+                    return await Place.findByIdAndUpdate(place._id, {$push: {hashTags : self}});
+                }else {
+                    return;
+                }
+            });
         }
-        let msg = 'Not found model:';
-        if (!places) {
-            msg += 'Place ';
-        }
-        next(new Error(msg));
-    } else {
-        next();
+        return next();
+    } catch (e) {
+        return next(e);
     }
 });

@@ -24,34 +24,36 @@ let Place = require('./Place');
 let Client = require('./Client');
 
 ComplaintSchema.pre('remove', async function (next) {
-    await Client.update(
-        {complaints: this._id},
-        {$pull: {complaints: this._id}},
-        {multi: true});
-    await Place.update(
-        {complaints: this._id},
-        {$pull: {complaints: this._id}},
-        {multi: true});
-    next();
+    try {
+        await Client.update(
+            {complaints: this._id},
+            {$pull: {complaints: this._id}},
+            {multi: true});
+        await Place.update(
+            {complaints: this._id},
+            {$pull: {complaints: this._id}},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 ComplaintSchema.pre('save', async function (next) {
-    let client = await Client.findById(this.client);
-    let place = await Place.findById(this.place);
-    if (client && place) {
-        client.complaints.push(this);
-        place.complaints.push(this);
-        await client.save();
-        await place.save();
+    try {
+        let client = await Client.findById(this.client);
+        let place = await Place.findById(this.place);
+        this.client = client ? client._id : '';
+        this.place = place ? place._id : '';
+        if (client && client.complaints.indexOf(this._id) == -1) {
+            return await Client.findByIdAndUpdate(client._id, {$push : {complaints : this}});
+        }
+        if (place && place.complaints.indexOf(this._id) == -1) {
+            return await Place.findByIdAndUpdate(place._id, {$push : {complaints : this}});
+        }
+        return next();
+    } catch (e) {
+        return next(e);
     }
-    next();
-    // let msg = 'Not found model:';
-    // if (!client){
-    //     msg += 'Client ';
-    // }
-    // if (!place){
-    //     msg += 'Place';
-    // }
-    // next(new Error(msg));
 });
 
 

@@ -40,10 +40,10 @@ let ClientSchema = new Schema({
     },
     avatar: {
         type: String,
-        default : path.join(__dirname,'default','default.jpg')
+        default: path.join(__dirname, 'default', 'default.jpg')
     },
     roles: {
-        type: Array,
+        type: Array,//todo enum
         default: [ROLES.GLOBAL_ROLES.USER_ROLE]
     },
     ownPlaces: [{
@@ -88,47 +88,117 @@ let Place = require('./Place');
 let Rating = require('./Rating');
 let Department = require('./Department');
 ClientSchema.pre('remove', async function (next) {
-    let complaints = await Complaint.find({client: this._id});
-    let drinkApplications = await DrinkApplication.find({client: this._id});
-    let ratings = await Rating.find({client: this._id});
-    let departments = await Department.find({client: this._id});
-    let ownPlaces = await Place.find({boss: this._id});
+    try {
+        let complaints = await Complaint.find({client: this._id});
+        let drinkApplications = await DrinkApplication.find({client: this._id});
+        let ratings = await Rating.find({client: this._id});
+        let departments = await Department.find({client: this._id});
+        let ownPlaces = await Place.find({boss: this._id});
 
-    complaints.forEach(function (complaint) {
-        complaint.remove();
-    });
-    drinkApplications.forEach(function (drinkApplication) {
-        drinkApplication.remove();
-    });
-    ratings.forEach(function (rating) {
-        rating.remove();
-    });
-    departments.forEach(function (department) {
-        department.remove();
-    });
-    ownPlaces.forEach(function (place) {
-        place.boss = null;
-        place.save();
-    });
-    next();
+        await complaints.forEach(async function (complaint) {
+            return await complaint.remove();
+        });
+        await drinkApplications.forEach(async function (drinkApplication) {
+            return await drinkApplication.remove();
+        });
+        await ratings.forEach(async function (rating) {
+            return await rating.remove();
+        });
+        await departments.forEach(async function (department) {
+            return await department.remove();
+        });
+        await Place.update({_id: this.ownPlaces}, {boss: null}, {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 
 ClientSchema.pre('save', async function (next) {
-    if (this.ownPlaces) {
-        let places = await Place.find({_id: this.ownPlaces});
-        if (places) {
-            places.forEach(function (place) {
-                place.boss = this;
-                place.save();
-            });
-            next();
+    try {
+        let self = this;
+        if (this.ownPlaces) {
+            let places = await Place.find({_id: this.ownPlaces});
+            this.ownPlaces = [];
+            if (places) {
+                places.forEach(function (place) {
+                    self.ownPlaces.push(place._id);
+                });
+                places.forEach(async function (place) {
+                    if (place.boss) {
+                        return self.ownPlaces.splice(self.ownPlaces.indexOf(place), 1);
+                    } else {
+                        return await Place.findByIdAndUpdate(place._id, {boss: self});
+                    }
+                });
+            }
         }
-        let msg = 'Not found model:';
-        if (!places) {
-            msg += 'Places';
+        if (this.drinkApplications) {
+            let apps = await DrinkApplication.find({_id: this.drinkApplications});
+            this.drinkApplications = [];
+            if (apps) {
+                apps.forEach(function (app) {
+                    self.drinkApplications.push(app._id);
+                });
+                apps.forEach(async function (app) {
+                    if (app.client) {
+                        return self.drinkApplications.splice(self.drinkApplications.indexOf(app), 1);
+                    } else {
+                        return await DrinkApplication.findByIdAndUpdate(app._id, {organizer: self});
+                    }
+                });
+            }
         }
-        next(new Error(msg));
-    } else {
+        if (this.ratings) {
+            let ratings = await Rating.find({_id: this.ratings});
+            this.ratings = [];
+            if (ratings) {
+                ratings.forEach(function (rating) {
+                    self.ratings.push(rating._id);
+                });
+                ratings.forEach(async function (rating) {
+                    if (rating.client) {
+                        return self.ratings.splice(self.ratings.indexOf(rating), 1);
+                    } else {
+                        return await Rating.findByIdAndUpdate(rating._id, {client: self});
+                    }
+                });
+            }
+        }
+        if (this.complaints) {
+            let complaints = await Rating.find({_id: this.complaints});
+            this.complaints = [];
+            if (complaints) {
+                complaints.forEach(function (complaint) {
+                    self.complaints.push(complaint._id);
+                });
+                complaints.forEach(async function (complaint) {
+                    if (complaint.client) {
+                        return self.complaints.splice(self.complaints.indexOf(complaint), 1);
+                    } else {
+                        return await Complaint.findByIdAndUpdate(complaint._id, {client: self});
+                    }
+                });
+            }
+        }
+        if (this.departments) {
+            let departments = await Department.find({_id: this.departments});
+            this.departments = [];
+            if (departments) {
+                departments.forEach(function (department) {
+                    self.departments.push(department._id);
+                });
+                departments.forEach(async function (department) {
+                    if (department.client) {
+                        return self.departments.splice(self.departments.indexOf(department), 1);
+                    } else {
+                        return await Department.findByIdAndUpdate(department._id, {client: self});
+                    }
+                });
+            }
+        }
         return next();
+    } catch (e) {
+        return next(e);
     }
 });

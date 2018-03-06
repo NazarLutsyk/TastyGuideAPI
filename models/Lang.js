@@ -14,9 +14,14 @@ module.exports = mongoose.model('Lang', LangSchema);
 
 let Multilang = require('./Multilang');
 LangSchema.pre('remove', async function (next) {
-    let multilangs = await Multilang.find({lang: this._id});
-    multilangs.forEach(function (multilang) {
-        multilang.remove();
-    });
-    next();
+    try {
+        let multilangs = await Multilang.find({lang: this._id});
+        multilangs.forEach(async function (multilang) {
+            multilang.lang = null;
+            return await multilang.save();
+        });
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });

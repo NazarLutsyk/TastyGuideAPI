@@ -117,79 +117,203 @@ let TopPlace = require('./TopPlace');
 let Day = require('./Day');
 let Promo = require('./Promo');
 let HashTag = require('./HashTag');
-let Multilang = require('./Multilang');
+let Multilang = require('./PlaceMultilang');
 let Location = require('./Location');
 let Client = require('./Client');
 
 PlaceSchema.pre('remove', async function (next) {
-    let complaints = await Complaint.find({place: this._id});
-    let drinkApplications = await DrinkApplication.find({place: this._id});
-    let ratings = await Rating.find({place: this._id});
-    let departments = await Department.find({place: this._id});
-    let topPlaces = await TopPlace.find({place: this._id});
-    let days = await Day.find({place: this._id});
-    let promos = await Promo.find({place: this._id});
-    let locations = await Location.find({location: this._id});
+    try {
+        let complaints = await Complaint.find({place: this._id});
+        let drinkApplications = await DrinkApplication.find({place: this._id});
+        let ratings = await Rating.find({place: this._id});
+        let departments = await Department.find({place: this._id});
+        let topPlaces = await TopPlace.find({place: this._id});
+        let days = await Day.find({place: this._id});
+        let promos = await Promo.find({place: this._id});
+        let locations = await Location.find({location: this._id});
 
-    complaints.forEach(function (complaint) {
-        complaint.remove();
-    });
-    drinkApplications.forEach(function (drinkApplication) {
-        drinkApplication.remove();
-    });
-    ratings.forEach(function (rating) {
-        rating.remove();
-    });
-    departments.forEach(function (department) {
-        department.remove();
-    });
-    topPlaces.forEach(function (topPlace) {
-        topPlace.remove();
-    });
-    days.forEach(function (day) {
-        day.remove();
-    });
-    promos.forEach(function (promo) {
-        promo.remove();
-    });
-    locations.forEach(function (location) {
-        location.remove();
-    });
-    this.multilang.forEach(async function (multId) {
-        let mult = await Multilang.findById(multId);
-        mult.remove();
-    });
-    await HashTag.update(
-        {places: this._id},
-        {$pull: {places: this._id}},
-        {multi: true});
-    await Client.update(
-        {ownPlaces: this._id},
-        {$pull: {ownPlaces: this._id}},
-        {multi: true});
-    next();
+        complaints.forEach(async function (complaint) {
+            return await complaint.remove();
+        });
+        drinkApplications.forEach(async function (drinkApplication) {
+            return await drinkApplication.remove();
+        });
+        ratings.forEach(async function (rating) {
+            return await rating.remove();
+        });
+        departments.forEach(async function (department) {
+            return await department.remove();
+        });
+        topPlaces.forEach(async function (topPlace) {
+            return await topPlace.remove();
+        });
+        days.forEach(async function (day) {
+            return await day.remove();
+        });
+        promos.forEach(async function (promo) {
+            return await promo.remove();
+        });
+        locations.forEach(async function (location) {
+            return await location.remove();
+        });
+        this.multilang.forEach(async function (multId) {
+            let mult = await Multilang.findById(multId);
+            return await mult.remove();
+        });
+        await HashTag.update(
+            {places: this._id},
+            {$pull: {places: this._id}},
+            {multi: true});
+        await Client.update(
+            {ownPlaces: this._id},
+            {$pull: {ownPlaces: this._id}},
+            {multi: true});
+        await Client.update(
+            {favoritePlaces: this._id},
+            {$pull: {favoritePlaces: this._id}},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 
 PlaceSchema.pre('save', async function (next) {
+    let self = this;
     if (this.boss) {
         let boss = await Client.findById(this.boss);
-        if (boss) {
-            boss.ownPlaces.push(this);
-            boss.save();
-        } else {
-            return next(new Error('Model not found: Client'));
+        this.boss = boss ? boss._id : '';
+        if (boss && boss.ownPlaces.indexOf(this._id) == -1) {
+            return await Client.findByIdAndUpdate(boss._id, {$push: {ownPlaces: self}});
         }
     }
     if (this.hashTags) {
         let hashTags = await HashTag.find({_id: this.hashTags});
+        this.hashTags = [];
         if (hashTags) {
-            let self = this;
-            hashTags.forEach(function (hashTag) {
-                hashTag.places.push(self);
-                hashTag.save();
+            hashTags.forEach(function (hashTag){
+                self.hashTags.push(hashTag._id);
             });
-        } else {
-            return next(new Error('Model not found: HashTag'));
+            hashTags.forEach(async function (hashTag) {
+                if (hashTag.places.indexOf(self._id) != -1) {
+                    return self.hashTags.splice(self.hashTags.indexOf(hashTag._id), 1);
+                } else {
+                    return await HashTag.findByIdAndUpdate(hashTag._id, {$push: {places: self}});
+
+                }
+            });
+        }
+    }
+    if (this.promos) {
+        let promos = await Promo.find({_id: this.promos});
+        this.promos = [];
+        if (promos) {
+            promos.forEach(function (promo){
+                self.promos.push(promo._id);
+            });
+            promos.forEach(async function (promo) {
+                if (promo.place) {
+                    return self.promos.splice(self.promos.indexOf(promo), 1);
+                } else {
+                    return await Promo.findByIdAndUpdate(promo._id, {place: self});
+                }
+            });
+        }
+    }
+    if (this.complaints) {
+        let complaints = await Complaint.find({_id: this.complaints});
+        this.complaints = [];
+        if (complaints) {
+            complaints.forEach(function (complaint){
+                self.ownPlaces.push(complaint._id);
+            });
+            complaints.forEach(async function (complaint) {
+                if (complaint.place) {
+                    return self.complaints.splice(self.complaints.indexOf(complaint), 1);
+                } else {
+                    return await Complaint.findByIdAndUpdate(complaint._id, {place: self});
+                }
+            });
+        }
+    }
+    if (this.ratings) {
+        let ratings = await Rating.find({_id: this.ratings});
+        this.ratings = [];
+        if (ratings) {
+            ratings.forEach(function (rating){
+                self.ratings.push(rating._id);
+            });
+            ratings.forEach(async function (rating) {
+                if (rating.place) {
+                    return self.ratings.splice(self.ratings.indexOf(rating), 1);
+                } else {
+                    return await Rating.findByIdAndUpdate(rating._id, {place: self});
+                }
+            });
+        }
+    }
+    if (this.departments) {
+        let departments = await Department.find({_id: this.departments});
+        this.departments = [];
+        if (departments) {
+            departments.forEach(function (department){
+                self.departments.push(department._id);
+            });
+            departments.forEach(async function (department) {
+                if (department.place) {
+                    return self.departments.splice(self.departments.indexOf(department), 1);
+                } else {
+                    return await Department.findByIdAndUpdate(department._id, {place: self});
+                }
+            });
+        }
+    }
+    if (this.multilang) {
+        let multilangs = await Multilang.find({_id: this.multilang});
+        this.multilang = [];
+        if (multilangs) {
+            multilangs.forEach(function (multilang){
+                self.multilang.push(multilang._id);
+            });
+            multilangs.forEach(async function (multilang) {
+                if (multilang.place) {
+                    return self.multilang.splice(self.multilang.indexOf(multilang), 1);
+                } else {
+                    return await Multilang.findByIdAndUpdate(multilang._id, {place: self});
+                }
+            });
+        }
+    }
+    if (this.days) {
+        let days = await Day.find({_id: this.days});
+        this.days  = [];
+        if (days) {
+            days.forEach(function (day){
+                self.days.push(day._id);
+            });
+            days.forEach(async function (day) {
+                if (day.place) {
+                    return self.days.splice(self.days.indexOf(day), 1);
+                } else {
+                    return await Day.findByIdAndUpdate(day._id, {place: self});
+                }
+            });
+        }
+    }
+    if (this.tops) {
+        let tops = await TopPlace.find({_id: this.tops});
+        this.tops = [];
+        if (tops) {
+            tops.forEach(function (top){
+                self.tops.push(top._id);
+            });
+            tops.forEach(async function (top) {
+                if (top.place) {
+                    return self.tops.splice(self.tops.indexOf(top), 1);
+                } else {
+                    return await TopPlace.findByIdAndUpdate(top._id, {place: self});
+                }
+            });
         }
     }
     return next();

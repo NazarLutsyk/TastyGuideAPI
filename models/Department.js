@@ -30,43 +30,53 @@ let Place = require('./Place');
 let Client = require('./Client');
 let Promo = require('./Promo');
 DepartmentSchema.pre('remove', async function (next) {
-    await Client.update(
-        {departments: this._id},
-        {$pull: {departments: this._id}},
-        {multi: true});
-    await Place.update(
-        {departments: this._id},
-        {$pull: {departments: this._id}},
-        {multi: true});
-    let promos = await Promo.find({client: this._id});
-    promos.forEach(function (promo) {
-        promo.remove();
-    });
-    next();
+    try {
+        await Client.update(
+            {departments: this._id},
+            {$pull: {departments: this._id}},
+            {multi: true});
+        await Place.update(
+            {departments: this._id},
+            {$pull: {departments: this._id}},
+            {multi: true});
+        await Promo.update(
+            {author: this._id},
+            {author: null},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 DepartmentSchema.pre('save', async function (next) {
-    let client = await Client.findById(this.client);
-    let place = await Place.findById(this.place);
-    if (client && place) {
-        client.departments.push(this);
-        place.departments.push(this);
-        client.save();
-        place.save();
-        if (this.promos) {
-            this.promos.forEach(async function (promoId) {
-                let promo = await Promo.findById(promoId);
-                promo.departments.push(this);
-                await promo.save();
+    let self = this;
+    try {
+        let client = await Client.findById(this.client);
+        let place = await Place.findById(this.place);
+        let promos = await Promo.find({_id: this.promos});
+        this.client = client ? client._id : '';
+        this.place = place ? place._id : '';
+        this.promos = [];
+        if (client && client.departments.indexOf(this._id) == -1) {
+            return await Client.findByIdAndUpdate(client._id, {$push : {departments : this}});
+        }
+        if (place && place.departments.indexOf(this._id) == -1) {
+            return await Place.findByIdAndUpdate(place._id, {$push : {departments : this}});
+        }
+        if (promos) {
+            promos.forEach(function (promo){
+               self.promos.push(promo._id);
+            });
+            promos.forEach(async function (promo) {
+                if (promo.departments.indexOf(self._id) == -1) {
+                    return await Promo.findByIdAndUpdate(promo._id, {author: self});
+                }else {
+                    return;
+                }
             });
         }
+        return next();
+    } catch (e) {
+        return next(e);
     }
-    next();
-    // let msg = 'Not found model:';
-    // if (!client){
-    //     msg += 'Client ';
-    // }
-    // if (!place){
-    //     msg += 'Place';
-    // }
-    // next(new Error(msg));
 });

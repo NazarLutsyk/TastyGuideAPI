@@ -68,7 +68,7 @@ module.exports = {
         try {
             if (modelId && placeId) {
                 await relationHelper.addRelation
-                ('Client', 'Place', modelId, placeId, 'ownPlaces');
+                ('Client', 'Place', modelId, placeId, 'ownPlaces','boss');
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -98,7 +98,7 @@ module.exports = {
         try {
             if (modelId && appId) {
                 await relationHelper.addRelation
-                ('Client', 'DrinkApplication', modelId, appId, 'drinkApplications', 'client');
+                ('Client', 'DrinkApplication', modelId, appId, 'drinkApplications', 'organizer');
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -113,7 +113,7 @@ module.exports = {
         try {
             if (modelId && appId) {
                 await relationHelper.removeRelation
-                ('Client', 'DrinkApplication', modelId, appId, 'drinkAppliactions', 'client');
+                ('Client', 'DrinkApplication', modelId, appId, 'drinkAppliactions', 'organizer');
                 res.sendStatus(204);
             } else {
                 throw new Error('Id in path eq null');

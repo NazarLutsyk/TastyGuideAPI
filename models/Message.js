@@ -12,15 +12,17 @@ let MessageSchema = new Schema({
         default : Date.now(),
         required : true
     },
+    seen : {
+        type: Boolean,
+        default: false
+    },
     sender: {
         type: Schema.Types.ObjectId,
         ref: 'Client',
-        required : true
     },
     receiver: {
         type: Schema.Types.ObjectId,
         ref: 'Client',
-        required : true
-    },
+    }
 });
 module.exports = mongoose.model('Message', MessageSchema);

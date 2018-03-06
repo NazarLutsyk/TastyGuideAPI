@@ -23,42 +23,38 @@ let PromoSchema = new Schema({
 module.exports = mongoose.model('Promo', PromoSchema);
 
 let Place = require('./Place');
-let Multilang = require('./Multilang');
 let Department = require('./Department');
-let path = require('path');
 PromoSchema.pre('remove', async function (next) {
-    await Place.update(
-        {promos: this._id},
-        {$pull: {promos: this._id}},
-        {multi: true});
-    await Department.update(
-        {promos: this._id},
-        {$pull: {promos: this._id}},
-        {multi: true});
-    this.multilang.forEach(async function (multId) {
-        let mult = await Multilang.findById(multId);
-        mult.remove();
-    });
-    next();
+    try {
+        await Place.update(
+            {promos: this._id},
+            {$pull: {promos: this._id}},
+            {multi: true});
+        await Department.update(
+            {promos: this._id},
+            {$pull: {promos: this._id}},
+            {multi: true});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });
 
 PromoSchema.pre('save', async function (next) {
-    let client = await Department.findById(this.client);
-    let place = await Place.findById(this.place);
-    if (client && place) {
-        client.promos.push(this);
-        place.promos.push(this);
-        await client.save();
-        await place.save();
+    try {
+        let client = await Department.findById(this.client);
+        let place = await Place.findById(this.place);
+        this.client = client ? client._id : '';
+        this.place = place ? place._id : '';
+        if (client && client.promos.indexOf(this._id) == -1) {
+            return await Department.findByIdAndUpdate(client._id,{$push : {promos : this}});
+        }
+        if (place && place.promos.indexOf(this._id) == -1) {
+            return await Place.findByIdAndUpdate(place._id,{$push : {promos : this._id}});
+        }
+        return next();
+    } catch (e) {
+        return next(e);
     }
-    next();
-    // let msg = 'Not found model:';
-    // if (!client){
-    //     msg += 'Department ';
-    // }
-    // if (!place){
-    //     msg += 'Place';
-    // }
-    // next(new Error(msg));
 });
 
