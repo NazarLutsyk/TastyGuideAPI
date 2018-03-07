@@ -1,5 +1,5 @@
 let nodemailer = require('nodemailer');
-let MAIL = require('../config/mail');
+let MAIL = require(global.paths.CONFIG + '/mail');
 
 //todo normal message format
 module.exports = {

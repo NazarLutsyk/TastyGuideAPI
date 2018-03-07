@@ -1,4 +1,4 @@
-let EventMultilang = require('../models/EventMultilang');
+let EventMultilang = require(global.paths.MODELS + '/EventMultilang');
 
 module.exports = {
     async getEventMultilangs(req, res) {

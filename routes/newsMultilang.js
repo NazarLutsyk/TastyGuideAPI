@@ -1,6 +1,6 @@
-const NewsMultilangController = require('../controllers/NewsMultilangController');
-let permission = require('../middleware/authorizarion/index');
-let Rules = require('../middleware/authorizarion/rules/PromoMultilang');
+const NewsMultilangController = require(global.paths.CONTROLLERS + '/NewsMultilangController');
+let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
+let Rules = require(global.paths.MIDDLEWARE + '/authorizarion/rules/PromoMultilang');
 const express = require('express');
 
 const router = express.Router();

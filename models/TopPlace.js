@@ -21,6 +21,10 @@ let TopPlaceSchema = new Schema({
         type: Number,
         required : true
     },
+    actual : {
+        type : Boolean,
+        default : true
+    },
     place : {
         type : Schema.Types.ObjectId,
         ref : 'Place',
@@ -31,6 +35,7 @@ let TopPlaceSchema = new Schema({
 module.exports = mongoose.model('TopPlace',TopPlaceSchema);
 
 let Place = require('./Place');
+let winston = require(global.paths.CONFIG + '/winston');
 TopPlaceSchema.pre('remove', async function (next) {
     try {
         await Place.update(

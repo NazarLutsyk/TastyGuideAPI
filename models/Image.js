@@ -9,9 +9,9 @@ ImageSchema = new Schema({
 
 module.exports = mongoose.model('Image', ImageSchema);
 
-let fileHelper = require('../helpers/fileHelper');
-let Promo = require('../models/Promo');
-let Place = require('../models/Place');
+let fileHelper = require(global.paths.HELPERS + '/fileHelper');
+let Promo = require('./Promo');
+let Place = require('./Place');
 
 ImageSchema.pre('remove',async function (next) {
     try {

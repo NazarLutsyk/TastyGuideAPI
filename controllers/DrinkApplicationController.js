@@ -1,4 +1,4 @@
-let DrinkApplication = require('../models/DrinkApplication');
+let DrinkApplication = require(global.paths.MODELS + '/DrinkApplication');
 
 module.exports = {
     async getDrinkApplications(req, res) {

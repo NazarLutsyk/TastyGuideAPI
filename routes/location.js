@@ -1,8 +1,8 @@
-const LocationController = require('../controllers/LocationController');
+const LocationController = require(global.paths.CONTROLLERS + '/LocationController');
 const express = require('express');
 
-let permission = require('../middleware/authorizarion/index');
-let Rule = require('../middleware/authorizarion/rules/Location');
+let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
+let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Location');
 
 const router = express.Router();
 

@@ -1,5 +1,5 @@
-let Department = require('../../../models/Department');
-let Day = require('../../../models/Day');
+let Department = require(global.paths.MODELS + '/Department');
+let Day = require(global.paths.MODELS + '/Day');
 module.exports = {
     async updateDay(req,res,next) {
         let user = req.user;

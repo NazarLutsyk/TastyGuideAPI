@@ -1,6 +1,6 @@
-let Department = require('../../../models/Department');
-let Place = require('../../../models/Place');
-let PlaceMultilang = require('../../../models/PlaceMultilang');
+let Department = require(global.paths.MODELS + '/Department');
+let Place = require(global.paths.MODELS + '/Place');
+let PlaceMultilang = require(global.paths.MODELS + '/PlaceMultilang');
 module.exports = {
     async updatePlaceMultilang(req, res, next) {
         let user = req.user;

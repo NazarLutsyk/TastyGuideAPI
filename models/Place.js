@@ -4,7 +4,6 @@ let path = require('path');
 let Schema = mongoose.Schema;
 
 let PlaceSchema = new Schema({
-    ratingScore: Number,//todo get set
     phone: {
         type: String,
         required: true,
@@ -191,7 +190,7 @@ PlaceSchema.pre('save', async function (next) {
         let hashTags = await HashTag.find({_id: this.hashTags});
         this.hashTags = [];
         if (hashTags) {
-            hashTags.forEach(function (hashTag){
+            hashTags.forEach(function (hashTag) {
                 self.hashTags.push(hashTag._id);
             });
             hashTags.forEach(async function (hashTag) {
@@ -208,7 +207,7 @@ PlaceSchema.pre('save', async function (next) {
         let promos = await Promo.find({_id: this.promos});
         this.promos = [];
         if (promos) {
-            promos.forEach(function (promo){
+            promos.forEach(function (promo) {
                 self.promos.push(promo._id);
             });
             promos.forEach(async function (promo) {
@@ -224,8 +223,8 @@ PlaceSchema.pre('save', async function (next) {
         let complaints = await Complaint.find({_id: this.complaints});
         this.complaints = [];
         if (complaints) {
-            complaints.forEach(function (complaint){
-                self.ownPlaces.push(complaint._id);
+            complaints.forEach(function (complaint) {
+                self.complaints.push(complaint._id);
             });
             complaints.forEach(async function (complaint) {
                 if (complaint.place) {
@@ -240,7 +239,7 @@ PlaceSchema.pre('save', async function (next) {
         let ratings = await Rating.find({_id: this.ratings});
         this.ratings = [];
         if (ratings) {
-            ratings.forEach(function (rating){
+            ratings.forEach(function (rating) {
                 self.ratings.push(rating._id);
             });
             ratings.forEach(async function (rating) {
@@ -256,7 +255,7 @@ PlaceSchema.pre('save', async function (next) {
         let departments = await Department.find({_id: this.departments});
         this.departments = [];
         if (departments) {
-            departments.forEach(function (department){
+            departments.forEach(function (department) {
                 self.departments.push(department._id);
             });
             departments.forEach(async function (department) {
@@ -272,7 +271,7 @@ PlaceSchema.pre('save', async function (next) {
         let multilangs = await Multilang.find({_id: this.multilang});
         this.multilang = [];
         if (multilangs) {
-            multilangs.forEach(function (multilang){
+            multilangs.forEach(function (multilang) {
                 self.multilang.push(multilang._id);
             });
             multilangs.forEach(async function (multilang) {
@@ -286,9 +285,9 @@ PlaceSchema.pre('save', async function (next) {
     }
     if (this.days) {
         let days = await Day.find({_id: this.days});
-        this.days  = [];
+        this.days = [];
         if (days) {
-            days.forEach(function (day){
+            days.forEach(function (day) {
                 self.days.push(day._id);
             });
             days.forEach(async function (day) {
@@ -304,7 +303,7 @@ PlaceSchema.pre('save', async function (next) {
         let tops = await TopPlace.find({_id: this.tops});
         this.tops = [];
         if (tops) {
-            tops.forEach(function (top){
+            tops.forEach(function (top) {
                 self.tops.push(top._id);
             });
             tops.forEach(async function (top) {

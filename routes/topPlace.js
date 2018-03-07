@@ -1,6 +1,6 @@
-const TopPlaceController = require('../controllers/TopPlaceController');
+const TopPlaceController = require(global.paths.CONTROLLERS + '/TopPlaceController');
 const express = require('express');
-let permission = require('../middleware/authorizarion/index');
+let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
 
 const router = express.Router();
 

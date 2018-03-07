@@ -1,5 +1,5 @@
-let Department = require('../../../models/Department');
-let Promo = require('../../../models/Promo');
+let Department = require(global.paths.MODELS + '/Department');
+let Promo = require(global.paths.MODELS + '/Promo');
 module.exports = {
     async updatePromo(req,res,next) {
         let user = req.user;

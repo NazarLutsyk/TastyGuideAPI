@@ -1,4 +1,4 @@
-let Day = require('../models/Day');
+let Day = require(global.paths.MODELS + '/Day');
 
 module.exports = {
     async getDays(req, res) {

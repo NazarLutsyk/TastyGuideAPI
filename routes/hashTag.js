@@ -1,7 +1,7 @@
-const HashTagController = require('../controllers/HashTagController');
+const HashTagController = require(global.paths.CONTROLLERS + '/HashTagController');
 const express = require('express');
 
-let permission = require('../middleware/authorizarion/index');
+let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
 
 const router = express.Router();
 

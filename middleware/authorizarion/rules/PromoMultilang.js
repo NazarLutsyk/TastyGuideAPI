@@ -1,11 +1,11 @@
-let Department = require('../../../models/Department');
-let Promo = require('../../../models/Promo');
-let Bonuse = require('../../../models/Bonuse');
-let News = require('../../../models/News');
-let Event = require('../../../models/Event');
-let BonuseMultilang = require('../../../models/BonuseMultilang');
-let NewsMultilang = require('../../../models/NewsMultilang');
-let EventMultilang = require('../../../models/EventMultilang');
+let Department = require(global.paths.MODELS + '/Department');
+let Promo = require(global.paths.MODELS + '/Promo');
+let Bonuse = require(global.paths.MODELS + '/Bonuse');
+let News = require(global.paths.MODELS + '/News');
+let Event = require(global.paths.MODELS + '/Event');
+let BonuseMultilang = require(global.paths.MODELS + '/BonuseMultilang');
+let NewsMultilang = require(global.paths.MODELS + '/NewsMultilang');
+let EventMultilang = require(global.paths.MODELS + '/EventMultilang');
 module.exports = {
     async updatePromoMultilang(req, res, next) {
         let user = req.user;

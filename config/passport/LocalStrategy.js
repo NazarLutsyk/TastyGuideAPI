@@ -1,5 +1,5 @@
 let LocalStrategy = require('passport-local');
-let Client = require('../../models/Client');
+let Client = require( global.paths.MODELS+ '/Client');
 
 exports.LocalSignup = new LocalStrategy({
         usernameField: 'login',

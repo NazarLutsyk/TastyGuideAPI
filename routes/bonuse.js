@@ -1,6 +1,6 @@
-const BonuseController = require('../controllers/BonuseController');
-let permission = require('../middleware/authorizarion/index');
-let Rule = require('../middleware/authorizarion/rules/Promo');
+const BonuseController = require(global.paths.CONTROLLERS + '/BonuseController');
+let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
+let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Promo');
 const express = require('express');
 
 const router = express.Router();

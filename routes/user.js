@@ -1,7 +1,7 @@
 let router = require('express').Router();
 let passport = require('passport');
-let PassportMiddleware = require('../middleware/passport');
-let UserController = require('../controllers/UserController');
+let PassportMiddleware = require(global.paths.MIDDLEWARE + '/passport');
+let UserController = require(global.paths.CONTROLLERS + '/UserController');
 
 router.post('/local/signup', PassportMiddleware.notLoggedIn, UserController.signUp);
 router.post('/local/signin', PassportMiddleware.notLoggedIn, UserController.signIn);

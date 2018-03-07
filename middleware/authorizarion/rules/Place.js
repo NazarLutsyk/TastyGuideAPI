@@ -1,4 +1,4 @@
-let Department = require('../../../models/Department');
+let Department = require(global.paths.MODELS + '/Department');
 module.exports = {
     async updatePlace(req,res,next) {
         let user = req.user;

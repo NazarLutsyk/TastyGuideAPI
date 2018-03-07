@@ -1,5 +1,5 @@
-let Department = require('../models/Department');
-require('../helpers/relationHelper');
+let Department = require(global.paths.MODELS + '/Department');
+let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 
 module.exports = {
     async getDepartments(req, res) {

@@ -1,8 +1,8 @@
-const DepartmentController = require('../controllers/DepartmentController');
+const DepartmentController = require(global.paths.CONTROLLERS + '/DepartmentController');
 const express = require('express');
 
-let permission = require('../middleware/authorizarion/index');
-let Rule = require('../middleware/authorizarion/rules/Depatment');
+let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
+let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Depatment');
 
 const router = express.Router();
 

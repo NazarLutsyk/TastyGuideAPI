@@ -1,5 +1,5 @@
-let Bonuse = require('../models/Bonuse');
-let relationHelper = require('../helpers/relationHelper');
+let Bonuse = require(global.paths.MODELS + '/Bonuse');
+let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let path = require('path');
 
 module.exports = {

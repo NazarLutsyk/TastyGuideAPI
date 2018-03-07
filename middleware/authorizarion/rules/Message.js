@@ -1,4 +1,4 @@
-let Message = require('../../../models/Message');
+let Message = require(global.paths.MODELS + '/Message');
 module.exports = {
     async deleteMessage(req, res, next) {
         let user = req.user;

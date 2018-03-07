@@ -1,5 +1,5 @@
-let HashTag = require('../models/HashTag');
-let relationHelper = require('../helpers/relationHelper');
+let HashTag = require(global.paths.MODELS + '/HashTag');
+let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 
 module.exports = {
     async getHashTags(req, res) {

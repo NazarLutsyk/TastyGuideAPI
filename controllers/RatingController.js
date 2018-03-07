@@ -1,4 +1,4 @@
-let Rating = require('../models/Rating');
+let Rating = require(global.paths.MODELS + '/Rating');
 
 module.exports = {
     async getRatings(req, res) {

@@ -1,10 +1,14 @@
 let path = require('path');
 let multer = require('multer');
+let mkdirp = require('mkdirp');
 
 let diskStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         let uploadPath = path.join(__dirname, '../public', 'upload');
-        cb(null, uploadPath);
+        mkdirp(uploadPath, function (err) {
+            if (err) return cb(e);
+            else return cb(null, uploadPath);
+        });
     },
     filename: function (req, file, cb) {
         let originalname = file.originalname;
@@ -15,7 +19,11 @@ let diskStorage = multer.diskStorage({
         let id = Math.floor(Math.random() * (1000000 - 1) + 1);
 
         let resultFilename = id + '-' + Date.now() + extension;
-        cb(null, resultFilename);
+        if (['.jpg','.jpeg','.png','.svg','.gif'].indexOf(extension) != -1) {
+            cb(null, resultFilename);
+        }else {
+            cb(new Error('Bad extension'));
+        }
     }
 });
 let upload = multer({

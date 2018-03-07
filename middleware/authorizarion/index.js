@@ -1,4 +1,4 @@
-let ROLES = require('../../config/roles');
+let ROLES = require(global.paths.CONFIG + '/roles');
 module.exports = function (rule, ...allowed) {
 
     function isAllowed(roles) {

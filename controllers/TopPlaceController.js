@@ -1,4 +1,4 @@
-let TopPlace = require('../models/TopPlace');
+let TopPlace = require(global.paths.MODELS + '/TopPlace');
 
 module.exports = {
     async getTopPlaces(req, res) {

@@ -1,4 +1,4 @@
-let Complaint = require('../models/Complaint');
+let Complaint = require(global.paths.MODELS + '/Complaint');
 
 module.exports = {
     async getComplaints(req, res) {
@@ -42,7 +42,7 @@ module.exports = {
             res.status(400).send(e.toString());
         }
     },
-    async deleteMessage(req, res) {
+    async updateComplaint(req, res) {
         let complaintId = req.params.id;
         try {
             let complaint = await Complaint.findByIdAndUpdate(complaintId, req.body,{new : true});

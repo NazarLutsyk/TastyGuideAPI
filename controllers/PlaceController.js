@@ -1,5 +1,5 @@
-let Place = require('../models/Place');
-let relationHelper = require('../helpers/relationHelper');
+let Place = require(global.paths.MODELS + '/Place');
+let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 
 let path = require('path');
 module.exports = {

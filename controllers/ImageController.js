@@ -1,6 +1,9 @@
-let Image = require('../models/Image');
-let fileHelper = require('../helpers/fileHelper');
+let Image = require(global.paths.MODELS + '/Image');
+let fileHelper = require(global.paths.HELPERS + '/fileHelper');
+let upload = require(global.paths.MIDDLEWARE + '/multer');
 let path = require('path');
+upload = upload.array('images');
+
 
 module.exports = {
     async getImages(req, res) {
@@ -37,14 +40,17 @@ module.exports = {
         }
     },
     async createImage(req, res) {
-        try {
-            if (req.files) {
+        upload(req, res,async function (err) {
+            console.log('here');
+            if (err) {
+                return res.status(400).send(err.toString());
+            }else {
                 let result = [];
                 for (let file of req.files) {
                     let image = new Image({
-                        name : file.filename,
-                        path : file.path,
-                        extension : path.extname(file.filename)
+                        name: file.filename,
+                        path: file.path,
+                        extension: path.extname(file.filename)
                     });
                     result.push(image);
                 }
@@ -54,14 +60,7 @@ module.exports = {
                 }
                 res.status(201).json(response);
             }
-        } catch (e) {
-            if (req.files){
-                for (let file of req.files) {
-                    fileHelper.deleteFiles(file.path)
-                }
-            }
-            res.status(400).send(e.toString());
-        }
+        });
     },
     async removeImage(req, res) {
         let imageId = req.params.id;

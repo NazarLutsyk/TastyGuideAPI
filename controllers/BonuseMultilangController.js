@@ -1,4 +1,4 @@
-let BonuseMultilang = require('../models/BonuseMultilang');
+let BonuseMultilang = require(global.paths.MODELS + '/BonuseMultilang');
 
 module.exports = {
     async getBonuseMultilangs(req, res) {

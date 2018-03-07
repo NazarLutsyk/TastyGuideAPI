@@ -1,7 +1,7 @@
-const CurrencyController = require('../controllers/CurrencyController');
+const CurrencyController = require(global.paths.CONTROLLERS + '/CurrencyController');
 const express = require('express');
 
-let permission = require('../middleware/authorizarion/index');
+let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
 
 const router = express.Router();
 

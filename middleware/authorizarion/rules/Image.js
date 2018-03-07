@@ -1,6 +1,6 @@
-let Department = require('../../../models/Department');
-let Image = require('../../../models/Image');
-let Place = require('../../../models/Place');
+let Department = require(global.paths.MODELS + '/Department');
+let Image = require(global.paths.MODELS + '/Image');
+let Place = require(global.paths.MODELS + '/Place');
 module.exports = {
     async updateImage(req,res,next) {
         let user = req.user;

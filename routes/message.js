@@ -1,8 +1,8 @@
-const MessageController = require('../controllers/MessageController');
+const MessageController = require(global.paths.CONTROLLERS + '/MessageController');
 const express = require('express');
 
-let permission = require('../middleware/authorizarion/index');
-let Rule = require('../middleware/authorizarion/rules/Message');
+let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
+let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Message');
 
 const router = express.Router();
 

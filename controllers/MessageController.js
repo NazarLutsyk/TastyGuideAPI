@@ -1,4 +1,4 @@
-let Message = require('../models/Message');
+let Message = require(global.paths.MODELS + '/Message');
 
 module.exports = {
     async getMessages(req, res) {

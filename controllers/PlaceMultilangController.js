@@ -1,4 +1,4 @@
-let PlaceMultilang = require('../models/PlaceMultilang');
+let PlaceMultilang = require(global.paths.MODELS + '/PlaceMultilang');
 
 module.exports = {
     async getPlaceMultilangs(req, res) {

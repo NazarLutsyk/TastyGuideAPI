@@ -1,4 +1,4 @@
-let QueryHelper = require('../helpers/queryHelper');
+let QueryHelper = require(global.paths.HELPERS + '/queryHelper');
 
 module.exports = {
     parseQuery(req, res, next) {

@@ -1,4 +1,4 @@
-let Lang = require('../models/Lang');
+let Lang = require(global.paths.MODELS + '/Lang');
 
 module.exports = {
     async getLangs(req, res) {

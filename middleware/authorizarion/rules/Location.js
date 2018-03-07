@@ -1,5 +1,5 @@
-let Department = require('../../../models/Department');
-let Location = require('../../../models/Location');
+let Department = require(global.paths.MODELS + '/Department');
+let Location = require(global.paths.MODELS + '/Location');
 module.exports = {
     async updateLocation(req,res,next) {
         let user = req.user;

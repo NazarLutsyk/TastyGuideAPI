@@ -1,5 +1,5 @@
-let News = require('../models/News');
-let relationHelper = require('../helpers/relationHelper');
+let News = require(global.paths.MODELS + '/News');
+let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let path = require('path');
 
 module.exports = {

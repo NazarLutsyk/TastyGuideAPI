@@ -1,5 +1,5 @@
-let Client = require('../models/Client');
-let relationHelper = require('../helpers/relationHelper');
+let Client = require(global.paths.MODELS + '/Client');
+let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 
 module.exports = {
     async getClients(req, res) {

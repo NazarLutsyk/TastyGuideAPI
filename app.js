@@ -7,7 +7,10 @@ const mongoose = require('mongoose');
 let session = require('express-session');
 let MongoStorage = require('connect-mongo')(session);
 let passport = require('passport');
+require('./config/path');
+require('./config/winston');
 require('./config/passport/index');
+require('./config/schedule');
 
 const passportMiddleware = require('./middleware/passport');
 const index = require('./routes/index');

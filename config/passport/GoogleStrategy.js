@@ -1,6 +1,6 @@
 let GoogleStrategy = require('passport-google-oauth20').Strategy;
-let Client = require('../../models/Client');
-let SOCIAL = require('../social');
+let Client = require(global.paths.MODELS + '/Client');
+let SOCIAL = require(global.paths.CONFIG + '/social');
 
 exports.Auth = new GoogleStrategy({
     clientID: SOCIAL.GOOGLE.CLIENT_ID,

@@ -1,6 +1,6 @@
-const PlaceTypeController = require('../controllers/PlaceTypeController');
+const PlaceTypeController = require(global.paths.CONTROLLERS + '/PlaceTypeController');
 const express = require('express');
-let permission = require('../middleware/authorizarion/index');
+let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
 
 const router = express.Router();
 

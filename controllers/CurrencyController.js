@@ -1,4 +1,4 @@
-let Currency = require('../models/Currency');
+let Currency = require(global.paths.MODELS + '/Currency');
 
 module.exports = {
     async getCurrencys(req, res) {

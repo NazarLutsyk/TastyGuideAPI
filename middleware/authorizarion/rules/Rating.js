@@ -1,5 +1,5 @@
-let Client = require('../../../models/Client');
-let Rating = require('../../../models/Rating');
+let Client = require(global.paths.MODELS + '/Client');
+let Rating = require(global.paths.MODELS + '/Rating');
 module.exports = {
     async updateRating(req,res,next) {
         let user = req.user;

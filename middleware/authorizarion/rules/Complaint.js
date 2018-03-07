@@ -1,5 +1,5 @@
-let Client = require('../../../models/Client');
-let Complaint = require('../../../models/Complaint');
+let Client = require(global.paths.MODELS + '/Client');
+let Complaint = require(global.paths.MODELS + '/Complaint');
 module.exports = {
     async deleteMessage(req, res, next) {
         let user = req.user;

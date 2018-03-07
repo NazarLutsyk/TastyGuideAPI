@@ -5,7 +5,7 @@ let Schema = mongoose.Schema;
 let DepartmentSchema = new Schema({
     roles: [{
         type: String,
-        required: true//todo enum
+        required: true
     }],
     client: {
         type: Schema.Types.ObjectId,

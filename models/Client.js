@@ -43,7 +43,7 @@ let ClientSchema = new Schema({
         default: path.join(__dirname, 'default', 'default.jpg')
     },
     roles: {
-        type: Array,//todo enum
+        type: Array,
         default: [ROLES.GLOBAL_ROLES.USER_ROLE]
     },
     ownPlaces: [{

@@ -1,5 +1,5 @@
-let PlaceType = require('../models/PlaceType');
-let relationHelper = require('../helpers/relationHelper');
+let PlaceType = require(global.paths.MODELS + '/PlaceType');
+let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 
 module.exports = {
     async getPlaceTypes(req, res) {

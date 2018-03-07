@@ -1,4 +1,4 @@
-let NewsMultilang = require('../models/NewsMultilang');
+let NewsMultilang = require(global.paths.MODELS + '/NewsMultilang');
 
 module.exports = {
     async getNewsMultilangs(req, res) {

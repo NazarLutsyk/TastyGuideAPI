@@ -1,5 +1,5 @@
-let Event = require('../models/Event');
-let relationHelper = require('../helpers/relationHelper');
+let Event = require(global.paths.MODELS + '/Event');
+let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 
 let path = require('path');
 module.exports = {

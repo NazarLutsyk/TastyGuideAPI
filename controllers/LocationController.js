@@ -1,4 +1,4 @@
-let Location = require('../models/Location');
+let Location = require(global.paths.MODELS + '/Location');
 
 module.exports = {
     async getLocations(req, res) {
