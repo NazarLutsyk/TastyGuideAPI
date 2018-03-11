@@ -1,5 +1,6 @@
 let Client = require(global.paths.MODELS + '/Client');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getClients(req, res) {
@@ -16,13 +17,13 @@ module.exports = {
             let clients = await clientsQuery.exec();
             res.json(clients);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getClientById(req, res) {
         let clientId = req.params.id;
         try {
-            let clientQuery = Client.find({_id: clientId})
+            let clientQuery = Client.findOne({_id: clientId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -32,9 +33,10 @@ module.exports = {
             let client = await clientQuery.exec();
             res.json(client);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
+    //todo
     /*async createClient(req, res) {
         try {
             let client = await Client.create(req.body);
@@ -46,8 +48,13 @@ module.exports = {
     async updateClient(req, res) {
         let clientId = req.params.id;
         try {
-            let updatedClient = await Client.findByIdAndUpdate(clientId, req.body, {new: true});
-            res.status(201).json(updatedClient);
+            let err = keysValidator.diff(Client.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await Client.findByIdAndUpdate(clientId, req.body);
+                res.status(201).json(await Client.findById(clientId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

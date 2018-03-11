@@ -1,5 +1,6 @@
 let Place = require(global.paths.MODELS + '/Place');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 let path = require('path');
 module.exports = {
@@ -17,13 +18,13 @@ module.exports = {
             let places = await placeQuery.exec();
             res.json(places);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getPlaceById(req, res) {
         let placeId = req.params.id;
         try {
-            let PlaceQuery = Place.find({_id: placeId})
+            let PlaceQuery = Place.findOne({_id: placeId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -33,13 +34,18 @@ module.exports = {
             let place = await PlaceQuery.exec();
             res.json(place);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createPlace(req, res) {
         try {
-            let place = await Place.create(req.body);
-            res.status(201).json(place);
+            let err = keysValidator.diff(Place.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let place = await Place.create(req.body);
+                res.status(201).json(place);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -47,8 +53,13 @@ module.exports = {
     async updatePlace(req, res) {
         let placeId = req.params.id;
         try {
-            let updatedPlace = await Place.findByIdAndUpdate(placeId, req.body, {new: true});
-            res.status(201).json(updatedPlace);
+            let err = keysValidator.diff(Place.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await Place.findByIdAndUpdate(placeId, req.body);
+                res.status(201).json(await Place.findById(placeId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

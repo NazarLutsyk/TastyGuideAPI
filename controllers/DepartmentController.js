@@ -1,5 +1,6 @@
 let Department = require(global.paths.MODELS + '/Department');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getDepartments(req, res) {
@@ -16,13 +17,13 @@ module.exports = {
             let departments = await departmentQuery.exec();
             res.json(departments);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getDepartmentById(req, res) {
         let departmentId = req.params.id;
         try {
-            let departmentQuery = Department.find({_id: departmentId})
+            let departmentQuery = Department.findOne({_id: departmentId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -32,13 +33,18 @@ module.exports = {
             let department = await departmentQuery.exec();
             res.json(department);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createDepartment(req, res) {
         try {
-            let department = await Department.create(req.body);
-            res.status(201).json(department);
+            let err = keysValidator.diff(Department.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let department = await Department.create(req.body);
+                res.status(201).json(department);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -46,8 +52,13 @@ module.exports = {
     async updateDepartment(req, res) {
         let departmentId = req.params.id;
         try {
-            let department = await Department.findByIdAndUpdate(departmentId, req.body, {new: true});
-            res.status(201).json(department);
+            let err = keysValidator.diff(Department.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await Department.findByIdAndUpdate(departmentId, req.body);
+                res.status(201).json(await Department.findById(departmentId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

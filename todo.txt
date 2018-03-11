@@ -16,7 +16,8 @@
 //+model relation required
 //+paths
 //todo cors?
-//todo clusters
+//todo clusters?
+//todo pagination&aggregation?
 //+stack of places
 //+top place planning
 //+logger

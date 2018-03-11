@@ -1,4 +1,5 @@
 let Lang = require(global.paths.MODELS + '/Lang');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getLangs(req, res) {
@@ -15,13 +16,13 @@ module.exports = {
             let langs = await langQuery.exec();
             res.json(langs);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getLangById(req, res) {
         let langId = req.params.id;
         try {
-            let langQuery = Lang.find({_id: langId})
+            let langQuery = Lang.findOne({_id: langId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -45,8 +46,13 @@ module.exports = {
     async updateLang(req, res) {
         let langId = req.params.id;
         try {
-            let lang = await Lang.findByIdAndUpdate(langId, req.body,{new : true});
-            res.status(201).json(lang);
+            let err = keysValidator.diff(Lang.schema.tree, req.body);
+            if (err) {
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await Lang.findByIdAndUpdate(langId, req.body);
+                res.status(201).json(await Lang.findById(langId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

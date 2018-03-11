@@ -1,4 +1,5 @@
 let Rating = require(global.paths.MODELS + '/Rating');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getRatings(req, res) {
@@ -15,13 +16,13 @@ module.exports = {
             let ratings = await ratingQuery.exec();
             res.json(ratings);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getRatingById(req, res) {
         let ratingId = req.params.id;
         try {
-            let ratingQuery = Rating.find({_id: ratingId})
+            let ratingQuery = Rating.findOne({_id: ratingId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -31,13 +32,18 @@ module.exports = {
             let rating = await ratingQuery.exec();
             res.json(rating);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createRating(req, res) {
         try {
-            let rating = await Rating.create(req.body);
-            res.status(201).json(rating);
+            let err = keysValidator.diff(Rating.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let rating = await Rating.create(req.body);
+                res.status(201).json(rating);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -45,8 +51,13 @@ module.exports = {
     async updateRating(req, res) {
         let ratingId = req.params.id;
         try {
-            let rating = await Rating.findByIdAndUpdate(ratingId, req.body,{new : true});
-            res.status(201).json(rating);
+            let err = keysValidator.diff(Rating.schema.tree, req.body);
+            if (err) {
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await Rating.findByIdAndUpdate(ratingId, req.body);
+                res.status(201).json(await Rating.findById(ratingId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

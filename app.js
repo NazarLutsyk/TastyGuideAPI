@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 let session = require('express-session');
 let MongoStorage = require('connect-mongo')(session);
 let passport = require('passport');
+let helmet = require('helmet');
 require('./config/path');
 require('./config/winston');
 require('./config/passport/index');
@@ -23,6 +24,7 @@ const app = express();
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/drinker');
 
+app.use(helmet());
 app.use(express.static(path.join(__dirname,'public')));
 
 app.use(logger('dev'));
@@ -63,5 +65,3 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
-
-

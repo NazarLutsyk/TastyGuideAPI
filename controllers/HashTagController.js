@@ -1,5 +1,6 @@
 let HashTag = require(global.paths.MODELS + '/HashTag');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getHashTags(req, res) {
@@ -16,13 +17,13 @@ module.exports = {
             let hashTags = await hashTagQuery.exec();
             res.json(hashTags);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getHashTagById(req, res) {
         let hashTagId = req.params.id;
         try {
-            let hashTagQuery = HashTag.find({_id: hashTagId})
+            let hashTagQuery = HashTag.findOne({_id: hashTagId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -32,13 +33,18 @@ module.exports = {
             let hashTag = await hashTagQuery.exec();
             res.json(hashTag);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createHashTag(req, res) {
         try {
-            let hashTag = await HashTag.create(req.body);
-            res.status(201).json(hashTag);
+            let err = keysValidator.diff(HashTag.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let hashTag = await HashTag.create(req.body);
+                res.status(201).json(hashTag);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -46,10 +52,15 @@ module.exports = {
     async updateHashTag(req, res) {
         let hashTagId = req.params.id;
         try {
-            let hashTag = await HashTag.findByIdAndUpdate(hashTagId, req.body,{new : true});
-            res.status(201).json(hashTag);
+            let err = keysValidator.diff(HashTag.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await HashTag.findByIdAndUpdate(hashTagId, req.body);
+                res.status(201).json(await HashTag.findById(hashTagId));
+            }
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async removeHashTag(req, res) {

@@ -1,4 +1,5 @@
 let Currency = require(global.paths.MODELS + '/Currency');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getCurrencys(req, res) {
@@ -15,13 +16,13 @@ module.exports = {
             let currencies = await currencyQuery.exec();
             res.json(currencies);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getCurrencyById(req, res) {
         let currencyId = req.params.id;
         try {
-            let currenccyQuery = Currency.find({_id: currencyId})
+            let currenccyQuery = Currency.findOne({_id: currencyId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -31,13 +32,18 @@ module.exports = {
             let currency = await currenccyQuery.exec();
             res.json(currency);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createCurrency(req, res) {
         try {
-            let currency = await Currency.create(req.body);
-            res.status(201).json(currency);
+            let err = keysValidator.diff(Currency.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let currency = await Currency.create(req.body);
+                res.status(201).json(currency);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -45,8 +51,13 @@ module.exports = {
     async updateCurrency(req, res) {
         let currencyId = req.params.id;
         try {
-            let currency = await Currency.findByIdAndUpdate(currencyId, req.body,{new : true});
-            res.status(201).json(currency);
+            let err = keysValidator.diff(Currency.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await Currency.findByIdAndUpdate(currencyId, req.body);
+                res.status(201).json(await Currency.findById(currencyId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

@@ -1,5 +1,6 @@
 let Event = require(global.paths.MODELS + '/Event');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 let path = require('path');
 module.exports = {
@@ -17,13 +18,13 @@ module.exports = {
             let events = await eventQuery.exec();
             res.json(events);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getEventById(req, res) {
         let eventId = req.params.id;
         try {
-            let eventQuery = Event.find({_id: eventId})
+            let eventQuery = Event.findOne({_id: eventId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -33,13 +34,18 @@ module.exports = {
             let event = await eventQuery.exec();
             res.json(event);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createEvent(req, res) {
         try {
-            let event = await Event.create(req.body);
-            res.status(201).json(event);
+            let err = keysValidator.diff(Event.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let event = await Event.create(req.body);
+                res.status(201).json(event);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -47,8 +53,13 @@ module.exports = {
     async updateEvent(req, res) {
         let eventId = req.params.id;
         try {
-            let updatedEvent = await Event.findByIdAndUpdate(eventId, req.body, {new: true});
-            res.status(201).json(updatedEvent);
+            let err = keysValidator.diff(Event.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await Event.findByIdAndUpdate(eventId, req.body);
+                res.status(201).json(await Event.findById(eventId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

@@ -1,4 +1,5 @@
 let NewsMultilang = require(global.paths.MODELS + '/NewsMultilang');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getNewsMultilangs(req, res) {
@@ -15,13 +16,13 @@ module.exports = {
             let newsMultilangs = await newsMultilangQuery.exec();
             res.json(newsMultilangs);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getNewsMultilangById(req, res) {
         let newsMultilangId = req.params.id;
         try {
-            let newsMultilangQuery = NewsMultilang.find({_id: newsMultilangId})
+            let newsMultilangQuery = NewsMultilang.findOne({_id: newsMultilangId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -31,13 +32,18 @@ module.exports = {
             let newsMultilang = await newsMultilangQuery.exec();
             res.json(newsMultilang);
         }catch (e){
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createNewsMultilang(req, res) {
         try {
-            let newsMultilang = await NewsMultilang.create(req.body);
-            res.status(201).json(newsMultilang);
+            let err = keysValidator.diff(NewsMultilang.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let newsMultilang = await NewsMultilang.create(req.body);
+                res.status(201).json(newsMultilang);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -45,8 +51,13 @@ module.exports = {
     async updateNewsMultilang(req, res) {
         let newsMultilangId = req.params.id;
         try {
-            let newsMultilang = await NewsMultilang.findByIdAndUpdate(newsMultilangId, req.body, {new: true});
-            res.status(201).json(newsMultilang);
+            let err = keysValidator.diff(NewsMultilang.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await NewsMultilang.findByIdAndUpdate(newsMultilangId, req.body);
+                res.status(201).json(await NewsMultilang.findById(newsMultilangId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

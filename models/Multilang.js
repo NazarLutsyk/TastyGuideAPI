@@ -5,8 +5,7 @@ let Schema = mongoose.Schema;
 let MultilangSchema = new Schema({
     lang : {
         type : Schema.Types.ObjectId,
-        ref : 'Lang',
-        required : true
+        ref : 'Lang'
     },
 },{
     timestamps : true,

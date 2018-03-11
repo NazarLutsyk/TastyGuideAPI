@@ -18,7 +18,6 @@ let BonuseMultilangSchema = new Schema({
     bonuse: {
         type: Schema.Types.ObjectId,
         ref: 'Bonuse',
-        required: true
     },
 }, {
     discriminatorKey: 'kind'

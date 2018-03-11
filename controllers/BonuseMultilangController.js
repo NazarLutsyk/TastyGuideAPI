@@ -1,4 +1,5 @@
 let BonuseMultilang = require(global.paths.MODELS + '/BonuseMultilang');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getBonuseMultilangs(req, res) {
@@ -15,13 +16,13 @@ module.exports = {
             let bonuseMultilang = await bonuseMultilangQuery.exec();
             res.json(bonuseMultilang);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getBonuseMultilangById(req, res) {
         let bonuseMultilangId = req.params.id;
         try {
-            let bonuseMultilangQuery = BonuseMultilang.find({_id: bonuseMultilangId})
+            let bonuseMultilangQuery = BonuseMultilang.findOne({_id: bonuseMultilangId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -31,13 +32,18 @@ module.exports = {
             let bonuseMultilang = await bonuseMultilangQuery.exec();
             res.json(bonuseMultilang);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createBonuseMultilang(req, res) {
         try {
-            let bonuseMultilang = await BonuseMultilang.create(req.body);
-            res.status(201).json(bonuseMultilang);
+            let err = keysValidator.diff(BonuseMultilang.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let bonuseMultilang = await BonuseMultilang.create(req.body);
+                res.status(201).json(bonuseMultilang);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -45,8 +51,13 @@ module.exports = {
     async updateBonuseMultilang(req, res) {
         let bonuseMultilangId = req.params.id;
         try {
-            let bonuseMultilang = await BonuseMultilang.findByIdAndUpdate(bonuseMultilangId, req.body,{new : true});
-            res.status(201).json(bonuseMultilang);
+            let err = keysValidator.diff(BonuseMultilang.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await BonuseMultilang.findByIdAndUpdate(bonuseMultilangId, req.body);
+                res.status(201).json(await Bonuse.findById(bonuseId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

@@ -1,4 +1,5 @@
 let Complaint = require(global.paths.MODELS + '/Complaint');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getComplaints(req, res) {
@@ -15,13 +16,13 @@ module.exports = {
             let complaints = await complaintQuery.exec();
             res.json(complaints);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getComplaintById(req, res) {
         let complaintId = req.params.id;
         try {
-            let complaintQuery = Complaint.find({_id: complaintId})
+            let complaintQuery = Complaint.findOne({_id: complaintId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -31,13 +32,18 @@ module.exports = {
             let complaint = await complaintQuery.exec();
             res.json(complaint);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createComplaint(req, res) {
         try {
-            let complaint = await Complaint.create(req.body);
-            res.status(201).json(complaint);
+            let err = keysValidator.diff(Complaint.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let complaint = await Complaint.create(req.body);
+                res.status(201).json(complaint);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -45,8 +51,13 @@ module.exports = {
     async updateComplaint(req, res) {
         let complaintId = req.params.id;
         try {
-            let complaint = await Complaint.findByIdAndUpdate(complaintId, req.body,{new : true});
-            res.status(201).json(complaint);
+            let err = keysValidator.diff(Complaint.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await Complaint.findByIdAndUpdate(complaintId, req.body);
+                res.status(201).json(await Complaint.findById(complaintId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

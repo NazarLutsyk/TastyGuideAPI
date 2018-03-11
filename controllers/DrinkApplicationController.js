@@ -1,4 +1,5 @@
 let DrinkApplication = require(global.paths.MODELS + '/DrinkApplication');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getDrinkApplications(req, res) {
@@ -15,13 +16,13 @@ module.exports = {
             let drinkApplications = await drinkApplicationsQuery.exec();
             res.json(drinkApplications);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getDrinkApplicationById(req, res) {
         let drinkApplicationId = req.params.id;
         try {
-            let drinkApplicationQuery = DrinkApplication.find({_id: drinkApplicationId})
+            let drinkApplicationQuery = DrinkApplication.findOne({_id: drinkApplicationId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -31,13 +32,18 @@ module.exports = {
             let drinkApplication = await drinkApplicationQuery.exec();
             res.json(drinkApplication);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createDrinkApplication(req, res) {
         try {
-            let drinkApplication = await DrinkApplication.create(req.body);
-            res.status(201).json(drinkApplication);
+            let err = keysValidator.diff(DrinkApplication.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let drinkApplication = await DrinkApplication.create(req.body);
+                res.status(201).json(drinkApplication);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -45,8 +51,13 @@ module.exports = {
     async updateDrinkApplication(req, res) {
         let drinkApplicationId = req.params.id;
         try {
-            let drinkApplication = await DrinkApplication.findByIdAndUpdate(drinkApplicationId, req.body,{new : true});
-            res.status(201).json(drinkApplication);
+            let err = keysValidator.diff(DrinkApplication.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await DrinkApplication.findByIdAndUpdate(drinkApplicationId, req.body);
+                res.status(201).json(await DrinkApplication.findById(drinkApplicationId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

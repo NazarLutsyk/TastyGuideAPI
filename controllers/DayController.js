@@ -1,4 +1,5 @@
 let Day = require(global.paths.MODELS + '/Day');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getDays(req, res) {
@@ -15,13 +16,13 @@ module.exports = {
             let days = await dayQuery.exec();
             res.json(days);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getDayById(req, res) {
         let dayId = req.params.id;
         try {
-            let dayQuery = Day.find({_id: dayId})
+            let dayQuery = Day.findOne({_id: dayId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -31,13 +32,18 @@ module.exports = {
             let day = await dayQuery.exec();
             res.json(day);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createDay(req, res) {
         try {
-            let day = await Day.create(req.body);
-            res.status(201).json(day);
+            let err = keysValidator.diff(Day.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let day = await Day.create(req.body);
+                res.status(201).json(day);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -45,8 +51,13 @@ module.exports = {
     async updateDay(req, res) {
         let dayId = req.params.id;
         try {
-            let day = await Day.findByIdAndUpdate(dayId, req.body,{new : true});
-            res.status(201).json(day);
+            let err = keysValidator.diff(Day.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await Day.findByIdAndUpdate(dayId, req.body);
+                res.status(201).json(await Day.findById(dayId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

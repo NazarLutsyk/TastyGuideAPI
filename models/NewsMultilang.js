@@ -14,7 +14,6 @@ let NewsMultilangSchema = new Schema({
     news: {
         type: Schema.Types.ObjectId,
         ref: 'News',
-        required: true
     },
 }, {
     discriminatorKey: 'kind'

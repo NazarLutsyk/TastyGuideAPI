@@ -1,5 +1,6 @@
 let PlaceType = require(global.paths.MODELS + '/PlaceType');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getPlaceTypes(req, res) {
@@ -16,13 +17,13 @@ module.exports = {
             let placeTypes = await placeTypeQuery.exec();
             res.json(placeTypes);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getPlaceTypeById(req, res) {
         let placeTypeId = req.params.id;
         try {
-            let placeTypeQuery = PlaceType.find({_id: placeTypeId})
+            let placeTypeQuery = PlaceType.findOne({_id: placeTypeId})
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -32,13 +33,18 @@ module.exports = {
             let placeType = await placeTypeQuery.exec();
             res.json(placeType);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createPlaceType(req, res) {
         try {
-            let placeType = await PlaceType.create(req.body);
-            res.status(201).json(placeType);
+            let err = keysValidator.diff(PlaceType.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                let placeType = await PlaceType.create(req.body);
+                res.status(201).json(placeType);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -46,8 +52,13 @@ module.exports = {
     async updatePlaceType(req, res) {
         let placeTypeId = req.params.id;
         try {
-            let placeType = await PlaceType.findByIdAndUpdate(placeTypeId, req.body, {new: true});
-            res.status(201).json(placeType);
+            let err = keysValidator.diff(PlaceType.schema.tree, req.body);
+            if (err){
+                throw new Error('Unknown fields ' + err);
+            } else {
+                await PlaceType.findByIdAndUpdate(placeTypeId, req.body);
+                res.status(201).json(await PlaceType.findById(placeTypeId));
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

@@ -20,7 +20,7 @@ module.exports = {
             let bonuseMultilang = await images.exec();
             res.json(bonuseMultilang);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async getImageById(req, res) {
@@ -36,12 +36,11 @@ module.exports = {
             let image = await imageQuery.exec();
             res.json(image);
         } catch (e) {
-            res.status(404).send(e.toString());
+            res.status(400).send(e.toString());
         }
     },
     async createImage(req, res) {
         upload(req, res,async function (err) {
-            console.log('here');
             if (err) {
                 return res.status(400).send(err.toString());
             }else {
