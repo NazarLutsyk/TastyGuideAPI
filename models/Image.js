@@ -19,11 +19,11 @@ ImageSchema.pre('remove',async function (next) {
         await Place.update(
             {images: this._id},
             {$pull: {images: this._id}},
-            {multi: true});
+            {multi: true,runValidators: true,context:'query'});
         await Promo.update(
             {image: this._id},
             {image: null},
-            {multi: true});
+            {multi: true,runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);

@@ -55,8 +55,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                await PlaceTypeMultilang.findByIdAndUpdate(placeTypeMultilangId, req.body);
-                res.status(201).json(await PlaceTypeMultilang.findById(placeTypeMultilangId));
+                let updated = await PlaceTypeMultilang.findByIdAndUpdate(placeTypeMultilangId, req.body,{runValidators: true,context:'query'});
+                if(updated) {
+                    res.status(201).json(await PlaceTypeMultilang.findById(placeTypeMultilangId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -66,8 +70,12 @@ module.exports = {
         let placeTypeMultilangId = req.params.id;
         try {
             let placeTypeMultilang = await PlaceTypeMultilang.findById(placeTypeMultilangId);
-            placeTypeMultilang = await placeTypeMultilang.remove();
-            res.status(204).json(placeTypeMultilang);
+            if (placeTypeMultilang) {
+                placeTypeMultilang = await placeTypeMultilang.remove();
+                res.status(204).json(placeTypeMultilang);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

@@ -5,13 +5,7 @@ let Schema = mongoose.Schema;
 let TopPlaceSchema = new Schema({
     startDate : {
         type: Date,
-        required : true,
-        validate : {
-            validator : function (){
-                return this.startDate < this.endDate;
-            },
-            message : 'Start date must be smaller than end date!'
-        }
+        required : true
     },
     endDate : {
         type: Date,
@@ -35,13 +29,12 @@ let TopPlaceSchema = new Schema({
 module.exports = mongoose.model('TopPlace',TopPlaceSchema);
 
 let Place = require('./Place');
-let winston = require(global.paths.CONFIG + '/winston');
 TopPlaceSchema.pre('remove', async function (next) {
     try {
         await Place.update(
             {tops: this._id},
             {$pull: {tops: this._id}},
-            {multi: true});
+            {multi: true,runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -50,9 +43,9 @@ TopPlaceSchema.pre('remove', async function (next) {
 TopPlaceSchema.pre('save', async function (next) {
     try {
         let place = await Place.findById(this.place);
-        this.place = place ? place._id : '';
+        this.place = place ? place._id : null;
         if (place && place.tops.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {tops : this}});
+            return await Place.findByIdAndUpdate(place._id,{$push : {tops : this}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

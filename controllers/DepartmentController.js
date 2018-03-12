@@ -56,8 +56,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                await Department.findByIdAndUpdate(departmentId, req.body);
-                res.status(201).json(await Department.findById(departmentId));
+                let updated = await Department.findByIdAndUpdate(departmentId, req.body,{runValidators: true,context:'query'});
+                if(updated) {
+                    res.status(201).json(await Department.findById(departmentId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -67,8 +71,12 @@ module.exports = {
         let departmentId = req.params.id;
         try {
             let department = await Department.findById(departmentId);
-            department = await department.remove();
-            res.status(204).json(department);
+            if (department) {
+                department = await department.remove();
+                res.status(204).json(department);
+            }else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

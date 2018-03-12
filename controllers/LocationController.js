@@ -55,8 +55,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                await Location.findByIdAndUpdate(locationId, req.body);
-                res.status(201).json(await Location.findById(locationId));
+                let updated = await Location.findByIdAndUpdate(locationId, req.body,{runValidators: true,context:'query'});
+                if(updated) {
+                    res.status(201).json(await Location.findById(locationId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -65,8 +69,13 @@ module.exports = {
     async removeLocation(req, res) {
         let locationId = req.params.id;
         try {
-            let location = await Location.findByIdAndRemove(locationId);
-            res.status(204).json(location);
+            let location = await Location.findById(locationId);
+            if (location) {
+                await location.remove();
+                res.status(204).json(location);
+            }else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

@@ -10,7 +10,6 @@ let PromoSchema = new Schema({
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',
-        // required : true
     },
     image: {
         type: Schema.Types.ObjectId,
@@ -29,11 +28,11 @@ PromoSchema.pre('remove', async function (next) {
         await Place.update(
             {promos: this._id},
             {$pull: {promos: this._id}},
-            {multi: true});
+            {multi: true, runValidators: true,context:'query'});
         await Department.update(
             {promos: this._id},
             {$pull: {promos: this._id}},
-            {multi: true});
+            {multi: true, runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -44,13 +43,13 @@ PromoSchema.pre('save', async function (next) {
     try {
         let client = await Department.findById(this.client);
         let place = await Place.findById(this.place);
-        this.client = client ? client._id : '';
-        this.place = place ? place._id : '';
+        this.client = client ? client._id : null;
+        this.place = place ? place._id : null;
         if (client && client.promos.indexOf(this._id) == -1) {
-            return await Department.findByIdAndUpdate(client._id,{$push : {promos : this}});
+            return await Department.findByIdAndUpdate(client._id,{$push : {promos : this}},{runValidators: true,context:'query'});
         }
         if (place && place.promos.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {promos : this._id}});
+            return await Place.findByIdAndUpdate(place._id,{$push : {promos : this._id}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

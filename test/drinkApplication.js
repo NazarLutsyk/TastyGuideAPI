@@ -1,4 +1,5 @@
-let Lang = require('../models/Lang');
+require('../config/path');
+let DrinkApplication = require('../models/DrinkApplication');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let mongoose = require('mongoose');
@@ -6,74 +7,77 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('API endpoint /api/langs', function () {
+describe('API endpoint /api/drinkApplications', function () {
     this.timeout(5000);
+    mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/drinker');
 
-    describe('GET', function () {
+    describe('GET', function (desc) {
         let id1 = new mongoose.Types.ObjectId;
         let id2 = new mongoose.Types.ObjectId;
         before(async function () {
-            await Lang.create({
+            await DrinkApplication.create({
                 _id: id1,
-                name: 'b'
+                budged: 700,
+                date : new Date()
             });
-            await Lang.create({
+            await DrinkApplication.create({
                 _id: id2,
-                name: 'a'
+                budged: 500,
+                date : new Date()
             });
         });
         after(async function () {
-            await Lang.remove({});
+            await DrinkApplication.remove({});
         });
 
         it('(normal get)should return list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/langs');
+                .get('/api/drinkApplications');
             res.status.should.equal(200);
             res.body.should.be.a('array');
             res.body.length.should.be.above(0);
         });
         it('(normal get)should return model by id', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/langs/' + id1);
+                .get('/api/drinkApplications/' + id1);
             res.status.should.equal(200);
             res.body.should.have.property('_id');
         });
         it('(wrong id)should return null', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/langs/' + new mongoose.Types.ObjectId);
+                .get('/api/drinkApplications/' + new mongoose.Types.ObjectId);
             res.status.should.equal(200);
             should.not.exist(res.body);
         });
         it('(normal get with select) should return list of models with selected fields', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/langs')
-                .query({fields: 'name,-_id'});
+                .get('/api/drinkApplications')
+                .query({fields: 'budged,-_id'});
             res.status.should.equal(200);
             res.body.should.be.an('array');
-            res.body[0].should.have.property('name').but.not.have.property('_id');
+            res.body[0].should.have.property('budged').but.not.have.property('_id');
         });
         it('(normal get with sorting) should return sorted list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/langs')
-                .query({sort: 'name'});
+                .get('/api/drinkApplications')
+                .query({sort: 'budged'});
             res.status.should.equal(200);
             res.body.should.be.an('array');
-            res.body[0].name.should.equal('a');
+            res.body[0].budged.should.equal(500);
         });
         it('(normal get with query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/langs')
-                .query({query: JSON.stringify({name: 'a'})});
+                .get('/api/drinkApplications')
+                .query({query: JSON.stringify({budged: 500})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
             res.body.should.have.lengthOf(1);
-            res.body[0].name.should.equal('a');
+            res.body[0].budged.should.equal(500);
         });
         it('(wrong query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/langs')
+                .get('/api/drinkApplications')
                 .query({query: JSON.stringify({wrongField: 'a'})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
@@ -82,20 +86,35 @@ describe('API endpoint /api/langs', function () {
     });
 
     describe('POST', function () {
+        after(async function () {
+            await DrinkApplication.remove({});
+        });
+
         it('(normal create)should return created model', async function () {
             let res = await chai.request('localhost:3000')
-                .post('/api/langs')
+                .post('/api/drinkApplications')
                 .send({
-                    name: 'eng'
+                    friends : 'tasik',
+                    goal : 'drink',
+                    budged : 500,
+                    date : new Date(),
+                    place: new mongoose.Types.ObjectId,
+                    organizer: new mongoose.Types.ObjectId,
+                    currency: new mongoose.Types.ObjectId
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
-            res.body.name.should.equal('eng');
+            res.body.friends.should.equal('tasik');
+            res.body.goal.should.equal('drink');
+            res.body.budged.should.equal(500);
+            should.equal(res.body.place, null);
+            should.equal(res.body.organizer, null);
+            should.equal(res.body.currency, null);
         });
         it('(unknown field)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .post('/api/langs/')
+                    .post('/api/drinkApplications/')
                     .send({
                         unknownField: 'aaaa'
                     });
@@ -107,7 +126,7 @@ describe('API endpoint /api/langs', function () {
         it('(missing required)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .post('/api/langs/');
+                    .post('/api/drinkApplications/');
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 400);
@@ -118,28 +137,32 @@ describe('API endpoint /api/langs', function () {
     describe('PUT', function () {
         let id = new mongoose.Types.ObjectId;
         before(async function () {
-            await Lang.create({
+            await DrinkApplication.create({
                 _id: id,
-                name: 'b'
+                friends : 'tasik',
+                goal : 'drink',
+                budged : 500,
+                date : new Date(),
             });
         });
         after(async function () {
-            await Lang.remove({});
+            await DrinkApplication.remove({});
         });
+
         it('(normal update)should update model', async function () {
             let res = await chai.request('localhost:3000')
-                .put('/api/langs/' + id)
+                .put('/api/drinkApplications/' + id)
                 .send({
-                    name: 'fr'
+                    budged: 1000
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
-            res.body.name.should.equal('fr');
+            res.body.budged.should.equal(1000);
         });
         it('(unknown field)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/langs/' + id)
+                    .put('/api/drinkApplications/' + id)
                     .send({
                         unknownField: 'aaaa'
                     });
@@ -151,30 +174,40 @@ describe('API endpoint /api/langs', function () {
         it('(invalid id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/langs/' + new mongoose.Types.ObjectId);
+                    .put('/api/drinkApplications/' + new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 404);
             }
         });
+        it('(invalid budged)should return status 400', async function () {
+            try {
+                let res = await chai.request('localhost:3000')
+                    .put('/api/drinkApplications/' + id)
+                    .send({
+                        budged: -500
+                    });
+                if (res.status) should.fail();
+            } catch (e) {
+                should.equal(e.status, 400);
+            }
+        });
     });
 
     describe('DELETE', function () {
-        after(async function () {
-            await Lang.remove({});
-        });
         it('(normal delete)should return status 204', async function () {
-            let lang = await Lang.create({
-                name: 'uk'
+            let currency = await DrinkApplication.create({
+                budged : 500,
+                date : new Date(),
             });
             let res = await chai.request('localhost:3000')
-                .delete('/api/langs/' + lang._id);
+                .delete('/api/drinkApplications/' + currency._id);
             res.status.should.equal(204);
         });
         it('(wrong id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .delete('/api/langs/' + new mongoose.Types.ObjectId);
+                    .delete('/api/drinkApplications/' + new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 404);

@@ -40,7 +40,7 @@ module.exports = {
     async createEvent(req, res) {
         try {
             let err = keysValidator.diff(Event.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let event = await Event.create(req.body);
@@ -54,11 +54,15 @@ module.exports = {
         let eventId = req.params.id;
         try {
             let err = keysValidator.diff(Event.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                await Event.findByIdAndUpdate(eventId, req.body);
-                res.status(201).json(await Event.findById(eventId));
+                let updated = await Event.findByIdAndUpdate(eventId, req.body, {runValidators: true,context:'query'});
+                if (updated) {
+                    res.status(201).json(await Event.findById(eventId));
+                } else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -68,8 +72,12 @@ module.exports = {
         let eventId = req.params.id;
         try {
             let event = await Event.findById(eventId);
-            event = await event.remove();
-            res.status(204).json(event);
+            if (eventId) {
+                event = await event.remove();
+                res.status(204).json(event);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

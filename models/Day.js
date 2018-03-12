@@ -3,19 +3,9 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let DaySchema = new Schema({
-    date: {
-        type: Date,
-        required: true
-    },
     startTime: {
         type: Date,
-        required: true,
-        validate: {
-            validator: function () {
-                return this.startTime < this.endTime;
-            },
-            message: 'Start date must be smaller than end date!'
-        }
+        required: true
     },
     endTime: {
         type: Date,
@@ -40,7 +30,7 @@ DaySchema.pre('remove', async function (next) {
         await Place.update(
             {days: this._id},
             {$pull: {days: this._id}},
-            {multi: true});
+            {multi: true, runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -49,9 +39,9 @@ DaySchema.pre('remove', async function (next) {
 DaySchema.pre('save', async function (next) {
     try {
         let place = await Place.findById(this.place);
-        this.place = place ? place._id : '';
+        this.place = place ? place._id : null;
         if (place && place.days.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {days : this}});
+            return await Place.findByIdAndUpdate(place._id,{$push : {days : this}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

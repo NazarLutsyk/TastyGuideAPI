@@ -55,8 +55,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                await DrinkApplication.findByIdAndUpdate(drinkApplicationId, req.body);
-                res.status(201).json(await DrinkApplication.findById(drinkApplicationId));
+                let updated = await DrinkApplication.findByIdAndUpdate(drinkApplicationId, req.body,{runValidators: true,context:'query'});
+                if (updated) {
+                    res.status(201).json(await DrinkApplication.findById(drinkApplicationId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -66,8 +70,12 @@ module.exports = {
         let drinkApplicationId = req.params.id;
         try {
             let drinkApplication = await DrinkApplication.findById(drinkApplicationId);
-            drinkApplication = await drinkApplication.remove();
-            res.status(204).json(drinkApplication);
+            if (drinkApplication) {
+                drinkApplication = await drinkApplication.remove();
+                res.status(204).json(drinkApplication);
+            }else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

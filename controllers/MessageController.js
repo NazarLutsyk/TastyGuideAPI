@@ -50,8 +50,13 @@ module.exports = {
     async removeMessage(req, res) {
         let messageId = req.params.id;
         try {
-            let message = await Message.findByIdAndRemove(messageId);
-            res.status(204).json(message);
+            let message = await Message.findById(messageId);
+            if (message) {
+                await message.remove();
+                res.status(204).json(message);
+            }else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

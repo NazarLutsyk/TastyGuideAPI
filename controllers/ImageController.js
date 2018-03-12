@@ -65,8 +65,12 @@ module.exports = {
         let imageId = req.params.id;
         try {
             let image = await Image.findById(imageId);
-            image = await image.remove();
-            res.status(204).json(image);
+            if (image) {
+                image = await image.remove();
+                res.status(204).json(image);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

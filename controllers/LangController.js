@@ -50,8 +50,12 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                await Lang.findByIdAndUpdate(langId, req.body);
-                res.status(201).json(await Lang.findById(langId));
+                let updated = await Lang.findByIdAndUpdate(langId, req.body,{runValidators: true,context:'query'});
+                if (updated) {
+                    res.status(201).json(await Lang.findById(langId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -61,8 +65,12 @@ module.exports = {
         let langId = req.params.id;
         try {
             let lang = await Lang.findById(langId);
-            lang = await lang.remove();
-            res.status(204).json(lang);
+            if (lang) {
+                lang = await lang.remove();
+                res.status(204).json(lang);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

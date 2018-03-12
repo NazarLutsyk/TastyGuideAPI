@@ -38,7 +38,7 @@ EventSchema.pre('save', async function (next) {
                 if (multilang.event) {
                     return self.multilang.splice(self.multilang.indexOf(multilang._id), 1);
                 } else {
-                    return await Multilang.findByIdAndUpdate(multilang._id, {event: self});
+                    return await Multilang.findByIdAndUpdate(multilang._id, {event: self},{runValidators: true,context:'query'});
                 }
             });
         }

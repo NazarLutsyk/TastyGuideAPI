@@ -19,7 +19,7 @@ CurrencySchema.pre('remove',async function (next) {
         await DrinkApplication.update(
             {currency: this._id},
             {currency: null},
-            {multi: true});
+            {multi: true, runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);

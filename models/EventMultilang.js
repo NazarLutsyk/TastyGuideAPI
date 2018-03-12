@@ -26,7 +26,7 @@ EventMultilangSchema.pre('remove', async function (next) {
         await Promo.update(
             {multilang: this._id},
             {$pull: {multilang: this._id}},
-            {multi: true});
+            {multi: true, runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -35,9 +35,9 @@ EventMultilangSchema.pre('remove', async function (next) {
 EventMultilangSchema.pre('save', async function (next) {
     try {
         let promo = await Promo.findById(this.event);
-        this.event = promo ? promo._id : '';
+        this.event = promo ? promo._id : null;
         if (promo && promo.multilang.indexOf(this._id) == -1) {
-            return await Promo.findByIdAndUpdate(promo._id,{$push : {multilang : this}});
+            return await Promo.findByIdAndUpdate(promo._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

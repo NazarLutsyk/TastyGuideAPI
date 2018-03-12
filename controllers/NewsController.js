@@ -57,8 +57,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                await News.findByIdAndUpdate(newsId, req.body);
-                res.status(201).json(await News.findById(newsId));
+                let updated = await News.findByIdAndUpdate(newsId, req.body,{runValidators: true,context:'query'});
+                if(updated) {
+                    res.status(201).json(await News.findById(newsId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -68,8 +72,12 @@ module.exports = {
         let newsId = req.params.id;
         try {
             let news = await News.findById(newsId);
-            news = await news.remove();
-            res.status(204).json(news);
+            if (news) {
+                news = await news.remove();
+                res.status(204).json(news);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

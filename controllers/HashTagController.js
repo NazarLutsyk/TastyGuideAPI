@@ -39,7 +39,7 @@ module.exports = {
     async createHashTag(req, res) {
         try {
             let err = keysValidator.diff(HashTag.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let hashTag = await HashTag.create(req.body);
@@ -53,11 +53,15 @@ module.exports = {
         let hashTagId = req.params.id;
         try {
             let err = keysValidator.diff(HashTag.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                await HashTag.findByIdAndUpdate(hashTagId, req.body);
-                res.status(201).json(await HashTag.findById(hashTagId));
+                let updated = await HashTag.findByIdAndUpdate(hashTagId, req.body, {runValidators: true,context:'query'});
+                if (updated) {
+                    res.status(201).json(await HashTag.findById(hashTagId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -67,8 +71,12 @@ module.exports = {
         let hashTagId = req.params.id;
         try {
             let hashTag = await HashTag.findById(hashTagId);
-            hashTag = await hashTag.remove();
-            res.status(204).json(hashTag);
+            if (hashTag) {
+                hashTag = await hashTag.remove();
+                res.status(204).json(hashTag);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

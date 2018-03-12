@@ -56,8 +56,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                await PlaceType.findByIdAndUpdate(placeTypeId, req.body);
-                res.status(201).json(await PlaceType.findById(placeTypeId));
+                let updated = await PlaceType.findByIdAndUpdate(placeTypeId, req.body,{runValidators: true,context:'query'});
+                if(updated) {
+                    res.status(201).json(await PlaceType.findById(placeTypeId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -67,8 +71,12 @@ module.exports = {
         let placeTypeId = req.params.id;
         try {
             let placeType = await PlaceType.findById(placeTypeId);
-            placeType = await placeType.remove();
-            res.status(204).json(placeType);
+            if (placeType) {
+                placeType = await placeType.remove();
+                res.status(204).json(placeType);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

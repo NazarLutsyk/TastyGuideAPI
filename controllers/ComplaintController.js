@@ -38,7 +38,7 @@ module.exports = {
     async createComplaint(req, res) {
         try {
             let err = keysValidator.diff(Complaint.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let complaint = await Complaint.create(req.body);
@@ -52,11 +52,15 @@ module.exports = {
         let complaintId = req.params.id;
         try {
             let err = keysValidator.diff(Complaint.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                await Complaint.findByIdAndUpdate(complaintId, req.body);
-                res.status(201).json(await Complaint.findById(complaintId));
+                let updated = await Complaint.findByIdAndUpdate(complaintId, req.body, {runValidators: true,context:'query'});
+                if (updated) {
+                    res.status(201).json(await Complaint.findById(complaintId));
+                } else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -66,8 +70,12 @@ module.exports = {
         let complaintId = req.params.id;
         try {
             let complaint = await Complaint.findById(complaintId);
-            complaint = await complaint.remove();
-            res.status(204).json(complaint);
+            if (complaint) {
+                complaint = await complaint.remove();
+                res.status(204).json(complaint);
+            }else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

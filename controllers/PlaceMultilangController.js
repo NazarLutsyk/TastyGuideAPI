@@ -38,7 +38,7 @@ module.exports = {
     async createPlaceMultilang(req, res) {
         try {
             let err = keysValidator.diff(PlaceMultilang.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let placeMultilang = await PlaceMultilang.create(req.body);
@@ -52,11 +52,15 @@ module.exports = {
         let placeMultilangId = req.params.id;
         try {
             let err = keysValidator.diff(PlaceMultilang.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                await PlaceMultilang.findByIdAndUpdate(placeMultilangId, req.body);
-                res.status(201).json(await PlaceMultilang.findById(placeMultilangId));
+                let updated = await PlaceMultilang.findByIdAndUpdate(placeMultilangId, req.body, {runValidators: true,context:'query'});
+                if (updated) {
+                    res.status(201).json(await PlaceMultilang.findById(placeMultilangId));
+                } else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -66,8 +70,12 @@ module.exports = {
         let placeMultilangId = req.params.id;
         try {
             let placeMultilang = await PlaceMultilang.findById(placeMultilangId);
-            placeMultilang = await placeMultilang.remove();
-            res.status(204).json(placeMultilang);
+            if (placeMultilang) {
+                placeMultilang = await placeMultilang.remove();
+                res.status(204).json(placeMultilang);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

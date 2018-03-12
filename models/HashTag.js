@@ -22,7 +22,7 @@ HashTagSchema.pre('remove', async function (next) {
         await Place.update(
             {hashTags: this._id},
             {$pull: {hashTags: this._id}},
-            {multi: true});
+            {multi: true, runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -39,7 +39,7 @@ HashTagSchema.pre('save', async function (next) {
             });
             places.forEach(async function (place) {
                 if (place.hashTags.indexOf(self._id) == -1) {
-                    return await Place.findByIdAndUpdate(place._id, {$push: {hashTags : self}});
+                    return await Place.findByIdAndUpdate(place._id, {$push: {hashTags : self}},{runValidators: true,context:'query'});
                 }else {
                     return;
                 }

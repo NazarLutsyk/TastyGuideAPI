@@ -38,7 +38,7 @@ module.exports = {
     async createBonuseMultilang(req, res) {
         try {
             let err = keysValidator.diff(BonuseMultilang.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let bonuseMultilang = await BonuseMultilang.create(req.body);
@@ -52,11 +52,15 @@ module.exports = {
         let bonuseMultilangId = req.params.id;
         try {
             let err = keysValidator.diff(BonuseMultilang.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                await BonuseMultilang.findByIdAndUpdate(bonuseMultilangId, req.body);
-                res.status(201).json(await Bonuse.findById(bonuseId));
+                let updated = await BonuseMultilang.findByIdAndUpdate(bonuseMultilangId, req.body, {runValidators: true,context:'query'});
+                if (updated) {
+                    res.status(201).json(await Bonuse.findById(bonuseId));
+                } else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -66,8 +70,12 @@ module.exports = {
         let bonuseMultilangId = req.params.id;
         try {
             let bonuseMultilang = await BonuseMultilang.findById(bonuseMultilangId);
-            bonuseMultilang = await bonuseMultilang.remove();
-            res.status(204).json(bonuseMultilang);
+            if(bonuseMultilang) {
+                bonuseMultilang = await bonuseMultilang.remove();
+                res.status(204).json(bonuseMultilang);
+            }else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

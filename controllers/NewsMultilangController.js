@@ -55,8 +55,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                await NewsMultilang.findByIdAndUpdate(newsMultilangId, req.body);
-                res.status(201).json(await NewsMultilang.findById(newsMultilangId));
+                let updated = await NewsMultilang.findByIdAndUpdate(newsMultilangId, req.body,{runValidators: true,context:'query'});
+                if(updated) {
+                    res.status(201).json(await NewsMultilang.findById(newsMultilangId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -66,8 +70,12 @@ module.exports = {
         let newsMultilangId = req.params.id;
         try {
             let newsMultilang = await NewsMultilang.findById(newsMultilangId);
-            newsMultilang = await newsMultilang.remove();
-            res.status(204).json(newsMultilang);
+            if (newsMultilang) {
+                newsMultilang = await newsMultilang.remove();
+                res.status(204).json(newsMultilang);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

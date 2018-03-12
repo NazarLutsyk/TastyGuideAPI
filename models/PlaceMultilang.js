@@ -27,7 +27,7 @@ PlaceMultilangSchema.pre('remove', async function (next) {
         await Place.update(
             {multilang: this._id},
             {$pull: {multilang: this._id}},
-            {multi: true});
+            {multi: true,runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -36,9 +36,9 @@ PlaceMultilangSchema.pre('remove', async function (next) {
 PlaceMultilangSchema.pre('save', async function (next) {
     try {
         let place = await Place.findById(this.place);
-        this.place = place ? place._id : '';
+        this.place = place ? place._id : null;
         if (place && place.multilang.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {multilang : this}});
+            return await Place.findByIdAndUpdate(place._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

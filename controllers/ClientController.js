@@ -49,11 +49,15 @@ module.exports = {
         let clientId = req.params.id;
         try {
             let err = keysValidator.diff(Client.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                await Client.findByIdAndUpdate(clientId, req.body);
-                res.status(201).json(await Client.findById(clientId));
+                let updated = await Client.findByIdAndUpdate(clientId, req.body, {runValidators: true,context:'query'});
+                if (updated) {
+                    res.status(201).json(await Client.findById(clientId));
+                } else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -63,8 +67,12 @@ module.exports = {
         let clientId = req.params.id;
         try {
             let removedClient = await Client.findById(clientId);
-            removedClient = await removedClient.remove();
-            res.status(204).json(removedClient);
+            if (removedClient) {
+                removedClient = await removedClient.remove();
+                res.status(204).json(removedClient);
+            }else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }
@@ -75,7 +83,7 @@ module.exports = {
         try {
             if (modelId && placeId) {
                 await relationHelper.addRelation
-                ('Client', 'Place', modelId, placeId, 'ownPlaces','boss');
+                ('Client', 'Place', modelId, placeId, 'ownPlaces', 'boss');
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -210,7 +218,7 @@ module.exports = {
         try {
             if (modelId && departmentId) {
                 await relationHelper.removeRelation
-                ('Client', 'Department', modelId, departmentId, 'departments','client');
+                ('Client', 'Department', modelId, departmentId, 'departments', 'client');
                 res.sendStatus(204);
             } else {
                 throw new Error('Id in path eq null');

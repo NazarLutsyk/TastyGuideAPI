@@ -55,8 +55,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                await Day.findByIdAndUpdate(dayId, req.body);
-                res.status(201).json(await Day.findById(dayId));
+                let updated = await Day.findByIdAndUpdate(dayId, req.body,{runValidators: true,context:'query'});
+                if(updated) {
+                    res.status(201).json(await Day.findById(dayId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -66,8 +70,12 @@ module.exports = {
         let dayId = req.params.id;
         try {
             let day = await Day.findById(dayId);
-            day = await day.remove();
-            res.status(204).json(day);
+            if (day) {
+                day = await day.remove();
+                res.status(204).json(day);
+            }else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

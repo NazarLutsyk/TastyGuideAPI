@@ -40,7 +40,7 @@ module.exports = {
     async createPlace(req, res) {
         try {
             let err = keysValidator.diff(Place.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let place = await Place.create(req.body);
@@ -54,11 +54,15 @@ module.exports = {
         let placeId = req.params.id;
         try {
             let err = keysValidator.diff(Place.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                await Place.findByIdAndUpdate(placeId, req.body);
-                res.status(201).json(await Place.findById(placeId));
+                let updated = await Place.findByIdAndUpdate(placeId, req.body, {runValidators: true,context:'query'});
+                if (updated) {
+                    res.status(201).json(await Place.findById(placeId));
+                } else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -68,8 +72,12 @@ module.exports = {
         let placeId = req.params.id;
         try {
             let removedPlace = await Place.findById(placeId);
-            removedPlace = await removedPlace.remove();
-            res.sendStatus(204);
+            if (removedPlace) {
+                removedPlace = await removedPlace.remove();
+                res.sendStatus(204);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

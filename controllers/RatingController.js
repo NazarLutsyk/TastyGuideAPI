@@ -55,8 +55,12 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                await Rating.findByIdAndUpdate(ratingId, req.body);
-                res.status(201).json(await Rating.findById(ratingId));
+                let updated = await Rating.findByIdAndUpdate(ratingId, req.body,{runValidators: true,context:'query'});
+                if(updated) {
+                    res.status(201).json(await Rating.findById(ratingId));
+                }else {
+                    res.sendStatus(404);
+                }
             }
         } catch (e) {
             res.status(400).send(e.toString());
@@ -66,8 +70,12 @@ module.exports = {
         let ratingId = req.params.id;
         try {
             let rating = await Rating.findById(ratingId);
-            rating = await rating.remove();
-            res.status(204).json(rating);
+            if (rating) {
+                rating = await rating.remove();
+                res.status(204).json(rating);
+            } else {
+                res.sendStatus(404);
+            }
         } catch (e) {
             res.status(400).send(e.toString());
         }

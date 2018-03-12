@@ -14,7 +14,6 @@ let LocationSchema = new Schema({
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',
-        // required : true
     }
 }, {
     timestamps: true,
@@ -27,7 +26,7 @@ LocationSchema.pre('remove', async function (next) {
         await Place.update(
             {locations: this._id},
             {$pull: {locations: this._id}},
-            {multi: true});
+            {multi: true,runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -36,9 +35,9 @@ LocationSchema.pre('remove', async function (next) {
 LocationSchema.pre('save', async function (next) {
     try {
         let place = await Place.findById(this.place);
-        this.place = place ? place._id : '';
+        this.place = place ? place._id : null;
         if (place && !place.location) {
-            return await Place.findByIdAndUpdate(place._id, {location: this});
+            return await Place.findByIdAndUpdate(place._id, {location: this},{runValidators: true,context:'query'});
         }else {
             this.place = null;
         }

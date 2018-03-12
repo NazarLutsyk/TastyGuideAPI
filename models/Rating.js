@@ -5,13 +5,12 @@ let Schema = mongoose.Schema;
 let RatingSchema = new Schema({
     value: {
         type: Number,
-        required: true,
         default: 0,
         validate: {
-            validator: function () {
-                return this.value >= 0 && this.value <= 5;
+            validator: function (value) {
+                return value >= 0 && value <= 5;
             },
-            message: 'Reviews[min = 0,max = 5]'
+            message: 'Value[min = 0,max = 5]'
         }
     },
     comment: String,
@@ -21,12 +20,10 @@ let RatingSchema = new Schema({
     client: {
         type: Schema.Types.ObjectId,
         ref: 'Client',
-        // required: true
     },
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',
-        // required: true
     },
 }, {
     timestamps: true,
@@ -40,11 +37,11 @@ RatingSchema.pre('remove', async function (next) {
         await Client.update(
             {ratings: this._id},
             {$pull: {ratings: this._id}},
-            {multi: true});
+            {multi: true,runValidators: true,context:'query'});
         await Place.update(
             {ratings: this._id},
             {$pull: {ratings: this._id}},
-            {multi: true});
+            {multi: true, runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -54,13 +51,13 @@ RatingSchema.pre('save', async function (next) {
     try {
         let client = await Client.findById(this.client);
         let place = await Place.findById(this.place);
-        this.client = client ? client._id : '';
-        this.place = place ? place._id : '';
+        this.client = client ? client._id : null;
+        this.place = place ? place._id : null;
         if (client && client.ratings.indexOf(this._id) == -1) {
-            return await Client.findByIdAndUpdate(client._id,{$push : {ratings : this}});
+            return await Client.findByIdAndUpdate(client._id,{$push : {ratings : this}},{runValidators: true,context:'query'});
         }
         if (place && place.ratings.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {ratings : this}});
+            return await Place.findByIdAndUpdate(place._id,{$push : {ratings : this}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

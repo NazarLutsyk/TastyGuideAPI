@@ -26,33 +26,21 @@ let PlaceSchema = new Schema({
         type: [{
             type: Schema.Types.ObjectId,
             ref: 'Image'
-        }],
-        validate: {
-            validator: function () {
-                return this.images.length <= 4;
-            },
-            message: '{PATH} exceeds the limit of 4'
-        }
+        }]
     },
     averagePrice: {
         type: Number,
         default: 0,
         validate: {
-            validator: function () {
-                return this.averagePrice >= 0;
+            validator: function (averagePrice) {
+                return averagePrice >= 0;
             },
             message: 'Min avaragePrive eq 0'
         }
     },
     reviews: {
         type: Number,
-        default: 0,
-        validate: {
-            validator: function () {
-                return this.reviews >= 0;
-            },
-            message: 'Min reviews eq 0'
-        }
+        default: 0
     },
     allowed: {
         type: Boolean,
@@ -162,15 +150,15 @@ PlaceSchema.pre('remove', async function (next) {
         await HashTag.update(
             {places: this._id},
             {$pull: {places: this._id}},
-            {multi: true});
+            {multi: true, runValidators: true,context:'query'});
         await Client.update(
             {ownPlaces: this._id},
             {$pull: {ownPlaces: this._id}},
-            {multi: true});
+            {multi: true, runValidators: true,context:'query'});
         await Client.update(
             {favoritePlaces: this._id},
             {$pull: {favoritePlaces: this._id}},
-            {multi: true});
+            {multi: true,runValidators: true,context:'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -181,9 +169,9 @@ PlaceSchema.pre('save', async function (next) {
     let self = this;
     if (this.boss) {
         let boss = await Client.findById(this.boss);
-        this.boss = boss ? boss._id : '';
+        this.boss = boss ? boss._id : null;
         if (boss && boss.ownPlaces.indexOf(this._id) == -1) {
-            return await Client.findByIdAndUpdate(boss._id, {$push: {ownPlaces: self}});
+            return await Client.findByIdAndUpdate(boss._id, {$push: {ownPlaces: self}},{runValidators: true,context:'query'});
         }
     }
     if (this.hashTags) {
@@ -197,7 +185,7 @@ PlaceSchema.pre('save', async function (next) {
                 if (hashTag.places.indexOf(self._id) != -1) {
                     return self.hashTags.splice(self.hashTags.indexOf(hashTag._id), 1);
                 } else {
-                    return await HashTag.findByIdAndUpdate(hashTag._id, {$push: {places: self}});
+                    return await HashTag.findByIdAndUpdate(hashTag._id, {$push: {places: self}},{runValidators: true,context:'query'});
 
                 }
             });
@@ -214,7 +202,7 @@ PlaceSchema.pre('save', async function (next) {
                 if (promo.place) {
                     return self.promos.splice(self.promos.indexOf(promo), 1);
                 } else {
-                    return await Promo.findByIdAndUpdate(promo._id, {place: self});
+                    return await Promo.findByIdAndUpdate(promo._id, {place: self},{runValidators: true,context:'query'});
                 }
             });
         }
@@ -230,7 +218,7 @@ PlaceSchema.pre('save', async function (next) {
                 if (complaint.place) {
                     return self.complaints.splice(self.complaints.indexOf(complaint), 1);
                 } else {
-                    return await Complaint.findByIdAndUpdate(complaint._id, {place: self});
+                    return await Complaint.findByIdAndUpdate(complaint._id, {place: self},{runValidators: true,context:'query'});
                 }
             });
         }
@@ -246,7 +234,7 @@ PlaceSchema.pre('save', async function (next) {
                 if (rating.place) {
                     return self.ratings.splice(self.ratings.indexOf(rating), 1);
                 } else {
-                    return await Rating.findByIdAndUpdate(rating._id, {place: self});
+                    return await Rating.findByIdAndUpdate(rating._id, {place: self},{runValidators: true,context:'query'});
                 }
             });
         }
@@ -262,7 +250,7 @@ PlaceSchema.pre('save', async function (next) {
                 if (department.place) {
                     return self.departments.splice(self.departments.indexOf(department), 1);
                 } else {
-                    return await Department.findByIdAndUpdate(department._id, {place: self});
+                    return await Department.findByIdAndUpdate(department._id, {place: self},{runValidators: true,context:'query'});
                 }
             });
         }
@@ -278,7 +266,7 @@ PlaceSchema.pre('save', async function (next) {
                 if (multilang.place) {
                     return self.multilang.splice(self.multilang.indexOf(multilang), 1);
                 } else {
-                    return await Multilang.findByIdAndUpdate(multilang._id, {place: self});
+                    return await Multilang.findByIdAndUpdate(multilang._id, {place: self},{runValidators: true,context:'query'});
                 }
             });
         }
@@ -294,7 +282,7 @@ PlaceSchema.pre('save', async function (next) {
                 if (day.place) {
                     return self.days.splice(self.days.indexOf(day), 1);
                 } else {
-                    return await Day.findByIdAndUpdate(day._id, {place: self});
+                    return await Day.findByIdAndUpdate(day._id, {place: self},{runValidators: true,context:'query'});
                 }
             });
         }
@@ -310,7 +298,7 @@ PlaceSchema.pre('save', async function (next) {
                 if (top.place) {
                     return self.tops.splice(self.tops.indexOf(top), 1);
                 } else {
-                    return await TopPlace.findByIdAndUpdate(top._id, {place: self});
+                    return await TopPlace.findByIdAndUpdate(top._id, {place: self},{runValidators: true,context:'query'});
                 }
             });
         }

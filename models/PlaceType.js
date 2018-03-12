@@ -19,7 +19,7 @@ PlaceTypeSchema.pre('remove', async function (next) {
         await Place.update(
             {types: this._id},
             {$pull: {types: this._id}},
-            {multi: true});
+            {multi: true,runValidators: true,context:'query'});
         let multilangs = await PlaceTypeMultilang.find({placeType: this});
         multilangs.forEach(async function (multilang) {
             return await multilang.remove();
@@ -42,7 +42,7 @@ PlaceTypeSchema.pre('save', async function (next) {
                 if (multilang.placeType) {
                     return self.multilang.splice(self.multilang.indexOf(multilang._id), 1);
                 } else {
-                    return await PlaceTypeMultilang.findByIdAndUpdate(multilang._id,{placeType : self});
+                    return await PlaceTypeMultilang.findByIdAndUpdate(multilang._id,{placeType : self},{runValidators: true,context:'query'});
                 }
             });
         }
