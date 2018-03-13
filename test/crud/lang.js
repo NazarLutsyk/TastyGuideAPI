@@ -1,5 +1,4 @@
-require('../config/path');
-let HashTag = require('../models/HashTag');
+let Lang = require('../../models/Lang');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let mongoose = require('mongoose');
@@ -7,75 +6,74 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('API endpoint /api/hashTags', function () {
+describe('API endpoint /api/langs', function () {
     this.timeout(5000);
-    mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/drinker');
 
-    describe('GET', function (desc) {
+    describe('GET', function () {
         let id1 = new mongoose.Types.ObjectId;
         let id2 = new mongoose.Types.ObjectId;
         before(async function () {
-            await HashTag.create({
+            await Lang.create({
                 _id: id1,
-                value: 'b'
+                name: 'b'
             });
-            await HashTag.create({
+            await Lang.create({
                 _id: id2,
-                value: 'a'
+                name: 'a'
             });
         });
         after(async function () {
-            await HashTag.remove({});
+            await Lang.remove({});
         });
 
         it('(normal get)should return list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/hashTags');
+                .get('/api/langs');
             res.status.should.equal(200);
             res.body.should.be.a('array');
             res.body.length.should.be.above(0);
         });
         it('(normal get)should return model by id', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/hashTags/' + id1);
+                .get('/api/langs/' + id1);
             res.status.should.equal(200);
             res.body.should.have.property('_id');
         });
         it('(wrong id)should return null', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/hashTags/' + new mongoose.Types.ObjectId);
+                .get('/api/langs/' + new mongoose.Types.ObjectId);
             res.status.should.equal(200);
             should.not.exist(res.body);
         });
         it('(normal get with select) should return list of models with selected fields', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/hashTags')
-                .query({fields: 'value,-_id'});
+                .get('/api/langs')
+                .query({fields: 'name,-_id'});
             res.status.should.equal(200);
             res.body.should.be.an('array');
-            res.body[0].should.have.property('value').but.not.have.property('_id');
+            res.body[0].should.have.property('name').but.not.have.property('_id');
         });
         it('(normal get with sorting) should return sorted list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/hashTags')
-                .query({sort: 'value'});
+                .get('/api/langs')
+                .query({sort: 'name'});
             res.status.should.equal(200);
             res.body.should.be.an('array');
-            res.body[0].value.should.equal('a');
+            res.body[0].name.should.equal('a');
         });
         it('(normal get with query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/hashTags')
-                .query({query: JSON.stringify({value: 'a'})});
+                .get('/api/langs')
+                .query({query: JSON.stringify({name: 'a'})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
             res.body.should.have.lengthOf(1);
-            res.body[0].value.should.equal('a');
+            res.body[0].name.should.equal('a');
         });
         it('(wrong query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/hashTags')
+                .get('/api/langs')
                 .query({query: JSON.stringify({wrongField: 'a'})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
@@ -84,26 +82,20 @@ describe('API endpoint /api/hashTags', function () {
     });
 
     describe('POST', function () {
-        after(async function () {
-            await HashTag.remove({});
-        });
-
-        it('(normal create with non existing place)should return created model', async function () {
+        it('(normal create)should return created model', async function () {
             let res = await chai.request('localhost:3000')
-                .post('/api/hashTags')
+                .post('/api/langs')
                 .send({
-                    value: 'eng',
-                    places: [new mongoose.Types.ObjectId]
+                    name: 'eng'
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
-            res.body.value.should.equal('eng');
-            res.body.places.length.should.equal(0);
+            res.body.name.should.equal('eng');
         });
         it('(unknown field)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .post('/api/hashTags/')
+                    .post('/api/langs/')
                     .send({
                         unknownField: 'aaaa'
                     });
@@ -115,7 +107,7 @@ describe('API endpoint /api/hashTags', function () {
         it('(missing required)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .post('/api/hashTags/');
+                    .post('/api/langs/');
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 400);
@@ -126,29 +118,28 @@ describe('API endpoint /api/hashTags', function () {
     describe('PUT', function () {
         let id = new mongoose.Types.ObjectId;
         before(async function () {
-            await HashTag.create({
+            await Lang.create({
                 _id: id,
-                value: 'w'
+                name: 'b'
             });
         });
         after(async function () {
-            await HashTag.remove({});
+            await Lang.remove({});
         });
-
         it('(normal update)should update model', async function () {
             let res = await chai.request('localhost:3000')
-                .put('/api/hashTags/' + id)
+                .put('/api/langs/' + id)
                 .send({
-                    value: 'fr'
+                    name: 'fr'
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
-            res.body.value.should.equal('fr');
+            res.body.name.should.equal('fr');
         });
         it('(unknown field)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/hashTags/' + id)
+                    .put('/api/langs/' + id)
                     .send({
                         unknownField: 'aaaa'
                     });
@@ -160,7 +151,7 @@ describe('API endpoint /api/hashTags', function () {
         it('(invalid id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/hashTags/' + new mongoose.Types.ObjectId);
+                    .put('/api/langs/' + new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 404);
@@ -169,18 +160,21 @@ describe('API endpoint /api/hashTags', function () {
     });
 
     describe('DELETE', function () {
+        after(async function () {
+            await Lang.remove({});
+        });
         it('(normal delete)should return status 204', async function () {
-            let currency = await HashTag.create({
-                value: 'uk'
+            let lang = await Lang.create({
+                name: 'uk'
             });
             let res = await chai.request('localhost:3000')
-                .delete('/api/hashTags/' + currency._id);
+                .delete('/api/langs/' + lang._id);
             res.status.should.equal(204);
         });
         it('(wrong id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .delete('/api/hashTags/' +new mongoose.Types.ObjectId);
+                    .delete('/api/langs/' + new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 404);

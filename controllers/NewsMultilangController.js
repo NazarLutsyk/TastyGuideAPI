@@ -1,5 +1,6 @@
 let NewsMultilang = require(global.paths.MODELS + '/NewsMultilang');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getNewsMultilangs(req, res) {
@@ -55,9 +56,11 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await NewsMultilang.findByIdAndUpdate(newsMultilangId, req.body,{runValidators: true,context:'query'});
-                if(updated) {
-                    res.status(201).json(await NewsMultilang.findById(newsMultilangId));
+                let newsMultilang = await NewsMultilang.findById(newsMultilangId);
+                if (newsMultilang) {
+                    objectHelper.load(newsMultilang, req.body);
+                    let updated = await newsMultilang.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }

@@ -1,5 +1,6 @@
 let Day = require(global.paths.MODELS + '/Day');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getDays(req, res) {
@@ -55,9 +56,11 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await Day.findByIdAndUpdate(dayId, req.body,{runValidators: true,context:'query'});
-                if(updated) {
-                    res.status(201).json(await Day.findById(dayId));
+                let day = await Day.findById(dayId);
+                if (day) {
+                    objectHelper.load(day, req.body);
+                    let updated = await day.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }

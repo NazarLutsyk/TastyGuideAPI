@@ -10,7 +10,6 @@ let MessageSchema = new Schema({
     date : {
         type : Date,
         default : Date.now(),
-        required : true
     },
     seen : {
         type: Boolean,
@@ -26,3 +25,20 @@ let MessageSchema = new Schema({
     }
 });
 module.exports = mongoose.model('Message', MessageSchema);
+
+let Client = require('./Client');
+let Place = require('./Place');
+MessageSchema.pre('save', async function (next) {
+    try {
+        let sender = await Client.findById(this.sender);
+        let receiver = await Place.findById(this.receiver);
+        if ((!sender && this.sender != null) &&
+            (!receiver && this.receiver != null)) {
+            return next(new Error('Not found related model!'));
+        } else {
+            return next();
+        }
+    } catch (e) {
+        return next(e);
+    }
+});

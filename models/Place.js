@@ -14,20 +14,6 @@ let PlaceSchema = new Schema({
         required: true,
         match: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     },
-    locations: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Location',
-    }],
-    avatar: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
-    },
-    images: {
-        type: [{
-            type: Schema.Types.ObjectId,
-            ref: 'Image'
-        }]
-    },
     averagePrice: {
         type: Number,
         default: 0,
@@ -45,6 +31,20 @@ let PlaceSchema = new Schema({
     allowed: {
         type: Boolean,
         default: false,
+    },
+    location: {
+        type: Schema.Types.ObjectId,
+        ref: 'Location',
+    },
+    avatar: {
+        type: Schema.Types.ObjectId,
+        ref: 'Image'
+    },
+    images: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Image'
+        }]
     },
     boss: {
         type: Schema.Types.ObjectId,
@@ -117,7 +117,7 @@ PlaceSchema.pre('remove', async function (next) {
         let topPlaces = await TopPlace.find({place: this._id});
         let days = await Day.find({place: this._id});
         let promos = await Promo.find({place: this._id});
-        let locations = await Location.find({location: this._id});
+        let locations = await Location.remove({location: this._id});
 
         complaints.forEach(async function (complaint) {
             return await complaint.remove();
@@ -139,9 +139,6 @@ PlaceSchema.pre('remove', async function (next) {
         });
         promos.forEach(async function (promo) {
             return await promo.remove();
-        });
-        locations.forEach(async function (location) {
-            return await location.remove();
         });
         this.multilang.forEach(async function (multId) {
             let mult = await Multilang.findById(multId);
@@ -171,7 +168,7 @@ PlaceSchema.pre('save', async function (next) {
         let boss = await Client.findById(this.boss);
         this.boss = boss ? boss._id : null;
         if (boss && boss.ownPlaces.indexOf(this._id) == -1) {
-            return await Client.findByIdAndUpdate(boss._id, {$push: {ownPlaces: self}},{runValidators: true,context:'query'});
+            await Client.findByIdAndUpdate(boss._id, {$push: {ownPlaces: self}},{runValidators: true,context:'query'});
         }
     }
     if (this.hashTags) {

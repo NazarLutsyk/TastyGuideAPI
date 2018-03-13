@@ -33,10 +33,6 @@ let DrinkApplicationSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Place',
     },
-    currency: {
-        type: Schema.Types.ObjectId,
-        ref: 'Currency'
-    },
 }, {
     timestamps: true,
 });
@@ -44,16 +40,16 @@ module.exports = mongoose.model('DrinkApplication', DrinkApplicationSchema);
 
 let Place = require('./Place');
 let Client = require('./Client');
-DrinkApplicationSchema.pre('remove',async function (next) {
+DrinkApplicationSchema.pre('remove', async function (next) {
     try {
         await Client.update(
             {drinkApplications: this._id},
             {$pull: {drinkApplications: this._id}},
-            {multi: true, runValidators: true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         await Place.update(
             {drinkApplications: this._id},
             {$pull: {drinkApplications: this._id}},
-            {multi: true, runValidators: true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -63,17 +59,24 @@ DrinkApplicationSchema.pre('save', async function (next) {
     try {
         let client = await Client.findById(this.organizer);
         let place = await Place.findById(this.place);
-        let currency = await Place.findById(this.currency);
-        this.organizer = client ? client._id : null;
-        this.place = place ? place._id : null;
-        this.currency = currency ? currency._id : null;
-        if (client && client.drinkApplications.indexOf(this._id) == -1) {
-            return await Client.findByIdAndUpdate(client._id,{$push : {drinkApplications : this}},{runValidators: true,context:'query'});
+        if ((!client && this.organizer != null) &&
+            (!place && this.place != null)) {
+            return next(new Error('Not found related model!'));
+        } else {
+            if (client && client.drinkApplications.indexOf(this._id) == -1) {
+                await Client.findByIdAndUpdate(client._id, {$push: {drinkApplications: this}}, {
+                    runValidators: true,
+                    context: 'query'
+                });
+            }
+            if (place && place.drinkApplications.indexOf(this._id) == -1) {
+                await Place.findByIdAndUpdate(place._id, {$push: {drinkApplications: this}}, {
+                    runValidators: true,
+                    context: 'query'
+                });
+            }
+            return next();
         }
-        if (place && place.drinkApplications.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {drinkApplications : this}},{runValidators: true,context:'query'});
-        }
-        return next();
     } catch (e) {
         return next(e);
     }

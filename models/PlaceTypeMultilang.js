@@ -33,7 +33,7 @@ PlaceTypeMultilangSchema.pre('save', async function (next) {
         let placeType = await PlaceType.findById(this.placeType);
         this.placeType = placeType ? placeType._id : null;
         if (placeType  && placeType .multilang.indexOf(this._id) == -1) {
-            return await PlaceType.findByIdAndUpdate(placeType ._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
+            await PlaceType.findByIdAndUpdate(placeType ._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
         }
         next();
     } catch (e) {

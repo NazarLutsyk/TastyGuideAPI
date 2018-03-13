@@ -1,5 +1,6 @@
 let PlaceMultilang = require(global.paths.MODELS + '/PlaceMultilang');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getPlaceMultilangs(req, res) {
@@ -55,9 +56,11 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await PlaceMultilang.findByIdAndUpdate(placeMultilangId, req.body, {runValidators: true,context:'query'});
-                if (updated) {
-                    res.status(201).json(await PlaceMultilang.findById(placeMultilangId));
+                let placeMultilang = await PlaceMultilang.findById(placeMultilangId);
+                if (placeMultilang) {
+                    objectHelper.load(placeMultilang, req.body);
+                    let updated = await placeMultilang.save();
+                    res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);
                 }

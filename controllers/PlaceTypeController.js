@@ -1,6 +1,7 @@
 let PlaceType = require(global.paths.MODELS + '/PlaceType');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getPlaceTypes(req, res) {
@@ -56,9 +57,11 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await PlaceType.findByIdAndUpdate(placeTypeId, req.body,{runValidators: true,context:'query'});
-                if(updated) {
-                    res.status(201).json(await PlaceType.findById(placeTypeId));
+                let placeType = await PlaceType.findById(placeTypeId);
+                if (placeType) {
+                    objectHelper.load(placeType, req.body);
+                    let updated = await placeType.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }

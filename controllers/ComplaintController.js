@@ -1,5 +1,6 @@
 let Complaint = require(global.paths.MODELS + '/Complaint');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getComplaints(req, res) {
@@ -55,9 +56,11 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await Complaint.findByIdAndUpdate(complaintId, req.body, {runValidators: true,context:'query'});
-                if (updated) {
-                    res.status(201).json(await Complaint.findById(complaintId));
+                let complaint = await Complaint.findById(complaintId);
+                if (complaint) {
+                    objectHelper.load(complaint, req.body);
+                    let updated = await complaint.save();
+                    res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);
                 }
@@ -73,7 +76,7 @@ module.exports = {
             if (complaint) {
                 complaint = await complaint.remove();
                 res.status(204).json(complaint);
-            }else {
+            } else {
                 res.sendStatus(404);
             }
         } catch (e) {

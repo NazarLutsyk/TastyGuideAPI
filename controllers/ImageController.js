@@ -41,7 +41,7 @@ module.exports = {
     },
     async createImage(req, res) {
         upload(req, res,async function (err) {
-            if (err) {
+            if (err && !req.files) {
                 return res.status(400).send(err.toString());
             }else {
                 let result = [];

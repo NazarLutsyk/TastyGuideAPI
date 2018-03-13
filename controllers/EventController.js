@@ -1,6 +1,7 @@
 let Event = require(global.paths.MODELS + '/Event');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 let path = require('path');
 module.exports = {
@@ -57,9 +58,11 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await Event.findByIdAndUpdate(eventId, req.body, {runValidators: true,context:'query'});
-                if (updated) {
-                    res.status(201).json(await Event.findById(eventId));
+                let event = await Event.findById(eventId);
+                if (event) {
+                    objectHelper.load(event, req.body);
+                    let updated = await event.save();
+                    res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);
                 }
@@ -72,7 +75,7 @@ module.exports = {
         let eventId = req.params.id;
         try {
             let event = await Event.findById(eventId);
-            if (eventId) {
+            if (event) {
                 event = await event.remove();
                 res.status(204).json(event);
             } else {

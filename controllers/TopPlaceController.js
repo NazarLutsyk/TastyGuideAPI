@@ -1,5 +1,6 @@
 let TopPlace = require(global.paths.MODELS + '/TopPlace');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getTopPlaces(req, res) {
@@ -55,9 +56,11 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await TopPlace.findByIdAndUpdate(topPlaceId, req.body,{runValidators : true,context:'query'});
-                if(updated) {
-                    res.status(201).json(await TopPlace.findById(topPlaceId));
+                let topPlace = await TopPlace.findById(topPlaceId);
+                if (topPlace) {
+                    objectHelper.load(topPlace, req.body);
+                    let updated = await topPlace.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }

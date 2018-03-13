@@ -1,5 +1,6 @@
 let DrinkApplication = require(global.paths.MODELS + '/DrinkApplication');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getDrinkApplications(req, res) {
@@ -55,9 +56,11 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await DrinkApplication.findByIdAndUpdate(drinkApplicationId, req.body,{runValidators: true,context:'query'});
-                if (updated) {
-                    res.status(201).json(await DrinkApplication.findById(drinkApplicationId));
+                let drinkApp = await DrinkApplication.findById(drinkApplicationId);
+                if (drinkApp) {
+                    objectHelper.load(drinkApp, req.body);
+                    let updated = await drinkApp.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }

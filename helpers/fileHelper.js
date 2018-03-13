@@ -6,7 +6,7 @@ module.exports = {
             files = [files];
         }
         if (files.length > 0) {
-            for (let file of files) {
+            for (let file in files) {
                 if (file.indexOf('default.jpg') == -1) {
                     fs.unlink(file, function (err) {
                         if (err) {

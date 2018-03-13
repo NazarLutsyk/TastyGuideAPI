@@ -20,7 +20,7 @@ let EventMultilangSchema = new Schema({
 });
 module.exports = Multilang.discriminator('EventMultilang', EventMultilangSchema);
 
-let Promo = require('./Promo');
+let Promo = require('./Event');
 EventMultilangSchema.pre('remove', async function (next) {
     try {
         await Promo.update(
@@ -37,7 +37,7 @@ EventMultilangSchema.pre('save', async function (next) {
         let promo = await Promo.findById(this.event);
         this.event = promo ? promo._id : null;
         if (promo && promo.multilang.indexOf(this._id) == -1) {
-            return await Promo.findByIdAndUpdate(promo._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
+            await Promo.findByIdAndUpdate(promo._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

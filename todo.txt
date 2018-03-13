@@ -18,6 +18,8 @@
 //todo cors?
 //todo clusters?
 //todo pagination&aggregation?
+//todo place location or locations?
+//change update controllers to save instead update
 //+stack of places
 //+top place planning
 //+logger

@@ -30,7 +30,7 @@ DaySchema.pre('remove', async function (next) {
         await Place.update(
             {days: this._id},
             {$pull: {days: this._id}},
-            {multi: true, runValidators: true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -41,7 +41,10 @@ DaySchema.pre('save', async function (next) {
         let place = await Place.findById(this.place);
         this.place = place ? place._id : null;
         if (place && place.days.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {days : this}},{runValidators: true,context:'query'});
+            await Place.findByIdAndUpdate(place._id, {$push: {days: this}}, {
+                runValidators: true,
+                context: 'query'
+            });
         }
         return next();
     } catch (e) {

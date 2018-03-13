@@ -16,10 +16,6 @@ let Place = require('./Place');
 ImageSchema.pre('remove',async function (next) {
     try {
         fileHelper.deleteFiles(this.path);
-        await Place.update(
-            {images: this._id},
-            {$pull: {images: this._id}},
-            {multi: true,runValidators: true,context:'query'});
         await Promo.update(
             {image: this._id},
             {image: null},

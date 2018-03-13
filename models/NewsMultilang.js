@@ -37,7 +37,7 @@ NewsMultilangSchema.pre('save', async function (next) {
         let promo = await Promo.findById(this.news);
         this.news = promo ? promo._id : null;
         if (promo && promo.multilang.indexOf(this._id) == -1) {
-            return await Promo.findByIdAndUpdate(promo._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
+            await Promo.findByIdAndUpdate(promo._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

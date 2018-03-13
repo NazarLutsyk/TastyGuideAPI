@@ -1,5 +1,5 @@
-require('../config/path');
-let Complaint = require('../models/Complaint');
+require('../../config/path');
+let Complaint = require('../../models/Complaint');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let mongoose = require('mongoose');
@@ -92,15 +92,11 @@ describe('API endpoint /api/complaints', function () {
             let res = await chai.request('localhost:3000')
                 .post('/api/complaints')
                 .send({
-                    value: 'a',
-                    place: new mongoose.Types.ObjectId,
-                    client: new mongoose.Types.ObjectId
+                    value: 'a'
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
             res.body.value.should.equal('a');
-            should.equal(res.body.place, null);
-            should.equal(res.body.client, null);
         });
         it('(unknown field)should return status 400', async function () {
             try {

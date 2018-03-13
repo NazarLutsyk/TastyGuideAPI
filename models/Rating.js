@@ -37,11 +37,11 @@ RatingSchema.pre('remove', async function (next) {
         await Client.update(
             {ratings: this._id},
             {$pull: {ratings: this._id}},
-            {multi: true,runValidators: true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         await Place.update(
             {ratings: this._id},
             {$pull: {ratings: this._id}},
-            {multi: true, runValidators: true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -51,15 +51,24 @@ RatingSchema.pre('save', async function (next) {
     try {
         let client = await Client.findById(this.client);
         let place = await Place.findById(this.place);
-        this.client = client ? client._id : null;
-        this.place = place ? place._id : null;
-        if (client && client.ratings.indexOf(this._id) == -1) {
-            return await Client.findByIdAndUpdate(client._id,{$push : {ratings : this}},{runValidators: true,context:'query'});
+        if ((!client && this.client != null) &&
+            (!place && this.place != null)) {
+            return next(new Error('Not found related model!'));
+        } else {
+            if (client && client.ratings.indexOf(this._id) == -1) {
+                await Client.findByIdAndUpdate(client._id, {$push: {ratings: this}}, {
+                    runValidators: true,
+                    context: 'query'
+                });
+            }
+            if (place && place.ratings.indexOf(this._id) == -1) {
+                await Place.findByIdAndUpdate(place._id, {$push: {ratings: this}}, {
+                    runValidators: true,
+                    context: 'query'
+                });
+            }
+            return next();
         }
-        if (place && place.ratings.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {ratings : this}},{runValidators: true,context:'query'});
-        }
-        return next();
     } catch (e) {
         return next(e);
     }

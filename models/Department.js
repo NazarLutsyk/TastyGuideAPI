@@ -5,8 +5,8 @@ let Schema = mongoose.Schema;
 
 let DepartmentSchema = new Schema({
     roles: {
-        type : [String],
-        default : [ROLES.PLACE_ROLES.ADMIN_ROLE]
+        type: [String],
+        default: [ROLES.PLACE_ROLES.ADMIN_ROLE]
     },
     client: {
         type: Schema.Types.ObjectId,
@@ -33,15 +33,15 @@ DepartmentSchema.pre('remove', async function (next) {
         await Client.update(
             {departments: this._id},
             {$pull: {departments: this._id}},
-            {multi: true, runValidators: true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         await Place.update(
             {departments: this._id},
             {$pull: {departments: this._id}},
-            {multi: true, runValidators: true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         await Promo.update(
             {author: this._id},
             {author: null},
-            {multi: true, runValidators: true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -57,19 +57,28 @@ DepartmentSchema.pre('save', async function (next) {
         this.place = place ? place._id : null;
         this.promos = [];
         if (client && client.departments.indexOf(this._id) == -1) {
-            return await Client.findByIdAndUpdate(client._id, {$push : {departments : this}},{runValidators: true,context:'query'});
+            await Client.findByIdAndUpdate(client._id, {$push: {departments: this}}, {
+                runValidators: true,
+                context: 'query'
+            });
         }
         if (place && place.departments.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id, {$push : {departments : this}},{runValidators: true,context:'query'});
+            await Place.findByIdAndUpdate(place._id, {$push: {departments: this}}, {
+                runValidators: true,
+                context: 'query'
+            });
         }
         if (promos) {
-            promos.forEach(function (promo){
-               self.promos.push(promo._id);
+            promos.forEach(function (promo) {
+                self.promos.push(promo._id);
             });
             promos.forEach(async function (promo) {
                 if (promo.departments.indexOf(self._id) == -1) {
-                    return await Promo.findByIdAndUpdate(promo._id, {author: self},{runValidators: true,context:'query'});
-                }else {
+                    return await Promo.findByIdAndUpdate(promo._id, {author: self}, {
+                        runValidators: true,
+                        context: 'query'
+                    });
+                } else {
                     return;
                 }
             });

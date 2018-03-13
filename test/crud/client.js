@@ -1,5 +1,5 @@
-require('../config/path');
-let Department = require('../models/Department');
+require('../../config/path');
+let Client = require('../../models/Client');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let mongoose = require('mongoose');
@@ -7,67 +7,76 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('API endpoint /api/departments', function () {
+describe('API endpoint /api/clients', function () {
     this.timeout(5000);
-    mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/drinker');
 
-    describe('GET', function (desc) {
+    describe('GET', function () {
         let id1 = new mongoose.Types.ObjectId;
         let id2 = new mongoose.Types.ObjectId;
         before(async function () {
-            await Department.create({
+            await Client.create({
                 _id: id1,
-                roles: ['a']
+                name: 'b',
+                surname : 'b'
             });
-            await Department.create({
+            await Client.create({
                 _id: id2,
-                roles: ['b']
+                name: 'a',
+                surname: 'a'
             });
         });
         after(async function () {
-            await Department.remove({});
+            await Client.remove({});
         });
 
         it('(normal get)should return list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/departments');
+                .get('/api/clients');
             res.status.should.equal(200);
             res.body.should.be.a('array');
             res.body.length.should.be.above(0);
         });
         it('(normal get)should return model by id', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/departments/' + id1);
+                .get('/api/clients/' + id1);
             res.status.should.equal(200);
             res.body.should.have.property('_id');
         });
         it('(wrong id)should return null', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/departments/' + new mongoose.Types.ObjectId);
+                .get('/api/clients/' + new mongoose.Types.ObjectId);
             res.status.should.equal(200);
             should.not.exist(res.body);
         });
         it('(normal get with select) should return list of models with selected fields', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/departments')
-                .query({fields: 'roles,-_id'});
+                .get('/api/clients')
+                .query({fields: 'name,-_id'});
             res.status.should.equal(200);
             res.body.should.be.an('array');
-            res.body[0].should.have.property('roles').but.not.have.property('_id');
+            res.body[0].should.have.property('name').but.not.have.property('_id');
+        });
+        it('(normal get with sorting) should return sorted list of models', async function () {
+            let res = await chai.request('localhost:3000')
+                .get('/api/clients')
+                .query({sort: 'name'});
+            res.status.should.equal(200);
+            res.body.should.be.an('array');
+            res.body[0].name.should.equal('a');
         });
         it('(normal get with query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/departments')
-                .query({query: JSON.stringify({roles: 'a'})});
+                .get('/api/clients')
+                .query({query: JSON.stringify({name: 'a'})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
             res.body.should.have.lengthOf(1);
-            res.body[0].roles.should.include('a');
+            res.body[0].name.should.equal('a');
         });
         it('(wrong query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/departments')
+                .get('/api/clients')
                 .query({query: JSON.stringify({wrongField: 'a'})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
@@ -75,67 +84,34 @@ describe('API endpoint /api/departments', function () {
         });
     });
 
-    describe('POST', function () {
-        after(async function () {
-            await Department.remove({});
-        });
-
-        it('(normal create)should return created model', async function () {
-            let res = await chai.request('localhost:3000')
-                .post('/api/departments')
-                .send({
-                    roles: ['a'],
-                    place: new mongoose.Types.ObjectId,
-                    client: new mongoose.Types.ObjectId,
-                    promos : new mongoose.Types.ObjectId,
-                });
-            res.status.should.equal(201);
-            res.body.should.be.a('object');
-            res.body.roles.should.include('a');
-            should.equal(res.body.place, null);
-            should.equal(res.body.client, null);
-            should.equal(res.body.promos.length,0);
-        });
-        it('(unknown field)should return status 400', async function () {
-            try {
-                let res = await chai.request('localhost:3000')
-                    .post('/api/departments/')
-                    .send({
-                        unknownField: 'aaaa'
-                    });
-                if (res.status) should.fail();
-            } catch (e) {
-                should.equal(e.status, 400);
-            }
-        });
-    });
-
     describe('PUT', function () {
         let id = new mongoose.Types.ObjectId;
         before(async function () {
-            await Department.create({
+            await Client.create({
                 _id: id,
-                roles: ['q']
+                name: 'b',
+                surname : 'b'
             });
         });
         after(async function () {
-            await Department.remove({});
+            await Client.remove({});
         });
-
         it('(normal update)should update model', async function () {
             let res = await chai.request('localhost:3000')
-                .put('/api/departments/' + id)
+                .put('/api/clients/' + id)
                 .send({
-                    roles: ['w']
+                    name: 'a',
+                    surname: 'a'
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
-            res.body.roles.should.include('w');
+            res.body.name.should.equal('a');
+            res.body.surname.should.equal('a');
         });
         it('(unknown field)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/departments/' + id)
+                    .put('/api/clients/' + id)
                     .send({
                         unknownField: 'aaaa'
                     });
@@ -147,27 +123,44 @@ describe('API endpoint /api/departments', function () {
         it('(invalid id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/departments/' + new mongoose.Types.ObjectId);
+                    .put('/api/clients/' + new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 404);
             }
         });
+        it('(invalid phone and email)should return status 400', async function () {
+            try {
+                let res = await chai.request('localhost:3000')
+                    .put('/api/clients/' + id)
+                    .send({
+                        phone : 'asd',
+                        email : 'sww'
+                    });
+                if (res.status) should.fail();
+            } catch (e) {
+                should.equal(e.status, 400);
+            }
+        });
     });
 
     describe('DELETE', function () {
+        after(async function () {
+            await Client.remove({});
+        });
         it('(normal delete)should return status 204', async function () {
-            let currency = await Department.create({
-                roles : ['a']
+            let lang = await Client.create({
+                name: 'uk',
+                surname : 'aaa'
             });
             let res = await chai.request('localhost:3000')
-                .delete('/api/departments/' + currency._id);
+                .delete('/api/clients/' + lang._id);
             res.status.should.equal(204);
         });
         it('(wrong id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .delete('/api/departments/' + new mongoose.Types.ObjectId);
+                    .delete('/api/clients/' + new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 404);

@@ -1,5 +1,6 @@
 let Rating = require(global.paths.MODELS + '/Rating');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getRatings(req, res) {
@@ -55,9 +56,11 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await Rating.findByIdAndUpdate(ratingId, req.body,{runValidators: true,context:'query'});
-                if(updated) {
-                    res.status(201).json(await Rating.findById(ratingId));
+                let rating = await Rating.findById(ratingId);
+                if (rating) {
+                    objectHelper.load(rating, req.body);
+                    let updated = await rating.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }

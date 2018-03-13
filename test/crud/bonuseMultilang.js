@@ -1,5 +1,5 @@
-require('../config/path');
-let Location = require('../models/Location');
+require('../../config/path');
+let BonuseMultilang = require('../../models/BonuseMultilang');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let mongoose = require('mongoose');
@@ -7,7 +7,7 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('API endpoint /api/locations', function () {
+describe('API endpoint /api/bonuseMultilangs', function () {
     this.timeout(5000);
     mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/drinker');
@@ -16,68 +16,70 @@ describe('API endpoint /api/locations', function () {
         let id1 = new mongoose.Types.ObjectId;
         let id2 = new mongoose.Types.ObjectId;
         before(async function () {
-            await Location.create({
+            await BonuseMultilang.create({
                 _id: id1,
-                ltg: 50,
-                lng: 100,
+                header : 'b',
+                description : 'a',
+                conditions : 'a'
             });
-            await Location.create({
+            await BonuseMultilang.create({
                 _id: id2,
-                ltg: 100,
-                lng: 50,
+                header : 'a',
+                description : 'b',
+                conditions : 'a'
             });
         });
         after(async function () {
-            await Location.remove({});
+            await BonuseMultilang.remove({});
         });
 
         it('(normal get)should return list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/locations');
+                .get('/api/bonuseMultilangs');
             res.status.should.equal(200);
             res.body.should.be.a('array');
             res.body.length.should.be.above(0);
         });
         it('(normal get)should return model by id', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/locations/' + id1);
+                .get('/api/bonuseMultilangs/' + id1);
             res.status.should.equal(200);
             res.body.should.have.property('_id');
         });
         it('(wrong id)should return null', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/locations/' + new mongoose.Types.ObjectId);
+                .get('/api/bonuseMultilangs/' + new mongoose.Types.ObjectId);
             res.status.should.equal(200);
             should.not.exist(res.body);
         });
         it('(normal get with select) should return list of models with selected fields', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/locations')
-                .query({fields: 'ltg,-_id'});
+                .get('/api/bonuseMultilangs')
+                .query({fields: 'header,-_id'});
             res.status.should.equal(200);
             res.body.should.be.an('array');
-            res.body[0].should.have.property('ltg').but.not.have.property('_id');
+            res.body[0].should.have.property('header').but.not.have.property('_id');
         });
         it('(normal get with sorting) should return sorted list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/locations')
-                .query({sort: 'ltg'});
+                .get('/api/bonuseMultilangs')
+                .query({sort: 'value'});
             res.status.should.equal(200);
             res.body.should.be.an('array');
-            res.body[0].ltg.should.equal(50);
+            res.body[0].header.should.equal('b');
         });
         it('(normal get with query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/locations')
-                .query({query: JSON.stringify({ltg: 50})});
+                .get('/api/bonuseMultilangs')
+                .query({query: JSON.stringify({header: 'a'})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
             res.body.should.have.lengthOf(1);
-            res.body[0].ltg.should.equal(50);
+            res.body[0].header.should.equal('a');
         });
         it('(wrong query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/locations')
+                .get('/api/bonuseMultilangs')
                 .query({query: JSON.stringify({wrongField: 'a'})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
@@ -87,26 +89,27 @@ describe('API endpoint /api/locations', function () {
 
     describe('POST', function () {
         after(async function () {
-            await Location.remove({});
+            await BonuseMultilang.remove({});
         });
 
-        it('(normal create)should return created model', async function () {
+        it('(normal create with non existing place)should return created model', async function () {
             let res = await chai.request('localhost:3000')
-                .post('/api/locations')
+                .post('/api/bonuseMultilangs')
                 .send({
-                    ltg: 50,
-                    lng: 100,
-                    place: new mongoose.Types.ObjectId
+                    header : 'a',
+                    description : 'b',
+                    conditions : 'a'
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
-            res.body.ltg.should.equal(50);
-            should.equal(res.body.place, null)
+            res.body.header.should.equal('a');
+            res.body.description.should.equal('b');
+            res.body.conditions.should.equal('a');
         });
         it('(unknown field)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .post('/api/locations/')
+                    .post('/api/bonuseMultilangs/')
                     .send({
                         unknownField: 'aaaa'
                     });
@@ -118,7 +121,7 @@ describe('API endpoint /api/locations', function () {
         it('(missing required)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .post('/api/locations/');
+                    .post('/api/bonuseMultilangs/');
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 400);
@@ -129,30 +132,35 @@ describe('API endpoint /api/locations', function () {
     describe('PUT', function () {
         let id = new mongoose.Types.ObjectId;
         before(async function () {
-            await Location.create({
+            await BonuseMultilang.create({
                 _id: id,
-                ltg: 100,
-                lng: 100,
+                header : 'a',
+                description : 'b',
+                conditions : 'a'
             });
         });
         after(async function () {
-            await Location.remove({});
+            await BonuseMultilang.remove({});
         });
 
         it('(normal update)should update model', async function () {
             let res = await chai.request('localhost:3000')
-                .put('/api/locations/' + id)
+                .put('/api/bonuseMultilangs/' + id)
                 .send({
-                    ltg: 50
+                    header : 'a',
+                    description : 'b',
+                    conditions : 'q'
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
-            res.body.ltg.should.equal(50);
+            res.body.header.should.equal('a');
+            res.body.description.should.equal('b');
+            res.body.conditions.should.equal('q');
         });
         it('(unknown field)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/locations/' + id)
+                    .put('/api/bonuseMultilangs/' + id)
                     .send({
                         unknownField: 'aaaa'
                     });
@@ -164,31 +172,32 @@ describe('API endpoint /api/locations', function () {
         it('(invalid id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/locations/' + new mongoose.Types.ObjectId);
+                    .put('/api/bonuseMultilangs/' + new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
-                should.equal(e.status,404);
+                should.equal(e.status, 404);
             }
         });
     });
 
     describe('DELETE', function () {
         it('(normal delete)should return status 204', async function () {
-            let currency = await Location.create({
-                ltg : 50,
-                lng : 50,
+            let currency = await BonuseMultilang.create({
+                header : 'a',
+                description : 'b',
+                conditions : 'a'
             });
             let res = await chai.request('localhost:3000')
-                .delete('/api/locations/' + currency._id);
+                .delete('/api/bonuseMultilangs/' + currency._id);
             res.status.should.equal(204);
         });
         it('(wrong id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .delete('/api/locations/' + new mongoose.Types.ObjectId);
+                    .delete('/api/bonuseMultilangs/' +new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
-                should.equal(e.status,404);
+                should.equal(e.status, 404);
             }
         });
     });

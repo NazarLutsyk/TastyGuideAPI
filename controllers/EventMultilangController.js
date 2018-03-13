@@ -1,10 +1,11 @@
 let EventMultilang = require(global.paths.MODELS + '/EventMultilang');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getEventMultilangs(req, res) {
         try {
-            let eventMultilangQuery = await EventMultilang
+            let eventMultilangQuery = EventMultilang
                 .find(req.query.query)
                 .sort(req.query.sort)
                 .select(req.query.fields);
@@ -55,9 +56,11 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await EventMultilang.findByIdAndUpdate(eventMultilangId, req.body,{runValidators: true,context:'query'});
-                if(updated) {
-                    res.status(201).json(await EventMultilang.findById(eventMultilangId));
+                let eventMultilang = await EventMultilang.findById(eventMultilangId);
+                if (eventMultilang) {
+                    objectHelper.load(eventMultilang, req.body);
+                    let updated = await eventMultilang.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }

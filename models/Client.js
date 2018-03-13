@@ -19,8 +19,8 @@ let ClientSchema = new Schema({
     password: {
         type: String,
         validate: {
-            validator: function (password) {
-                return password.length >= 4;
+            validator: function () {
+                return this.password.length >= 4;
             },
             message: 'Password min length eq 4'
         }
@@ -40,7 +40,6 @@ let ClientSchema = new Schema({
     },
     avatar: {
         type: String,
-        default: path.join(__dirname, 'default', 'default.jpg')
     },
     roles: {
         type: Array,
@@ -107,7 +106,7 @@ ClientSchema.pre('remove', async function (next) {
         await departments.forEach(async function (department) {
             return await department.remove();
         });
-        await Place.update({_id: this.ownPlaces}, {boss: null}, {multi: true, runValidators:true,context:'query'});
+        await Place.update({_id: this.ownPlaces}, {boss: null}, {multi: true, runValidators: true, context: 'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -128,7 +127,10 @@ ClientSchema.pre('save', async function (next) {
                     if (place.boss) {
                         return self.ownPlaces.splice(self.ownPlaces.indexOf(place), 1);
                     } else {
-                        return await Place.findByIdAndUpdate(place._id, {boss: self},{runValidators: true,context:'query'});
+                        return await Place.findByIdAndUpdate(place._id, {boss: self}, {
+                            runValidators: true,
+                            context: 'query'
+                        });
                     }
                 });
             }
@@ -144,7 +146,7 @@ ClientSchema.pre('save', async function (next) {
                     if (app.client) {
                         return self.drinkApplications.splice(self.drinkApplications.indexOf(app), 1);
                     } else {
-                        return await DrinkApplication.findByIdAndUpdate(app._id, {organizer: self},{runValidators: true,context:'query'});
+                        return await DrinkApplication.findByIdAndUpdate(app._id, {organizer: self}, {runValidators: true});
                     }
                 });
             }
@@ -160,7 +162,7 @@ ClientSchema.pre('save', async function (next) {
                     if (rating.client) {
                         return self.ratings.splice(self.ratings.indexOf(rating), 1);
                     } else {
-                        return await Rating.findByIdAndUpdate(rating._id, {client: self},{runValidators: true,context:'query'});
+                        return await Rating.findByIdAndUpdate(rating._id, {client: self}, {runValidators: true});
                     }
                 });
             }
@@ -176,7 +178,7 @@ ClientSchema.pre('save', async function (next) {
                     if (complaint.client) {
                         return self.complaints.splice(self.complaints.indexOf(complaint), 1);
                     } else {
-                        return await Complaint.findByIdAndUpdate(complaint._id, {client: self},{runValidators: true,context:'query'});
+                        return await Complaint.findByIdAndUpdate(complaint._id, {client: self}, {runValidators: true});
                     }
                 });
             }
@@ -192,7 +194,10 @@ ClientSchema.pre('save', async function (next) {
                     if (department.client) {
                         return self.departments.splice(self.departments.indexOf(department), 1);
                     } else {
-                        return await Department.findByIdAndUpdate(department._id, {client: self},{runValidators: true,context:'query'});
+                        return await Department.findByIdAndUpdate(department._id, {client: self}, {
+                            runValidators: true,
+                            context: 'query'
+                        });
                     }
                 });
             }

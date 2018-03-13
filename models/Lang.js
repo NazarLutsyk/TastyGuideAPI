@@ -15,7 +15,7 @@ module.exports = mongoose.model('Lang', LangSchema);
 let Multilang = require('./Multilang');
 LangSchema.pre('remove', async function (next) {
     try {
-        await Multilang.update({lang: this._id},{lang:null},{multi:true,runValidators:true,context:'query'});
+        await Multilang.update({lang: this._id}, {lang: null}, {multi: true, runValidators: true, context: 'query'});
         return next();
     } catch (e) {
         return next(e);

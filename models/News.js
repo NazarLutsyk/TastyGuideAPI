@@ -39,7 +39,10 @@ NewsSchema.pre('save', async function (next) {
                 if (multilang.news) {
                     return self.multilang.splice(self.multilang.indexOf(multilang._id), 1);
                 } else {
-                    return await Multilang.findByIdAndUpdate(multilang._id, {news: self},{runValidators: true,context:'query'});
+                    return await Multilang.findByIdAndUpdate(multilang._id, {news: self}, {
+                        runValidators: true,
+                        context: 'query'
+                    });
                 }
             });
         }

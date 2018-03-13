@@ -46,10 +46,10 @@ PromoSchema.pre('save', async function (next) {
         this.client = client ? client._id : null;
         this.place = place ? place._id : null;
         if (client && client.promos.indexOf(this._id) == -1) {
-            return await Department.findByIdAndUpdate(client._id,{$push : {promos : this}},{runValidators: true,context:'query'});
+            await Department.findByIdAndUpdate(client._id,{$push : {promos : this}},{runValidators: true,context:'query'});
         }
         if (place && place.promos.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {promos : this._id}},{runValidators: true,context:'query'});
+            await Place.findByIdAndUpdate(place._id,{$push : {promos : this._id}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

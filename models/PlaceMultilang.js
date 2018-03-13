@@ -14,7 +14,6 @@ let PlaceMultilangSchema = new Schema({
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',
-        required: true
     },
 }, {
     discriminatorKey: 'kind'
@@ -38,7 +37,7 @@ PlaceMultilangSchema.pre('save', async function (next) {
         let place = await Place.findById(this.place);
         this.place = place ? place._id : null;
         if (place && place.multilang.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
+            await Place.findByIdAndUpdate(place._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
         }
         return next();
     } catch (e) {

@@ -1,4 +1,5 @@
 let Message = require(global.paths.MODELS + '/Message');
+let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 
 module.exports = {
     async getMessages(req, res) {

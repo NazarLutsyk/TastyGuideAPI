@@ -1,5 +1,5 @@
-require('../config/path');
-let Day = require('../models/Day');
+require('../../config/path');
+let Bonuse = require('../../models/Bonuse');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let mongoose = require('mongoose');
@@ -7,7 +7,7 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('API endpoint /api/days', function () {
+describe('API endpoint /api/bonuses', function () {
     this.timeout(5000);
     mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/drinker');
@@ -16,53 +16,51 @@ describe('API endpoint /api/days', function () {
         let id1 = new mongoose.Types.ObjectId;
         let id2 = new mongoose.Types.ObjectId;
         before(async function () {
-            await Day.create({
+            await Bonuse.create({
                 _id: id1,
-                startTime: new Date(),
-                endTime: new Date('Mon Mar 15 2019 12:54:05'),
-                place: new mongoose.Types.ObjectId
+                startDate: new Date(),
+                endDate: new Date(),
             });
-            await Day.create({
+            await Bonuse.create({
                 _id: id2,
-                startTime: new Date(),
-                endTime: new Date('Mon Mar 15 2019 12:54:05'),
-                place: new mongoose.Types.ObjectId
+                startDate: new Date(),
+                endDate: new Date(),
             });
         });
         after(async function () {
-            await Day.remove({});
+            await Bonuse.remove({});
         });
 
         it('(normal get)should return list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/days');
+                .get('/api/bonuses');
             res.status.should.equal(200);
             res.body.should.be.a('array');
             res.body.length.should.be.above(0);
         });
         it('(normal get)should return model by id', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/days/' + id1);
+                .get('/api/bonuses/' + id1);
             res.status.should.equal(200);
             res.body.should.have.property('_id');
         });
         it('(wrong id)should return null', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/days/' + new mongoose.Types.ObjectId);
+                .get('/api/bonuses/' + new mongoose.Types.ObjectId);
             res.status.should.equal(200);
             should.not.exist(res.body);
         });
         it('(normal get with select) should return list of models with selected fields', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/days')
-                .query({fields: 'startTime,-_id'});
+                .get('/api/bonuses')
+                .query({fields: 'multilang,-_id'});
             res.status.should.equal(200);
             res.body.should.be.an('array');
-            res.body[0].should.have.property('startTime').but.not.have.property('_id');
+            res.body[0].should.have.property('multilang').but.not.have.property('_id');
         });
         it('(normal get with query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/days')
+                .get('/api/bonuses')
                 .query({query: JSON.stringify({_id: id1})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
@@ -71,7 +69,7 @@ describe('API endpoint /api/days', function () {
         });
         it('(wrong query) should return queried list of models', async function () {
             let res = await chai.request('localhost:3000')
-                .get('/api/days')
+                .get('/api/bonuses')
                 .query({query: JSON.stringify({wrongField: 'a'})});
             res.status.should.equal(200);
             res.body.should.be.an('array');
@@ -81,37 +79,28 @@ describe('API endpoint /api/days', function () {
 
     describe('POST', function () {
         after(async function () {
-            await Day.remove({});
+            await Bonuse.remove({});
         });
 
         it('(normal create with non existing place)should return created model', async function () {
             let res = await chai.request('localhost:3000')
-                .post('/api/days')
+                .post('/api/bonuses')
                 .send({
-                    startTime: new Date(),
-                    endTime: new Date('Mon Mar 15 2019 12:54:05'),
-                    place: new mongoose.Types.ObjectId
+                    startDate: new Date(),
+                    endDate: new Date(),
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
-            should.equal(res.body.place, null)
+            res.body.startDate.should.exist;
+            res.body.endDate.should.exist;
         });
         it('(unknown field)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .post('/api/days/')
+                    .post('/api/bonuses/')
                     .send({
                         unknownField: 'aaaa'
                     });
-                if (res.status) should.fail();
-            } catch (e) {
-                should.equal(e.status, 400);
-            }
-        });
-        it('(missing required)should return status 400', async function () {
-            try {
-                let res = await chai.request('localhost:3000')
-                    .post('/api/days/');
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 400);
@@ -122,22 +111,21 @@ describe('API endpoint /api/days', function () {
     describe('PUT', function () {
         let id = new mongoose.Types.ObjectId;
         before(async function () {
-            await Day.create({
+            await Bonuse.create({
                 _id: id,
-                startTime: new Date(),
-                endTime: new Date('Mon Mar 15 2019 12:54:05'),
-                place: new mongoose.Types.ObjectId
+                startDate: new Date(),
+                endDate: new Date(),
             });
         });
         after(async function () {
-            await Day.remove({});
+            await Bonuse.remove({});
         });
-
         it('(normal update)should update model', async function () {
             let res = await chai.request('localhost:3000')
-                .put('/api/days/' + id)
+                .put('/api/bonuses/' + id)
                 .send({
-                    startTime : new Date()
+                    startDate : new Date(),
+                    endDate : new Date()
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
@@ -145,7 +133,7 @@ describe('API endpoint /api/days', function () {
         it('(unknown field)should return status 400', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/days/' + id)
+                    .put('/api/bonuses/' + id)
                     .send({
                         unknownField: 'aaaa'
                     });
@@ -157,7 +145,7 @@ describe('API endpoint /api/days', function () {
         it('(invalid id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/days/' + new mongoose.Types.ObjectId);
+                    .put('/api/bonuses/' + new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 404);
@@ -167,18 +155,18 @@ describe('API endpoint /api/days', function () {
 
     describe('DELETE', function () {
         it('(normal delete)should return status 204', async function () {
-            let topPlace = await Day.create({
-                startTime: new Date(),
-                endTime: new Date('Mon Mar 15 2019 12:54:05'),
+            let topPlace = await Bonuse.create({
+                startDate: new Date(),
+                endDate: new Date(),
             });
             let res = await chai.request('localhost:3000')
-                .delete('/api/days/' + topPlace._id);
+                .delete('/api/bonuses/' + topPlace._id);
             res.status.should.equal(204);
         });
         it('(wrong id)should return status 404', async function () {
             try {
                 let res = await chai.request('localhost:3000')
-                    .delete('/api/days/' + new mongoose.Types.ObjectId);
+                    .delete('/api/bonuses/' + new mongoose.Types.ObjectId);
                 if (res.status) should.fail();
             } catch (e) {
                 should.equal(e.status, 404);

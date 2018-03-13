@@ -13,15 +13,15 @@ let CurrencySchema = new Schema({
 
 module.exports = mongoose.model('Currency', CurrencySchema);
 
-let DrinkApplication = require('./DrinkApplication');
-CurrencySchema.pre('remove',async function (next) {
-    try {
-        await DrinkApplication.update(
-            {currency: this._id},
-            {currency: null},
-            {multi: true, runValidators: true,context:'query'});
-        return next();
-    } catch (e) {
-        return next(e);
-    }
-});
+// let DrinkApplication = require('./DrinkApplication');
+// CurrencySchema.pre('remove',async function (next) {
+//     try {
+//         await DrinkApplication.update(
+//             {currency: this._id},
+//             {currency: null},
+//             {multi: true, runValidators: true,context:'query'});
+//         return next();
+//     } catch (e) {
+//         return next(e);
+//     }
+// });

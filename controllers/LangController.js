@@ -1,5 +1,6 @@
 let Lang = require(global.paths.MODELS + '/Lang');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getLangs(req, res) {
@@ -50,9 +51,11 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await Lang.findByIdAndUpdate(langId, req.body,{runValidators: true,context:'query'});
-                if (updated) {
-                    res.status(201).json(await Lang.findById(langId));
+                let lang = await Lang.findById(langId);
+                if (lang) {
+                    objectHelper.load(lang, req.body);
+                    let updated = await lang.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }

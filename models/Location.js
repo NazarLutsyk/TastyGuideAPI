@@ -25,8 +25,8 @@ LocationSchema.pre('remove', async function (next) {
     try {
         await Place.update(
             {locations: this._id},
-            {$pull: {locations: this._id}},
-            {multi: true,runValidators: true,context:'query'});
+            {location: null},
+            {multi: true, runValidators: true, context: 'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -37,8 +37,8 @@ LocationSchema.pre('save', async function (next) {
         let place = await Place.findById(this.place);
         this.place = place ? place._id : null;
         if (place && !place.location) {
-            return await Place.findByIdAndUpdate(place._id, {location: this},{runValidators: true,context:'query'});
-        }else {
+            await Place.findByIdAndUpdate(place._id, {location: this}, {runValidators: true, context: 'query'});
+        } else {
             this.place = null;
         }
         return next();

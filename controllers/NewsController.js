@@ -2,6 +2,7 @@ let News = require(global.paths.MODELS + '/News');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let path = require('path');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getNews(req, res) {
@@ -57,9 +58,11 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await News.findByIdAndUpdate(newsId, req.body,{runValidators: true,context:'query'});
-                if(updated) {
-                    res.status(201).json(await News.findById(newsId));
+                let news = await News.findById(newsId);
+                if (news) {
+                    objectHelper.load(news, req.body);
+                    let updated = await news.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }

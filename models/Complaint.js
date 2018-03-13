@@ -28,11 +28,11 @@ ComplaintSchema.pre('remove', async function (next) {
         await Client.update(
             {complaints: this._id},
             {$pull: {complaints: this._id}},
-            {multi: true,runValidators: true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         await Place.update(
             {complaints: this._id},
             {$pull: {complaints: this._id}},
-            {multi: true, runValidators:true,context:'query'});
+            {multi: true, runValidators: true, context: 'query'});
         return next();
     } catch (e) {
         return next(e);
@@ -42,15 +42,26 @@ ComplaintSchema.pre('save', async function (next) {
     try {
         let client = await Client.findById(this.client);
         let place = await Place.findById(this.place);
-        this.client = client ? client._id : null;
-        this.place = place ? place._id : null;
-        if (client && client.complaints.indexOf(this._id) == -1) {
-            return await Client.findByIdAndUpdate(client._id, {$push : {complaints : this}},{runValidators: true,context:'query'});
+        if ((!client && this.client != null) &&
+            (!place && this.place != null)) {
+            return next(new Error('Not found related model!'));
+        } else {
+            if (client && client.complaints.indexOf(this._id) == -1) {
+                await Client.findByIdAndUpdate(client._id, {$push: {complaints: this}}, {
+                    new: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+            }
+            if (place && place.complaints.indexOf(this._id) == -1) {
+                await Place.findByIdAndUpdate(place._id, {$push: {complaints: this}}, {
+                    new: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+            }
+            return next();
         }
-        if (place && place.complaints.indexOf(this._id) == -1) {
-            return await Place.findByIdAndUpdate(place._id, {$push : {complaints : this}},{runValidators: true,context:'query'});
-        }
-        return next();
     } catch (e) {
         return next(e);
     }

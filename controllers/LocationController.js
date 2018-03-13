@@ -1,5 +1,6 @@
 let Location = require(global.paths.MODELS + '/Location');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getLocations(req, res) {
@@ -55,9 +56,11 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let updated = await Location.findByIdAndUpdate(locationId, req.body,{runValidators: true,context:'query'});
-                if(updated) {
-                    res.status(201).json(await Location.findById(locationId));
+                let location = await Location.findById(locationId);
+                if (location) {
+                    objectHelper.load(location, req.body);
+                    let updated = await location.save();
+                    res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
                 }
@@ -77,6 +80,7 @@ module.exports = {
                 res.sendStatus(404);
             }
         } catch (e) {
+            console.log(e);
             res.status(400).send(e.toString());
         }
     }
