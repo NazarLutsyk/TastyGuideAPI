@@ -135,13 +135,40 @@ describe('complaint relations', function () {
                     should.equal(complaint.place,undefined);
                 }
             });
+            it('should delete old relation and add new',async function () {
+                let oldPlace = await Place.create({
+                    phone : '12323423423',
+                    email : 'asdas@asd.asd',
+                });
+                let newPlace = await Place.create({
+                    phone : '12323423423',
+                    email : 'asdas@asd.asd',
+                });
+                let complaint = new Complaint({
+                    value : 'sa',
+                    place : oldPlace
+                });
+                complaint = await complaint.supersave();
+                let res = await chai.request('localhost:3000')
+                    .put('/api/complaints/' + complaint._id)
+                    .send({
+                        place: newPlace._id
+                    });
+
+                newPlace = await Place.findById(newPlace._id);
+                oldPlace = await Place.findById(oldPlace._id);
+                res.body.place.toString().should.equal(newPlace._id.toString());
+                newPlace.complaints.should.include(res.body._id.toString());
+                should.equal(oldPlace.types.length,0);
+            });
             it('invalid update model with wrong relations', async function () {
                 try {
-                    var complaint = await Complaint.create({
+                    var complaint = new Complaint({
                         value: 'complaint',
                         client : idClient,
                         place : idPlace
                     });
+                    complaint = await complaint.supersave();
                     let res = await chai.request('localhost:3000')
                         .put('/api/complaints/' + complaint._id)
                         .send({
@@ -185,11 +212,12 @@ describe('complaint relations', function () {
                 await Place.remove();
             });
             it('normal delete model with relations', async function () {
-                let complaint = await Complaint.create({
+                let complaint = Complaint({
                     value: 'complaint',
                     client: idClient,
                     place: idPlace
                 });
+                complaint = await complaint.supersave();
                 let res = await chai.request('localhost:3000')
                     .delete('/api/complaints/' + complaint._id);
                 res.status.should.equal(204);

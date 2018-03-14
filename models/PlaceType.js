@@ -19,11 +19,8 @@ PlaceTypeSchema.pre('remove', async function (next) {
         await Place.update(
             {types: this._id},
             {$pull: {types: this._id}},
-            {multi: true,runValidators: true,context:'query'});
-        let multilangs = await PlaceTypeMultilang.find({placeType: this});
-        multilangs.forEach(async function (multilang) {
-            return await multilang.remove();
-        });
+            {multi: true, runValidators: true, context: 'query'});
+        await PlaceTypeMultilang.remove({placeType: this._id});
         return next();
     } catch (e) {
         return next(e);
@@ -33,20 +30,19 @@ PlaceTypeSchema.pre('save', async function (next) {
     let self = this;
     try {
         let multilangs = await PlaceTypeMultilang.find({_id: this.multilang});
-        this.multilang = [];
-        if (multilangs) {
-            multilangs.forEach(function (multilang) {
-                self.multilang.push(multilang._id);
-            });
-            multilangs.forEach(async function (multilang) {
-                if (multilang.placeType) {
-                    return self.multilang.splice(self.multilang.indexOf(multilang._id), 1);
-                } else {
-                    return await PlaceTypeMultilang.findByIdAndUpdate(multilang._id,{placeType : self},{runValidators: true,context:'query'});
+        if (multilangs.length <= 0 && this.multilang.length > 0) {
+            return next(new Error('Not found related model!'));
+        } else {
+            for (let multilang of multilangs) {
+                if (multilang.placeType == null) {
+                    await PlaceTypeMultilang.findByIdAndUpdate(multilang._id, {placeType: self}, {
+                        runValidators: true,
+                        context: 'query'
+                    });
                 }
-            });
+            }
+            return next();
         }
-        return next();
     } catch (e) {
         return next(e);
     }

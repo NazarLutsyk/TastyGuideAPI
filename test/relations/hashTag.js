@@ -39,7 +39,7 @@ describe('hashTag relations', function () {
                     .post('/api/hashTags')
                     .send({
                         value: 'complaint',
-                        places : [idPlace1,idPlace2]
+                        places: [idPlace1, idPlace2]
                     });
                 res.status.should.equal(201);
                 res.body.should.be.an('object');
@@ -59,7 +59,7 @@ describe('hashTag relations', function () {
                         .post('/api/hashTags')
                         .send({
                             value: 'complaint',
-                            places : [new mongoose.Types.ObjectId]
+                            places: [new mongoose.Types.ObjectId]
                         });
                     if (res.status) should.fail();
                 } catch (e) {
@@ -97,7 +97,7 @@ describe('hashTag relations', function () {
                 let res = await chai.request('localhost:3000')
                     .put('/api/hashTags/' + idHashTag)
                     .send({
-                        places: [idPlace1,idPlace2]
+                        places: [idPlace1, idPlace2]
                     });
                 res.status.should.equal(201);
                 res.body.should.be.an('object');
@@ -112,13 +112,13 @@ describe('hashTag relations', function () {
             });
             it('normal update model with relations', async function () {
                 let hashTag = await HashTag.create({
-                    value : 'aaa',
-                    places : [idPlace1]
+                    value: 'aaa',
+                    places: [idPlace1]
                 });
                 let res = await chai.request('localhost:3000')
                     .put('/api/hashTags/' + hashTag._id)
                     .send({
-                        places: [idPlace1,idPlace2]
+                        places: [idPlace1, idPlace2]
                     });
                 res.status.should.equal(201);
                 res.body.should.be.an('object');
@@ -147,20 +147,20 @@ describe('hashTag relations', function () {
                 } catch (e) {
                     should.equal(e.status, 400);
                     hashTag = await HashTag.findById(hashTag._id);
-                    should.equal(hashTag.places.length,0);
+                    should.equal(hashTag.places.length, 0);
                 }
             });
             it('invalid update model with wrong relations', async function () {
                 try {
                     var hashTag = await HashTag.create({
                         value: 'hashTag',
-                        places : [idPlace1,idPlace2]
+                        places: [idPlace1, idPlace2]
                     });
                     let res = await chai.request('localhost:3000')
                         .put('/api/hashTags/' + hashTag._id)
                         .send({
                             value: 'hashTag',
-                            places : [new mongoose.Types.ObjectId]
+                            places: [new mongoose.Types.ObjectId]
                         });
                     if (res.status) should.fail();
                 } catch (e) {
@@ -199,7 +199,7 @@ describe('hashTag relations', function () {
             it('normal delete model with relations', async function () {
                 let hashTag = await HashTag.create({
                     value: 'hashTag',
-                    places : [idPlace1,idPlace2]
+                    places: [idPlace1, idPlace2]
                 });
                 let res = await chai.request('localhost:3000')
                     .delete('/api/hashTags/' + hashTag._id);
@@ -211,5 +211,117 @@ describe('hashTag relations', function () {
             });
         });
     });
-    //todo push pull
+    describe('push pull', function () {
+        let idPlace = new mongoose.Types.ObjectId;
+        beforeEach(async function () {
+            await Place.create({
+                _id: idPlace,
+                email: 'nluasd@asd.ccc',
+                phone: '38684854214'
+            });
+        });
+        afterEach(async function () {
+            await Place.remove({});
+            await HashTag.remove({});
+        });
+        describe('PUT', function () {
+            it('should add relation to empty model', async function () {
+                let hashTag = await HashTag.create({value: 'aaaa'});
+                let res = await chai.request('localhost:3000')
+                    .put(`/api/hashTags/${hashTag._id}/places/${idPlace}`);
+                let place = await Place.findById(idPlace);
+                hashTag = await HashTag.findById(hashTag._id);
+                res.status.should.equal(201);
+                place.hashTags.should.lengthOf(1);
+                place.hashTags.should.include(hashTag._id.toString());
+                place.hashTags.should.lengthOf(1);
+                hashTag.places.should.include(place._id.toString());
+            });
+            it('should add relation to not empty model', async function () {
+                let place1 = await Place.create({
+                    email: 'nluasd@asd.ccc',
+                    phone: '38684854214'
+                });
+                let hashTag = await HashTag.create({value: 'aaaa', places: [place1._id]});
+                let res = await chai.request('localhost:3000')
+                    .put(`/api/hashTags/${hashTag._id}/places/${idPlace}`);
+                place1 = await Place.findById(place1._id);
+                let place2 = await Place.findById(idPlace);
+                hashTag = await HashTag.findById(hashTag._id);
+                res.status.should.equal(201);
+                place1.hashTags.should.lengthOf(1);
+                place2.hashTags.should.lengthOf(1);
+                place1.hashTags.should.include(hashTag._id.toString());
+                place2.hashTags.should.include(hashTag._id.toString());
+                hashTag.places.should.include(place1._id.toString());
+                hashTag.places.should.include(place2._id.toString());
+                hashTag.places.should.lengthOf(2);
+            });
+            it('should not add duplicated relation', async function () {
+                let hashTag = await HashTag.create({value: 'aaaa', places: [idPlace]});
+                let res = await chai.request('localhost:3000')
+                    .put(`/api/hashTags/${hashTag._id}/places/${idPlace}`);
+                let place = await Place.findById(idPlace);
+                hashTag = await HashTag.findById(hashTag._id);
+                res.status.should.equal(201);
+                place.hashTags.should.lengthOf(1);
+                place.hashTags.should.include(hashTag._id.toString());
+                hashTag.places.should.include(place._id.toString());
+                hashTag.places.should.lengthOf(1);
+            });
+            it('should not add wrong relation', async function () {
+                try {
+                    var hashTag = await HashTag.create({value: 'aaaa'});
+                    let res = await chai.request('localhost:3000')
+                        .put(`/api/hashTags/${hashTag._id}/places/${new mongoose.Types.ObjectId}`);
+                    if (res.status) should.fail();
+                } catch (e) {
+                    hashTag = await HashTag.findById(hashTag._id);
+                    e.status.should.equal(400);
+                    should.equal(hashTag.places.length, 0);
+                }
+            });
+        });
+        describe('DELETE', function () {
+            let idPlace = new mongoose.Types.ObjectId;
+            let idHashTag = new mongoose.Types.ObjectId;
+            beforeEach(async function () {
+                let place = await Place.create({
+                    _id: idPlace,
+                    email: 'nluasd@asd.ccc',
+                    phone: '38684854214'
+                });
+                await HashTag.create({
+                    _id : idHashTag,
+                    value: 'aa',
+                    places: [place]
+                });
+            });
+            afterEach(async function () {
+                await Place.remove({});
+                await HashTag.remove({});
+            });
+            it('should delete relation', async function () {
+                let res = await chai.request('localhost:3000')
+                    .delete(`/api/hashTags/${idHashTag}/places/${idPlace}`);
+                let place = await Place.findById(idPlace);
+                let hashTag = await HashTag.findById(idHashTag);
+                res.status.should.equal(204);
+                should.equal(place.hashTags.length,0);
+                should.equal(hashTag.places.length,0);
+            });
+            it('should not remove wrong relation', async function () {
+                try {
+                    let res = await chai.request('localhost:3000')
+                        .delete(`/api/hashTags/${idHashTag}/places/${new mongoose.Types.ObjectId}`);
+                } catch (e) {
+                    let place = await Place.findById(idPlace);
+                    let hashTag = await HashTag.findById(idHashTag);
+                    e.status.should.equal(400);
+                    should.equal(hashTag.places.length, 1);
+                    should.equal(place.hashTags.length, 1);
+                }
+            });
+        });
+    });
 });

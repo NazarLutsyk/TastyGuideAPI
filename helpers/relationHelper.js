@@ -21,8 +21,8 @@ module.exports = {
         }
     },
     async removeRelation(model1, model2, id1, id2, field1, field2) {
-        let Model1 = require(global.paths.MODELS + model1);
-        let Model2 = require(global.paths.MODELS + model2);
+        let Model1 = require(global.paths.MODELS + '/' + model1);
+        let Model2 = require(global.paths.MODELS + '/' + model2);
         model1 = await Model1.findById(id1);
         model2 = await Model2.findById(id2);
         if (model1 && model2) {

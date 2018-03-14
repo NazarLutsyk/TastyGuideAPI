@@ -19,7 +19,8 @@
 //todo clusters?
 //todo pagination&aggregation?
 //todo place location or locations?
-//change update controllers to save instead update
+//todo delete pre save pre delete add statics supersave,superupdate,superdelete
+//+change update controllers to save instead update
 //+stack of places
 //+top place planning
 //+logger

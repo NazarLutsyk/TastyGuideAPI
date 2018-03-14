@@ -42,7 +42,8 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let rating = await Rating.create(req.body);
+                let rating = new Rating(req.body);
+                rating = await rating.supersave();
                 res.status(201).json(rating);
             }
         } catch (e) {
@@ -58,8 +59,7 @@ module.exports = {
             } else {
                 let rating = await Rating.findById(ratingId);
                 if (rating) {
-                    objectHelper.load(rating, req.body);
-                    let updated = await rating.save();
+                    let updated = await rating.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

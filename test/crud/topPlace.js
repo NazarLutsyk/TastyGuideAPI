@@ -21,14 +21,12 @@ describe('API endpoint /api/topPlaces', function () {
                 startDate: new Date(),
                 endDate: new Date('Mon Mar 15 2019 12:54:05'),
                 price: 3000,
-                place: new mongoose.Types.ObjectId
             });
             await TopPlace.create({
                 _id: id2,
                 startDate: new Date(),
                 endDate: new Date('Mon Mar 15 2019 12:54:05'),
                 price: 5000,
-                place: new mongoose.Types.ObjectId
             });
         });
         after(async function () {
@@ -101,13 +99,11 @@ describe('API endpoint /api/topPlaces', function () {
                     startDate: new Date(),
                     endDate: new Date('Mon Mar 15 2019 12:54:05'),
                     price: 5000,
-                    place: new mongoose.Types.ObjectId
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
             res.body.price.should.equal(5000);
             res.body.actual.should.equal(true);
-            should.equal(res.body.place, null)
         });
         it('(unknown field)should return status 400', async function () {
             try {
@@ -140,7 +136,6 @@ describe('API endpoint /api/topPlaces', function () {
                 startDate: new Date(),
                 endDate: new Date('Mon Mar 15 2019 12:54:05'),
                 price: 5000,
-                place: new mongoose.Types.ObjectId
             });
         });
         after(async function () {

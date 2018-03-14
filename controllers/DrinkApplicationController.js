@@ -42,10 +42,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let drinkApplication = await DrinkApplication.create(req.body);
-                res.status(201).json(drinkApplication);
+                let drinkApp = new DrinkApplication(req.body);
+                drinkApp = await drinkApp.supersave();
+                res.status(201).json(drinkApp);
             }
         } catch (e) {
+            console.log(e);
             res.status(400).send(e.toString());
         }
     },
@@ -57,9 +59,8 @@ module.exports = {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let drinkApp = await DrinkApplication.findById(drinkApplicationId);
-                if (drinkApp) {
-                    objectHelper.load(drinkApp, req.body);
-                    let updated = await drinkApp.save();
+                if (drinkApp && req.body) {
+                    let updated = await drinkApp.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

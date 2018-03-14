@@ -39,14 +39,17 @@ DaySchema.pre('remove', async function (next) {
 DaySchema.pre('save', async function (next) {
     try {
         let place = await Place.findById(this.place);
-        this.place = place ? place._id : null;
-        if (place && place.days.indexOf(this._id) == -1) {
-            await Place.findByIdAndUpdate(place._id, {$push: {days: this}}, {
-                runValidators: true,
-                context: 'query'
-            });
+        if (!place && this.place != null) {
+            return next(new Error('Not found related model!'));
+        } else {
+            if (place && place.days.indexOf(this._id) == -1) {
+                await Place.findByIdAndUpdate(place._id, {$push: {days: this}}, {
+                    runValidators: true,
+                    context: 'query'
+                });
+            }
+            return next();
         }
-        return next();
     } catch (e) {
         return next(e);
     }

@@ -24,7 +24,7 @@ let Place = require('./Place');
 LocationSchema.pre('remove', async function (next) {
     try {
         await Place.update(
-            {locations: this._id},
+            {location: this._id},
             {location: null},
             {multi: true, runValidators: true, context: 'query'});
         return next();
@@ -35,13 +35,16 @@ LocationSchema.pre('remove', async function (next) {
 LocationSchema.pre('save', async function (next) {
     try {
         let place = await Place.findById(this.place);
-        this.place = place ? place._id : null;
-        if (place && !place.location) {
-            await Place.findByIdAndUpdate(place._id, {location: this}, {runValidators: true, context: 'query'});
+        if (!place && this.place != null) {
+            return next(new Error('Not found related model!'));
         } else {
-            this.place = null;
+            if (place && !place.location) {
+                await Place.findByIdAndUpdate(place._id, {location: this}, {runValidators: true, context: 'query'});
+            } else {
+                this.place = null;
+            }
+            return next();
         }
-        return next();
     } catch (e) {
         return next(e);
     }

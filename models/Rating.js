@@ -28,6 +28,73 @@ let RatingSchema = new Schema({
 }, {
     timestamps: true,
 });
+
+RatingSchema.methods.supersave = async function () {
+    let Place = require('./Place');
+    let Client = require('./Client');
+
+    let client = await Client.findById(this.client);
+    let place = await Place.findById(this.place);
+
+    if (!client && this.client) {
+        throw new Error('Not found related model Client!');
+    }
+    if (!place && this.place) {
+        throw new Error('Not found related model Place!');
+    } else {
+        if (client) {
+            await Client.findByIdAndUpdate(client._id, {$push: {ratings: this._id}}, {
+                new: true,
+                runValidators: true,
+                context: 'query'
+            });
+        }
+        if (place) {
+            await Place.findByIdAndUpdate(place._id, {$push: {ratings: this._id}}, {
+                new: true,
+                runValidators: true,
+                context: 'query'
+            });
+        }
+    }
+    return await this.save();
+};
+
+RatingSchema.methods.superupdate = async function (newDoc) {
+    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let Place = require('./Place');
+    let Client = require('./Client');
+
+    if (newDoc.place && newDoc.place != this.place) {
+        let newPlace = await Place.findById(newDoc.place);
+        if (newPlace) {
+            await Place.findByIdAndUpdate(this.place, {$pull: {ratings: this._id}});
+            if (newPlace.ratings.indexOf(this._id) == -1) {
+                newPlace.ratings.push(this._id);
+                await newPlace.save();
+            }
+        } else {
+            throw new Error('Not found related model Place!');
+        }
+    }
+    if (newDoc.client && newDoc.client != this.client) {
+        let newClient = await Client.findById(newDoc.client);
+        if (newClient) {
+            await Client.findByIdAndUpdate(this.client, {$pull: {ratings: this._id}});
+            if (newClient.ratings.indexOf(this._id) == -1) {
+                newClient.ratings.push(this._id);
+                await newClient.save();
+            }
+        } else {
+            throw new Error('Not found related model Client!');
+        }
+    }
+    objectHelper.load(this, newDoc);
+    return await this.save();
+
+};
+
+
 module.exports = mongoose.model('Rating', RatingSchema);
 
 let Place = require('./Place');
@@ -43,32 +110,6 @@ RatingSchema.pre('remove', async function (next) {
             {$pull: {ratings: this._id}},
             {multi: true, runValidators: true, context: 'query'});
         return next();
-    } catch (e) {
-        return next(e);
-    }
-});
-RatingSchema.pre('save', async function (next) {
-    try {
-        let client = await Client.findById(this.client);
-        let place = await Place.findById(this.place);
-        if ((!client && this.client != null) &&
-            (!place && this.place != null)) {
-            return next(new Error('Not found related model!'));
-        } else {
-            if (client && client.ratings.indexOf(this._id) == -1) {
-                await Client.findByIdAndUpdate(client._id, {$push: {ratings: this}}, {
-                    runValidators: true,
-                    context: 'query'
-                });
-            }
-            if (place && place.ratings.indexOf(this._id) == -1) {
-                await Place.findByIdAndUpdate(place._id, {$push: {ratings: this}}, {
-                    runValidators: true,
-                    context: 'query'
-                });
-            }
-            return next();
-        }
     } catch (e) {
         return next(e);
     }

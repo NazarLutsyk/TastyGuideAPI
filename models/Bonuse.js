@@ -38,23 +38,19 @@ BonuseSchema.pre('save', async function (next) {
     let self = this;
     try {
         let multilangs = await Multilang.find({_id: this.multilang});
-        this.multilangs = [];
-        if (multilangs) {
-            multilangs.forEach(function (multilang) {
-                self.multilangs.push(multilang._id);
-            });
-            multilangs.forEach(async function (multilang) {
-                if (multilang.bonuse) {
-                    return self.multilang.splice(self.multilang.indexOf(multilang._id), 1);
-                } else {
-                    return await Multilang.findByIdAndUpdate(multilang._id, {bonuse: self}, {
+        if (multilangs.length <= 0 && this.multilang.length > 0) {
+            return next(new Error('Not found related model!'));
+        } else {
+            for (let multilang of multilangs) {
+                if (multilang.bonuse == null) {
+                    await Multilang.findByIdAndUpdate(multilang._id, {bonuse: self}, {
                         runValidators: true,
                         context: 'query'
                     });
                 }
-            });
+            }
+            return next();
         }
-        return next();
     } catch (e) {
         return next(e);
     }

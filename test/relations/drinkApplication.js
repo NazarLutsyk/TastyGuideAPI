@@ -135,15 +135,42 @@ describe('drinkApp relations', function () {
                     should.equal(complaint.place,undefined);
                 }
             });
+            it('should delete old relation and add new',async function () {
+                let oldPlace = await Place.create({
+                    phone : '12323423423',
+                    email : 'asdas@asd.asd',
+                });
+                let newPlace = await Place.create({
+                    phone : '12323423423',
+                    email : 'asdas@asd.asd',
+                });
+                let drinkApp = new DrinkApplication({
+                    date: new Date(),
+                    place : oldPlace
+                });
+                drinkApp = await drinkApp.supersave();
+                let res = await chai.request('localhost:3000')
+                    .put('/api/drinkApplications/' + drinkApp._id)
+                    .send({
+                        place: newPlace._id
+                    });
+
+                newPlace = await Place.findById(newPlace._id);
+                oldPlace = await Place.findById(oldPlace._id);
+                res.body.place.toString().should.equal(newPlace._id.toString());
+                newPlace.drinkApplications.should.include(res.body._id.toString());
+                should.equal(oldPlace.types.length,0);
+            });
             it('invalid update model with wrong relations', async function () {
                 try {
-                    var complaint = await DrinkApplication.create({
+                    var drinkApp = new DrinkApplication({
                         date: new Date(),
                         organizer : idClient,
                         place : idPlace
                     });
+                    drinkApp = await drinkApp.supersave();
                     let res = await chai.request('localhost:3000')
-                        .put('/api/drinkApplications/' + complaint._id)
+                        .put('/api/drinkApplications/' + drinkApp._id)
                         .send({
                             date: new Date(),
                             organizer: new mongoose.Types.ObjectId,
@@ -152,13 +179,13 @@ describe('drinkApp relations', function () {
                     if (res.status) should.fail();
                 } catch (e) {
                     should.equal(e.status, 400);
-                    complaint = await DrinkApplication.findById(complaint._id);
+                    drinkApp = await DrinkApplication.findById(drinkApp._id);
                     let place = await Place.findById(idPlace);
                     let organizer = await Client.findById(idClient);
-                    complaint.organizer.should.eql(organizer._id);
-                    complaint.place.should.eql(place._id);
-                    place.drinkApplications.should.include(complaint._id);
-                    organizer.drinkApplications.should.include(complaint._id);
+                    drinkApp.organizer.should.eql(organizer._id);
+                    drinkApp.place.should.eql(place._id);
+                    place.drinkApplications.should.include(drinkApp._id);
+                    organizer.drinkApplications.should.include(drinkApp._id);
                 }
             });
         });

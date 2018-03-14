@@ -96,12 +96,10 @@ describe('API endpoint /api/locations', function () {
                 .send({
                     ltg: 50,
                     lng: 100,
-                    place: new mongoose.Types.ObjectId
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
             res.body.ltg.should.equal(50);
-            should.equal(res.body.place, null)
         });
         it('(unknown field)should return status 400', async function () {
             try {
