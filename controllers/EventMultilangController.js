@@ -42,7 +42,8 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let eventMultilang = await EventMultilang.create(req.body);
+                let eventMultilang = new EventMultilang(req.body);
+                eventMultilang = await eventMultilang.supersave();
                 res.status(201).json(eventMultilang);
             }
         } catch (e) {
@@ -58,8 +59,7 @@ module.exports = {
             } else {
                 let eventMultilang = await EventMultilang.findById(eventMultilangId);
                 if (eventMultilang) {
-                    objectHelper.load(eventMultilang, req.body);
-                    let updated = await eventMultilang.save();
+                    let updated = await eventMultilang.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

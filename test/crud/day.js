@@ -84,17 +84,15 @@ describe('API endpoint /api/days', function () {
             await Day.remove({});
         });
 
-        it('(normal create with non existing place)should return created model', async function () {
+        it('(normal create)should return created model', async function () {
             let res = await chai.request('localhost:3000')
                 .post('/api/days')
                 .send({
                     startTime: new Date(),
                     endTime: new Date('Mon Mar 15 2019 12:54:05'),
-                    place: new mongoose.Types.ObjectId
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
-            should.equal(res.body.place, null)
         });
         it('(unknown field)should return status 400', async function () {
             try {

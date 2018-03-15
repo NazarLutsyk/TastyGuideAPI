@@ -76,11 +76,10 @@ DrinkApplicationSchema.methods.superupdate = async function (newDoc) {
     if (newDoc.place && newDoc.place != this.place) {
         let newPlace = await Place.findById(newDoc.place);
         if (newPlace) {
-            await Place.findByIdAndUpdate(this.place, {$pull: {drinkApplications: this._id}});
-            if (newPlace.drinkApplications.indexOf(this._id) == -1) {
-                newPlace.drinkApplications.push(this._id);
-                await newPlace.save();
-            }
+            await Place.findByIdAndUpdate(this.place, {$pull: {drinkApplications: this._id}},{runValidators: true, context: 'query'});
+            await Place.update(
+                {_id: newPlace._id},
+                {$addToSet: {drinkApplications: this._id}},{runValidators: true, context: 'query'});
         } else {
             throw new Error('Not found related model Place!');
         }
@@ -88,11 +87,11 @@ DrinkApplicationSchema.methods.superupdate = async function (newDoc) {
     if (newDoc.organizer && newDoc.organizer != this.organizer) {
         let newClient = await Client.findById(newDoc.organizer);
         if (newClient) {
-            await Client.findByIdAndUpdate(this.organizer, {$pull: {drinkApplications: this._id}});
-            if (newClient.drinkApplications.indexOf(this._id) == -1) {
-                newClient.drinkApplications.push(this._id);
-                await newClient.save();
-            }
+            await Client.findByIdAndUpdate(this.organizer, {$pull: {drinkApplications: this._id}},{runValidators: true, context: 'query'});
+            await Client.update(
+                {_id: newClient._id},
+                {$addToSet: {drinkApplications: this._id}},
+                {runValidators: true, context: 'query'});
         } else {
             throw new Error('Not found related model Client!');
         }

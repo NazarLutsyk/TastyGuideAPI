@@ -58,11 +58,14 @@ ComplaintSchema.methods.superupdate = async function (newDoc) {
     if (newDoc.place && newDoc.place != this.place) {
         let newPlace = await Place.findById(newDoc.place);
         if (newPlace) {
-            await Place.findByIdAndUpdate(this.place, {$pull: {complaints: this._id}});
-            if(newPlace.complaints.indexOf(this._id) == -1){
-                newPlace.complaints.push(this._id);
-                await newPlace.save();
-            }
+            await Place.findByIdAndUpdate(this.place, {$pull: {complaints: this._id}}, {
+                runValidators: true,
+                context: 'query'
+            });
+            await Place.update(
+                {_id: newPlace._id},
+                {$addToSet: {complaints: this._id}},
+                {runValidators: true, context: 'query'});
         } else {
             throw new Error('Not found related model Place!');
         }
@@ -70,18 +73,20 @@ ComplaintSchema.methods.superupdate = async function (newDoc) {
     if (newDoc.client && newDoc.client != this.client) {
         let newClient = await Client.findById(newDoc.client);
         if (newClient) {
-            await Client.findByIdAndUpdate(this.client, {$pull: {complaints: this._id}});
-            if(newClient.complaints.indexOf(this._id) == -1){
-                newClient.complaints.push(this._id);
-                await newClient.save();
-            }
+            await Client.findByIdAndUpdate(this.client, {$pull: {complaints: this._id}}, {
+                runValidators: true,
+                context: 'query'
+            });
+            await Client.update(
+                {_id: newClient._id},
+                {$addToSet: {complaints: this._id}},
+                {runValidators: true, context: 'query'});
         } else {
             throw new Error('Not found related model Client!');
         }
     }
     objectHelper.load(this, newDoc);
     return await this.save();
-
 };
 
 

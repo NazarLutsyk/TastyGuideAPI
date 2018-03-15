@@ -23,6 +23,114 @@ let DepartmentSchema = new Schema({
 }, {
     timestamps: true,
 });
+
+DepartmentSchema.methods.supersave = async function () {
+    let Place = require('./Place');
+    let Client = require('./Client');
+    let Promo = require('./Promo');
+
+    let client = await Client.findById(this.client);
+    let place = await Place.findById(this.place);
+
+
+    let count = await Promo.count({_id: this.promos});
+
+    if ((count === 0 && this.promos.length !== 0) || (count !== this.promos.length)) {
+        throw new Error('Not found related model Promo!');
+    } else if (count === this.promos.length) {
+        await Promo.update({_id: this.promos}, {author: this._id}, {
+            multi: true,
+            runValidators: true,
+            context: 'query'
+        });
+    }
+    if (!client && this.client) {
+        throw new Error('Not found related model Client!');
+    }
+    if (!place && this.place) {
+        throw new Error('Not found related model Place!');
+    } else {
+        if (client) {
+            await Client.findByIdAndUpdate(client._id, {$push: {departments: this._id}}, {
+                new: true,
+                runValidators: true,
+                context: 'query'
+            });
+        }
+        if (place) {
+            await Place.findByIdAndUpdate(place._id, {$push: {departments: this._id}}, {
+                new: true,
+                runValidators: true,
+                context: 'query'
+            });
+        }
+    }
+    return await this.save();
+};
+
+DepartmentSchema.methods.superupdate = async function (newDoc) {
+    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let Place = require('./Place');
+    let Client = require('./Client');
+    let Promo = require('./Promo');
+
+    if (newDoc.hasOwnProperty('promos')) {
+        let count = await Promo.count({_id: newDoc.promos});
+        if (count == newDoc.promos.length) {
+            let toAdd = [];
+            let toRemove = [];
+            for (let promos of newDoc.promos) {
+                if (this.promos.indexOf(promos) == -1)
+                    toAdd.push(promos);
+            }
+            for (let promos of this.promos) {
+                if (newDoc.promos.indexOf(promos) != -1)
+                    toRemove.push(promos);
+            }
+            if (toRemove)
+                await Promo.update({_id: {$in: toRemove}}, {author: null}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+            if (toAdd)
+                await Promo.update({_id: {$in: toAdd}}, {author: this._id}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+        } else {
+            throw new Error('Not found related model Place!');
+        }
+    }
+    if (newDoc.place && newDoc.place != this.place) {
+        let newPlace = await Place.findById(newDoc.place);
+        if (newPlace) {
+            await Place.findByIdAndUpdate(this.place, {$pull: {departments: this._id}},{runValidators: true, context: 'query'});
+            await Place.update(
+                {_id: newPlace._id},
+                {$addToSet: {departments: this._id}},
+                {runValidators: true, context: 'query'});
+        } else {
+            throw new Error('Not found related model Place!');
+        }
+    }
+    if (newDoc.client && newDoc.client != this.client) {
+        let newClient = await Client.findById(newDoc.client);
+        if (newClient) {
+            await Client.findByIdAndUpdate(this.client, {$pull: {departments: this._id}},{runValidators: true, context: 'query'});
+            await Client.update(
+                {_id: newClient._id},
+                {$addToSet: {departments: this._id}},
+                {runValidators: true, context: 'query'});
+        } else {
+            throw new Error('Not found related model Client!');
+        }
+    }
+    objectHelper.load(this, newDoc);
+    return await this.save();
+};
+
 module.exports = mongoose.model('Department', DepartmentSchema);
 
 let Place = require('./Place');
@@ -42,47 +150,6 @@ DepartmentSchema.pre('remove', async function (next) {
             {author: this._id},
             {author: null},
             {multi: true, runValidators: true, context: 'query'});
-        return next();
-    } catch (e) {
-        return next(e);
-    }
-});
-DepartmentSchema.pre('save', async function (next) {
-    let self = this;
-    try {
-        let client = await Client.findById(this.client);
-        let place = await Place.findById(this.place);
-        let promos = await Promo.find({_id: this.promos});
-        this.client = client ? client._id : null;
-        this.place = place ? place._id : null;
-        this.promos = [];
-        if (client && client.departments.indexOf(this._id) == -1) {
-            await Client.findByIdAndUpdate(client._id, {$push: {departments: this}}, {
-                runValidators: true,
-                context: 'query'
-            });
-        }
-        if (place && place.departments.indexOf(this._id) == -1) {
-            await Place.findByIdAndUpdate(place._id, {$push: {departments: this}}, {
-                runValidators: true,
-                context: 'query'
-            });
-        }
-        if (promos) {
-            promos.forEach(function (promo) {
-                self.promos.push(promo._id);
-            });
-            promos.forEach(async function (promo) {
-                if (promo.departments.indexOf(self._id) == -1) {
-                    return await Promo.findByIdAndUpdate(promo._id, {author: self}, {
-                        runValidators: true,
-                        context: 'query'
-                    });
-                } else {
-                    return;
-                }
-            });
-        }
         return next();
     } catch (e) {
         return next(e);

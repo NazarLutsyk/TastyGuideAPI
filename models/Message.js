@@ -7,11 +7,11 @@ let MessageSchema = new Schema({
         type: String,
         required: true
     },
-    date : {
-        type : Date,
-        default : Date.now(),
+    date: {
+        type: Date,
+        default: Date.now(),
     },
-    seen : {
+    seen: {
         type: Boolean,
         default: false
     },
@@ -24,21 +24,18 @@ let MessageSchema = new Schema({
         ref: 'Client',
     }
 });
+
+MessageSchema.methods.supersave = async function () {
+    let Client = require('./Client');
+
+    let sender = await Client.findById(this.sender);
+    let receiver = await Client.findById(this.receiver);
+
+    if ((!sender && this.sender) || (!receiver && this.receiver)) {
+        throw new Error('Not found related model Client!');
+    }
+    return await this.save();
+};
+
 module.exports = mongoose.model('Message', MessageSchema);
 
-let Client = require('./Client');
-let Place = require('./Place');
-MessageSchema.pre('save', async function (next) {
-    try {
-        let sender = await Client.findById(this.sender);
-        let receiver = await Place.findById(this.receiver);
-        if ((!sender && this.sender != null) &&
-            (!receiver && this.receiver != null)) {
-            return next(new Error('Not found related model!'));
-        } else {
-            return next();
-        }
-    } catch (e) {
-        return next(e);
-    }
-});

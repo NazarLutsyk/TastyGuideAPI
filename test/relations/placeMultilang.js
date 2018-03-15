@@ -1,5 +1,5 @@
 require('../../config/path');
-let Day = require('../../models/Day');
+let PlaceMultilang = require('../../models/PlaceMultilang');
 let Place = require('../../models/Place');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
@@ -8,7 +8,7 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('day relations', function () {
+describe('place multilang relations', function () {
     this.timeout(5000);
     mongoose.Promise = global.Promise;
     mongoose.connect('mongodb://localhost/drinker');
@@ -20,37 +20,36 @@ describe('day relations', function () {
             beforeEach(async function () {
                 let place = await Place.create({
                     _id: idPlace,
-                    email: 'nluasd@asd.ccc',
-                    phone: '38684854214'
+                    phone : '5445648724532',
+                    email : 'asda@dsaas.adas'
                 });
             });
             afterEach(async function () {
-                await Day.remove();
+                await PlaceMultilang.remove();
                 await Place.remove();
             });
             it('normal create model with relations', async function () {
                 let res = await chai.request('localhost:3000')
-                    .post('/api/days')
+                    .post('/api/placeMultilangs')
                     .send({
-                        startTime: new Date(),
-                        endTime: new Date(),
+                        name : 'asdasd',
+                        description : 'asda',
                         place: idPlace
                     });
                 res.status.should.equal(201);
                 res.body.should.be.an('object');
                 res.body.place.should.equal(idPlace.toString());
                 let place = await Place.findById(idPlace);
-                place.days.should.lengthOf(1);
-                place.days.should.include(res.body._id);
+                place.multilang.should.include(res.body._id.toString());
             });
             it('invalid create model with wrong relations', async function () {
                 try {
                     let res = await chai.request('localhost:3000')
-                        .post('/api/days')
+                        .post('/api/placeMultilangs')
                         .send({
-                            startTime: new Date(),
-                            endTime: new Date(),
-                            client: new mongoose.Types.ObjectId,
+                            name : 'asdasd',
+                            description : 'asda',
+                            place: new mongoose.Types.ObjectId,
                         });
                     if (res.status) should.fail();
                 } catch (e) {
@@ -61,27 +60,27 @@ describe('day relations', function () {
 
         describe('update', function () {
             let idPlace = new mongoose.Types.ObjectId;
-            let idComplaint = new mongoose.Types.ObjectId;
+            let idMultilang = new mongoose.Types.ObjectId;
 
             beforeEach(async function () {
                 let place = await Place.create({
                     _id: idPlace,
-                    email: 'nluasd@asd.ccc',
-                    phone: '38684854214'
+                    phone : '5445648724532',
+                    email : 'asda@dsaas.adas'
                 });
-                let topPlace = await Day.create({
-                    _id: idComplaint,
-                    startTime: new Date(),
-                    endTime: new Date(),
+                let multilang = await PlaceMultilang.create({
+                    _id: idMultilang,
+                    name : 'asdasd',
+                    description : 'asda',
                 });
             });
             afterEach(async function () {
-                await Day.remove();
+                await PlaceMultilang.remove();
                 await Place.remove();
             });
             it('normal update empty model with relations', async function () {
                 let res = await chai.request('localhost:3000')
-                    .put('/api/days/' + idComplaint)
+                    .put('/api/placeMultilangs/' + idMultilang)
                     .send({
                         place: idPlace
                     });
@@ -89,47 +88,47 @@ describe('day relations', function () {
                 res.body.should.be.an('object');
                 res.body.place.should.equal(idPlace.toString());
                 let place = await Place.findById(idPlace);
-                place.days.should.lengthOf(1);
-                place.days.should.include(res.body._id);
+                place.multilang.should.include(res.body._id.toString());
             });
             it('invalid update empty model with wrong relations', async function () {
                 try {
-                    var complaint = await Day.create({
-                        startTime: new Date(),
-                        endTime: new Date(),
+                    var multilang = await PlaceMultilang.create({
+                        name : 'asdasd',
+                        description : 'asda',
                     });
                     let res = await chai.request('localhost:3000')
-                        .put('/api/days/' + complaint._id)
+                        .put('/api/placeMultilangs/' + multilang._id)
                         .send({
                             place: new mongoose.Types.ObjectId
                         });
                     if (res.status) should.fail();
                 } catch (e) {
                     should.equal(e.status, 400);
-                    complaint = await Day.findById(complaint._id);
-                    should.equal(complaint.place,undefined);
+                    multilang = await PlaceMultilang.findById(multilang._id);
+                    should.equal(multilang.place,undefined);
                 }
             });
             it('invalid update model with wrong relations', async function () {
                 try {
-                    var day = new Day({
-                        startTime: new Date(),
-                        endTime: new Date(),
+                    var multilang = new PlaceMultilang({
+                        name : 'asdasd',
+                        description : 'asda',
                         place : idPlace
                     });
-                    day = await day.supersave();
+                    multilang = await multilang.supersave();
+
                     let res = await chai.request('localhost:3000')
-                        .put('/api/days/' + day._id)
+                        .put('/api/placeMultilangs/' + multilang._id)
                         .send({
                             place: new mongoose.Types.ObjectId
                         });
                     if (res.status) should.fail();
                 } catch (e) {
                     should.equal(e.status, 400);
-                    day = await Day.findById(day._id);
+                    multilang = await PlaceMultilang.findById(multilang._id);
                     let place = await Place.findById(idPlace);
-                    day.place.should.eql(place._id);
-                    place.days.should.include(day._id);
+                    multilang.place.should.eql(place._id);
+                    place.multilang.should.include(multilang._id);
                 }
             });
         });
@@ -140,27 +139,26 @@ describe('day relations', function () {
             before(async function () {
                 let place = await Place.create({
                     _id: idPlace,
-                    email: 'nluasd@asd.ccc',
-                    phone: '38684854214'
+                    phone : '5445648724532',
+                    email : 'asda@dsaas.adas'
                 });
             });
             after(async function () {
-                await Day.remove();
+                await PlaceMultilang.remove();
                 await Place.remove();
             });
             it('normal delete model with relations', async function () {
-                var day = new Day({
-                    startTime: new Date(),
-                    endTime: new Date(),
+                let multilang = new PlaceMultilang({
+                    name : 'asdasd',
+                    description : 'asda',
                     place : idPlace
                 });
-                day = await day.supersave();
+                multilang = await multilang.supersave();
                 let res = await chai.request('localhost:3000')
-                    .delete('/api/days/' + day._id);
+                    .delete('/api/placeMultilangs/' + multilang._id);
                 res.status.should.equal(204);
                 let place = await Place.findById(idPlace);
-                place.days.should.lengthOf(0);
-                place.days.should.not.include(day._id);
+                should.equal(place.multilang.length,0)
             });
         });
     });

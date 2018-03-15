@@ -83,13 +83,14 @@ describe('message relations', function () {
                 await Client.remove();
             });
             it('normal delete model with relations', async function () {
-                let complaint = await Message.create({
+                let message = new Message({
                     sender: idClient1,
                     receiver: idClient2,
                     value : 'aaaa'
                 });
+                message - await message.supersave();
                 let res = await chai.request('localhost:3000')
-                    .delete('/api/messages/' + complaint._id);
+                    .delete('/api/messages/' + message._id);
                 res.status.should.equal(204);
             });
         });

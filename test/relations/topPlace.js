@@ -116,24 +116,25 @@ describe('top place relations', function () {
             });
             it('invalid update model with wrong relations', async function () {
                 try {
-                    var complaint = await TopPlace.create({
+                    var top = new TopPlace({
                         startDate: new Date(),
                         endDate: new Date(),
                         price: 72555,
                         place : idPlace
                     });
+                    top = await top.supersave();
                     let res = await chai.request('localhost:3000')
-                        .put('/api/topPlaces/' + complaint._id)
+                        .put('/api/topPlaces/' + top._id)
                         .send({
                             place: new mongoose.Types.ObjectId
                         });
                     if (res.status) should.fail();
                 } catch (e) {
                     should.equal(e.status, 400);
-                    complaint = await TopPlace.findById(complaint._id);
+                    top = await TopPlace.findById(top._id);
                     let place = await Place.findById(idPlace);
-                    complaint.place.should.eql(place._id);
-                    place.tops.should.include(complaint._id);
+                    top.place.should.eql(place._id);
+                    place.tops.should.include(top._id);
                 }
             });
         });
@@ -153,18 +154,19 @@ describe('top place relations', function () {
                 await Place.remove();
             });
             it('normal delete model with relations', async function () {
-                let complaint = await TopPlace.create({
+                let top = new TopPlace({
                     startDate: new Date(),
                     endDate: new Date(),
                     price: 72555,
-                    place: idPlace
+                    place : idPlace
                 });
+                top = await top.supersave();
                 let res = await chai.request('localhost:3000')
-                    .delete('/api/topPlaces/' + complaint._id);
+                    .delete('/api/topPlaces/' + top._id);
                 res.status.should.equal(204);
                 let place = await Place.findById(idPlace);
                 place.tops.should.lengthOf(0);
-                place.tops.should.not.include(complaint._id);
+                place.tops.should.not.include(top._id);
             });
         });
     });

@@ -105,28 +105,30 @@ describe('location relations', function () {
                 } catch (e) {
                     should.equal(e.status, 400);
                     complaint = await Location.findById(complaint._id);
-                    should.equal(complaint.place,null);
+                    should.equal(complaint.place,undefined);
                 }
             });
             it('invalid update model with wrong relations', async function () {
                 try {
-                    var complaint = await Location.create({
+                    var location = new Location({
                         ltg : 50,
                         lng : 100,
                         place : idPlace
                     });
+                    location = await location.supersave();
+
                     let res = await chai.request('localhost:3000')
-                        .put('/api/locations/' + complaint._id)
+                        .put('/api/locations/' + location._id)
                         .send({
                             place: new mongoose.Types.ObjectId
                         });
                     if (res.status) should.fail();
                 } catch (e) {
                     should.equal(e.status, 400);
-                    complaint = await Location.findById(complaint._id);
+                    location = await Location.findById(location._id);
                     let place = await Place.findById(idPlace);
-                    complaint.place.should.eql(place._id);
-                    place.location.should.eql(complaint._id);
+                    location.place.should.eql(place._id);
+                    place.location.should.eql(location._id);
                 }
             });
         });
@@ -146,13 +148,14 @@ describe('location relations', function () {
                 await Place.remove();
             });
             it('normal delete model with relations', async function () {
-                let complaint = await Location.create({
+                let location = new Location({
                     ltg : 50,
                     lng : 100,
-                    place: idPlace
+                    place : idPlace
                 });
+                location = await location.supersave();
                 let res = await chai.request('localhost:3000')
-                    .delete('/api/locations/' + complaint._id);
+                    .delete('/api/locations/' + location._id);
                 res.status.should.equal(204);
                 let place = await Place.findById(idPlace);
                 should.equal(place.location,null)

@@ -68,11 +68,11 @@ RatingSchema.methods.superupdate = async function (newDoc) {
     if (newDoc.place && newDoc.place != this.place) {
         let newPlace = await Place.findById(newDoc.place);
         if (newPlace) {
-            await Place.findByIdAndUpdate(this.place, {$pull: {ratings: this._id}});
-            if (newPlace.ratings.indexOf(this._id) == -1) {
-                newPlace.ratings.push(this._id);
-                await newPlace.save();
-            }
+            await Place.findByIdAndUpdate(this.place, {$pull: {ratings: this._id}},{runValidators: true, context: 'query'});
+            await Place.update(
+                {_id: newPlace._id},
+                {$addToSet: {ratings: this._id}},
+                {runValidators: true, context: 'query'});
         } else {
             throw new Error('Not found related model Place!');
         }
@@ -80,18 +80,17 @@ RatingSchema.methods.superupdate = async function (newDoc) {
     if (newDoc.client && newDoc.client != this.client) {
         let newClient = await Client.findById(newDoc.client);
         if (newClient) {
-            await Client.findByIdAndUpdate(this.client, {$pull: {ratings: this._id}});
-            if (newClient.ratings.indexOf(this._id) == -1) {
-                newClient.ratings.push(this._id);
-                await newClient.save();
-            }
+            await Client.findByIdAndUpdate(this.client, {$pull: {ratings: this._id}},{runValidators: true, context: 'query'});
+            await Client.update(
+                {_id: newClient._id},
+                {$addToSet: {ratings: this._id}},
+                {runValidators: true, context: 'query'});
         } else {
             throw new Error('Not found related model Client!');
         }
     }
     objectHelper.load(this, newDoc);
     return await this.save();
-
 };
 
 

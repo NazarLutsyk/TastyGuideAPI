@@ -42,10 +42,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let topPlace = await TopPlace.create(req.body);
+                let topPlace = new TopPlace(req.body);
+                topPlace = await topPlace.supersave();
                 res.status(201).json(topPlace);
             }
         } catch (e) {
+            console.log(e);
             res.status(400).send(e.toString());
         }
     },
@@ -58,8 +60,7 @@ module.exports = {
             } else {
                 let topPlace = await TopPlace.findById(topPlaceId);
                 if (topPlace) {
-                    objectHelper.load(topPlace, req.body);
-                    let updated = await topPlace.save();
+                    let updated = await topPlace.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

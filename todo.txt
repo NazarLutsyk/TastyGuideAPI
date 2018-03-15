@@ -20,6 +20,7 @@
 //todo pagination&aggregation?
 //todo place location or locations?
 //todo delete pre save pre delete add statics supersave,superupdate,superdelete
+//todo add transactions to supersave and superupdate
 //+change update controllers to save instead update
 //+stack of places
 //+top place planning

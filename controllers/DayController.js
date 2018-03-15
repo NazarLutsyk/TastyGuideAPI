@@ -42,7 +42,8 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let day = await Day.create(req.body);
+                let day = new Day(req.body);
+                day = await day.supersave();
                 res.status(201).json(day);
             }
         } catch (e) {
@@ -58,8 +59,7 @@ module.exports = {
             } else {
                 let day = await Day.findById(dayId);
                 if (day) {
-                    objectHelper.load(day, req.body);
-                    let updated = await day.save();
+                    let updated = await day.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

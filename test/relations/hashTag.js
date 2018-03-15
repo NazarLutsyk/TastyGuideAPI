@@ -111,10 +111,11 @@ describe('hashTag relations', function () {
                 place2.hashTags.should.include(res.body._id.toString());
             });
             it('normal update model with relations', async function () {
-                let hashTag = await HashTag.create({
+                let hashTag = new HashTag({
                     value: 'aaa',
                     places: [idPlace1]
                 });
+                hashTag = await hashTag.supersave();
                 let res = await chai.request('localhost:3000')
                     .put('/api/hashTags/' + hashTag._id)
                     .send({
@@ -152,10 +153,11 @@ describe('hashTag relations', function () {
             });
             it('invalid update model with wrong relations', async function () {
                 try {
-                    var hashTag = await HashTag.create({
+                    var hashTag = new HashTag({
                         value: 'hashTag',
                         places: [idPlace1, idPlace2]
                     });
+                    hashTag = await hashTag.supersave();
                     let res = await chai.request('localhost:3000')
                         .put('/api/hashTags/' + hashTag._id)
                         .send({
@@ -197,10 +199,11 @@ describe('hashTag relations', function () {
                 await Place.remove();
             });
             it('normal delete model with relations', async function () {
-                let hashTag = await HashTag.create({
+                let hashTag = new HashTag({
                     value: 'hashTag',
                     places: [idPlace1, idPlace2]
                 });
+                hashTag = await hashTag.supersave();
                 let res = await chai.request('localhost:3000')
                     .delete('/api/hashTags/' + hashTag._id);
                 res.status.should.equal(204);
@@ -242,7 +245,8 @@ describe('hashTag relations', function () {
                     email: 'nluasd@asd.ccc',
                     phone: '38684854214'
                 });
-                let hashTag = await HashTag.create({value: 'aaaa', places: [place1._id]});
+                let hashTag = new HashTag({value: 'aaaa', places: [place1._id]});
+                hashTag = await hashTag.supersave();
                 let res = await chai.request('localhost:3000')
                     .put(`/api/hashTags/${hashTag._id}/places/${idPlace}`);
                 place1 = await Place.findById(place1._id);
@@ -258,7 +262,8 @@ describe('hashTag relations', function () {
                 hashTag.places.should.lengthOf(2);
             });
             it('should not add duplicated relation', async function () {
-                let hashTag = await HashTag.create({value: 'aaaa', places: [idPlace]});
+                let hashTag = HashTag({value: 'aaaa', places: [idPlace]});
+                hashTag = await hashTag.supersave();
                 let res = await chai.request('localhost:3000')
                     .put(`/api/hashTags/${hashTag._id}/places/${idPlace}`);
                 let place = await Place.findById(idPlace);
@@ -291,11 +296,12 @@ describe('hashTag relations', function () {
                     email: 'nluasd@asd.ccc',
                     phone: '38684854214'
                 });
-                await HashTag.create({
+                let hashTag = new HashTag({
                     _id : idHashTag,
                     value: 'aa',
                     places: [place]
                 });
+                hashTag = await hashTag.supersave();
             });
             afterEach(async function () {
                 await Place.remove({});

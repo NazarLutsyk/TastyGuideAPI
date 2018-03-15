@@ -42,7 +42,8 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let bonuseMultilang = await BonuseMultilang.create(req.body);
+                let bonuseMultilang = new BonuseMultilang(req.body);
+                bonuseMultilang = await bonuseMultilang.supersave();
                 res.status(201).json(bonuseMultilang);
             }
         } catch (e) {
@@ -58,8 +59,7 @@ module.exports = {
             } else {
                 let bonuseMultilang = await BonuseMultilang.findById(bonuseMultilangId);
                 if (bonuseMultilang) {
-                    objectHelper.load(bonuseMultilang, req.body);
-                    let updated = await bonuseMultilang.save();
+                    let updated = await bonuseMultilang.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);

@@ -43,7 +43,8 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let hashTag = await HashTag.create(req.body);
+                let hashTag = new HashTag(req.body);
+                hashTag = await hashTag.supersave();
                 res.status(201).json(hashTag);
             }
         } catch (e) {
@@ -59,8 +60,7 @@ module.exports = {
             } else {
                 let hashTag = await HashTag.findById(hashTagId);
                 if (hashTag) {
-                    objectHelper.load(hashTag, req.body);
-                    let updated = await hashTag.save();
+                    let updated = await hashTag.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

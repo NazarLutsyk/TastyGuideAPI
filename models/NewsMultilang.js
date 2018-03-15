@@ -18,6 +18,46 @@ let NewsMultilangSchema = new Schema({
 }, {
     discriminatorKey: 'kind'
 });
+
+NewsMultilangSchema.methods.supersave = async function () {
+    let News = require('./News');
+
+    let news = await News.findById(this.news);
+
+    if (!news && this.news) {
+        throw new Error('Not found related model News!');
+    } else if (news) {
+        await News.findByIdAndUpdate(news._id, {$push: {multilang: this._id}}, {
+            new: true,
+            runValidators: true,
+            context: 'query'
+        });
+    }
+    return await this.save();
+};
+NewsMultilangSchema.methods.superupdate = async function (newDoc) {
+    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let News = require('./News');
+
+    if (newDoc.news && newDoc.news != this.news) {
+        let newPlace = await News.findById(newDoc.news);
+        if (newPlace) {
+            await News.findByIdAndUpdate(this.news, {$pull: {multilang: this._id}}, {
+                runValidators: true,
+                context: 'query'
+            });
+            await News.update(
+                {_id: newPlace._id},
+                {$addToSet: {multilang: this._id}},
+                {runValidators: true, context: 'query'});
+        } else {
+            throw new Error('Not found related model News!');
+        }
+    }
+    objectHelper.load(this, newDoc);
+    return await this.save();
+};
+
 module.exports = Multilang.discriminator('NewsMultilang', NewsMultilangSchema);
 
 let Promo = require('./News');
@@ -27,18 +67,6 @@ NewsMultilangSchema.pre('remove', async function (next) {
             {multilang: this._id},
             {$pull: {multilang: this._id}},
             {multi: true,runValidators:true,context:'query'});
-        return next();
-    } catch (e) {
-        return next(e);
-    }
-});
-NewsMultilangSchema.pre('save', async function (next) {
-    try {
-        let promo = await Promo.findById(this.news);
-        this.news = promo ? promo._id : null;
-        if (promo && promo.multilang.indexOf(this._id) == -1) {
-            await Promo.findByIdAndUpdate(promo._id,{$push : {multilang : this}},{runValidators: true,context:'query'});
-        }
         return next();
     } catch (e) {
         return next(e);

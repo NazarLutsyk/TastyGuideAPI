@@ -41,7 +41,8 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let message = await Message.create(req.body);
+                let message = new Message(req.body);
+                message = await message.supersave();
                 res.status(201).json(message);
             }
         } catch (e) {

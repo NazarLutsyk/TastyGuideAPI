@@ -42,7 +42,8 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let placeTypeMultilang = await PlaceTypeMultilang.create(req.body);
+                let placeTypeMultilang = new PlaceTypeMultilang(req.body);
+                placeTypeMultilang = await placeTypeMultilang.supersave();
                 res.status(201).json(placeTypeMultilang);
             }
         } catch (e) {
@@ -58,8 +59,7 @@ module.exports = {
             } else {
                 let placeTypeMultilang = await PlaceTypeMultilang.findById(placeTypeMultilangId);
                 if (placeTypeMultilang) {
-                    objectHelper.load(placeTypeMultilang, req.body);
-                    let updated = await placeTypeMultilang.save();
+                    let updated = await placeTypeMultilang.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

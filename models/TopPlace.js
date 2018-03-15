@@ -26,6 +26,46 @@ let TopPlaceSchema = new Schema({
 }, {
     timestamps: true,
 });
+
+TopPlaceSchema.methods.supersave = async function () {
+    let Place = require('./Place');
+
+    let place = await Place.findById(this.place);
+
+    if (!place && this.place) {
+        throw new Error('Not found related model Place!');
+    } else if (place) {
+        await Place.findByIdAndUpdate(place._id, {$push: {tops: this._id}}, {
+            new: true,
+            runValidators: true,
+            context: 'query'
+        });
+    }
+    return await this.save();
+};
+TopPlaceSchema.methods.superupdate = async function (newDoc) {
+    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let Place = require('./Place');
+
+    if (newDoc.place && newDoc.place != this.place) {
+        let newPlace = await Place.findById(newDoc.place);
+        if (newPlace) {
+            await Place.findByIdAndUpdate(this.place, {$pull: {tops: this._id}}, {
+                runValidators: true,
+                context: 'query'
+            });
+            await Place.update(
+                {_id: newPlace._id},
+                {$addToSet: {tops: this._id}},
+                {runValidators: true, context: 'query'});
+        } else {
+            throw new Error('Not found related model Place!');
+        }
+    }
+    objectHelper.load(this, newDoc);
+    return await this.save();
+};
+
 module.exports = mongoose.model('TopPlace', TopPlaceSchema);
 
 let Place = require('./Place');
@@ -36,24 +76,6 @@ TopPlaceSchema.pre('remove', async function (next) {
             {$pull: {tops: this._id}},
             {multi: true, runValidators: true, context: 'query'});
         return next();
-    } catch (e) {
-        return next(e);
-    }
-});
-TopPlaceSchema.pre('save', async function (next) {
-    try {
-        let place = await Place.findById(this.place);
-        if (!place && this.place != null) {
-            return next(new Error('Not found related model!'));
-        } else {
-            if (place && place.tops.indexOf(this._id) == -1) {
-                await Place.findByIdAndUpdate(place._id, {$push: {tops: this}}, {
-                    runValidators: true,
-                    context: 'query'
-                });
-            }
-            return next();
-        }
     } catch (e) {
         return next(e);
     }

@@ -22,6 +22,46 @@ let BonuseMultilangSchema = new Schema({
 }, {
     discriminatorKey: 'kind'
 });
+
+BonuseMultilangSchema.methods.supersave = async function () {
+    let Bonuse = require('./Bonuse');
+
+    let bonuse = await Bonuse.findById(this.bonuse);
+
+    if (!bonuse && this.bonuse) {
+        throw new Error('Not found related model Bonuse!');
+    } else if (bonuse) {
+        await Bonuse.findByIdAndUpdate(bonuse._id, {$push: {multilang: this._id}}, {
+            new: true,
+            runValidators: true,
+            context: 'query'
+        });
+    }
+    return await this.save();
+};
+BonuseMultilangSchema.methods.superupdate = async function (newDoc) {
+    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let Bonuse = require('./Bonuse');
+
+    if (newDoc.bonuse && newDoc.bonuse != this.bonuse) {
+        let newPlace = await Bonuse.findById(newDoc.bonuse);
+        if (newPlace) {
+            await Bonuse.findByIdAndUpdate(this.bonuse, {$pull: {multilang: this._id}}, {
+                runValidators: true,
+                context: 'query'
+            });
+            await Bonuse.update(
+                {_id: newPlace._id},
+                {$addToSet: {multilang: this._id}},
+                {runValidators: true, context: 'query'});
+        } else {
+            throw new Error('Not found related model Bonuse!');
+        }
+    }
+    objectHelper.load(this, newDoc);
+    return await this.save();
+};
+
 module.exports = Multilang.discriminator('BonuseMultilang', BonuseMultilangSchema);
 
 let Promo = require('./Bonuse');
@@ -31,21 +71,6 @@ BonuseMultilangSchema.pre('remove', async function (next) {
             {multilang: this._id},
             {$pull: {multilang: this._id}},
             {multi: true, runValidators: true, context: 'query'});
-        return next();
-    } catch (e) {
-        return next(e);
-    }
-});
-BonuseMultilangSchema.pre('save', async function (next) {
-    try {
-        let promo = await Promo.findById(this.bonuse);
-        this.bonuse = promo ? promo._id : null;
-        if (promo && promo.multilang.indexOf(this._id) == -1) {
-            await Promo.findByIdAndUpdate(promo._id, {$push: {multilang: this}}, {
-                runValidators: true,
-                context: 'query'
-            });
-        }
         return next();
     } catch (e) {
         return next(e);

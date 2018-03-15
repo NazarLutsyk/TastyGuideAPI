@@ -42,7 +42,8 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let location = await Location.create(req.body);
+                let location = new Location(req.body);
+                location = await location.supersave();
                 res.status(201).json(location);
             }
         } catch (e) {
@@ -58,8 +59,7 @@ module.exports = {
             } else {
                 let location = await Location.findById(locationId);
                 if (location) {
-                    objectHelper.load(location, req.body);
-                    let updated = await location.save();
+                    let updated = await location.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

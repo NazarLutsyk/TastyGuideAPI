@@ -101,9 +101,10 @@ describe('placeType relations', function () {
                 multilang2.placeType.toString().should.equal(res.body._id.toString());
             });
             it('normal update model with relations', async function () {
-                let placeType = await PlaceType.create({
+                let placeType = new PlaceType({
                     multilang: [idMultilang1]
                 });
+                placeType = await placeType.supersave();
                 let res = await chai.request('localhost:3000')
                     .put('/api/placeTypes/' + placeType._id)
                     .send({
@@ -138,9 +139,10 @@ describe('placeType relations', function () {
             });
             it('invalid update model with wrong relations', async function () {
                 try {
-                    var placeType = await PlaceType.create({
+                    var placeType = new PlaceType({
                         multilang: [idMultilang1, idMultilang2]
                     });
+                    placeType = await placeType.supersave();
                     let res = await chai.request('localhost:3000')
                         .put('/api/placeTypes/' + placeType._id)
                         .send({
@@ -175,9 +177,10 @@ describe('placeType relations', function () {
                     _id: idMultilang2,
                     name : 'aas'
                 });
-                placeType = await PlaceType.create({
+                placeType = new PlaceType({
                     multilang: [idMultilang1, idMultilang2]
                 });
+                placeType = await placeType.supersave();
                 await Place.create({
                     _id : idPlace,
                     email: 'nluasd@asd.ccc',
@@ -228,7 +231,8 @@ describe('placeType relations', function () {
             });
             it('should add relation to not empty model', async function () {
                 let multilang1 = await PlaceTypeMultilang.create({name : 'asd'});
-                let placeType = await PlaceType.create({multilang: [multilang1._id]});
+                let placeType = new PlaceType({multilang: [multilang1._id]});
+                placeType = await placeType.supersave();
                 let res = await chai.request('localhost:3000')
                     .put(`/api/placeTypes/${placeType._id}/multilangs/${idMultilang}`);
                 multilang1 = await PlaceTypeMultilang.findById(multilang1._id);
@@ -242,7 +246,8 @@ describe('placeType relations', function () {
                 placeType.multilang.should.lengthOf(2);
             });
             it('should not add duplicated relation', async function () {
-                let placeType = await PlaceType.create({multilang: [idMultilang]});
+                let placeType = new PlaceType({multilang: [idMultilang]});
+                placeType = await placeType.supersave();
                 let res = await chai.request('localhost:3000')
                     .put(`/api/placeTypes/${placeType._id}/multilangs/${idMultilang}`);
                 let multilang = await PlaceTypeMultilang.findById(idMultilang);
@@ -273,10 +278,11 @@ describe('placeType relations', function () {
                     _id: idMultilang,
                     name: 'nluasd@asd.ccc',
                 });
-                await PlaceType.create({
+                let placeType = await PlaceType({
                     _id : idPLaceType,
                     multilang: [multilang]
                 });
+                placeType = await placeType.supersave();
             });
             afterEach(async function () {
                 await PlaceTypeMultilang.remove({});
