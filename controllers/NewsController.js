@@ -44,10 +44,12 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let news = await News.create(req.body);
+                let news = new News(req.body);
+                news = await news.supersave();
                 res.status(201).json(news);
             }
         } catch (e) {
+            console.log(e);
             res.status(400).send(e.toString());
         }
     },
@@ -60,8 +62,7 @@ module.exports = {
             } else {
                 let news = await News.findById(newsId);
                 if (news) {
-                    objectHelper.load(news, req.body);
-                    let updated = await news.save();
+                    let updated = await news.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

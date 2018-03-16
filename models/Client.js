@@ -78,6 +78,168 @@ ClientSchema.methods.encryptPassword = function (password) {
 ClientSchema.methods.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
+ClientSchema.methods.superupdate = async function (newDoc) {
+    let Place = require('./Place');
+    let DrinkApplication = require('./DrinkApplication');
+    let Rating = require('./Rating');
+    let Complaint = require('./Complaint');
+    let Department = require('./Department');
+    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+
+    if (newDoc.hasOwnProperty('ownPlaces')) {
+        let count = await Place.count({_id: newDoc.ownPlaces});
+        if (count == newDoc.ownPlaces.length) {
+            let toAdd = [];
+            let toRemove = [];
+            for (let ownPlaces of newDoc.ownPlaces) {
+                if (this.ownPlaces.indexOf(ownPlaces.toString()) === -1)
+                    toAdd.push(ownPlaces);
+            }
+            for (let ownPlaces of this.ownPlaces) {
+                if (newDoc.ownPlaces.indexOf(ownPlaces.toString()) === -1)
+                    toRemove.push(ownPlaces);
+            }
+            if (toRemove)
+                await Place.update({_id: {$in: toRemove}}, {boss: null}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+            if (toAdd)
+                await Place.update({_id: {$in: toAdd}}, {boss: this._id}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+        } else {
+            throw new Error('Not found related model Place!');
+        }
+    }
+    if (newDoc.hasOwnProperty('drinkApplications')) {
+        let count = await DrinkApplication.count({_id: newDoc.drinkApplications});
+        if (count == newDoc.drinkApplications.length) {
+            let toAdd = [];
+            let toRemove = [];
+            for (let drinkApplication of newDoc.drinkApplications) {
+                if (this.drinkApplications.indexOf(drinkApplication.toString()) === -1)
+                    toAdd.push(drinkApplication);
+            }
+            for (let drinkApplication of this.drinkApplications) {
+                if (newDoc.drinkApplications.indexOf(drinkApplication.toString()) === -1)
+                    toRemove.push(drinkApplication);
+            }
+            if (toRemove)
+                await DrinkApplication.update({_id: {$in: toRemove}}, {organizer: null}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+            if (toAdd)
+                await DrinkApplication.update({_id: {$in: toAdd}}, {organizer: this._id}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+        } else {
+            throw new Error('Not found related model DrinkApplication!');
+        }
+    }
+    if (newDoc.hasOwnProperty('ratings')) {
+        let count = await Rating.count({_id: newDoc.ratings});
+        if (count == newDoc.ratings.length) {
+            let toAdd = [];
+            let toRemove = [];
+            for (let rating of newDoc.ratings) {
+                if (this.ratings.indexOf(rating.toString()) === -1)
+                    toAdd.push(rating);
+            }
+            for (let rating of this.ratings) {
+                if (newDoc.ratings.indexOf(rating.toString()) === -1)
+                    toRemove.push(rating);
+            }
+            if (toRemove)
+                await Rating.update({_id: {$in: toRemove}}, {client: null}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+            if (toAdd)
+                await Rating.update({_id: {$in: toAdd}}, {client: this._id}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+        } else {
+            throw new Error('Not found related model Rating!');
+        }
+    }
+    if (newDoc.hasOwnProperty('complaints')) {
+        let count = await Complaint.count({_id: newDoc.complaints});
+        if (count == newDoc.complaints.length) {
+            let toAdd = [];
+            let toRemove = [];
+            for (let complaint of newDoc.complaints) {
+                if (this.complaints.indexOf(complaint.toString()) === -1)
+                    toAdd.push(complaint);
+            }
+            for (let complaint of this.complaints) {
+                if (newDoc.complaints.indexOf(complaint.toString()) === -1)
+                    toRemove.push(complaint);
+            }
+            if (toRemove)
+                await Complaint.update({_id: {$in: toRemove}}, {client: null}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+            if (toAdd)
+                await Complaint.update({_id: {$in: toAdd}}, {client: this._id}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+        } else {
+            throw new Error('Not found related model Complaint!');
+        }
+    }
+    if (newDoc.hasOwnProperty('departments')) {
+        let count = await Department.count({_id: newDoc.departments});
+        if (count == newDoc.departments.length) {
+            let toAdd = [];
+            let toRemove = [];
+            for (let department of newDoc.departments) {
+                if (this.departments.indexOf(department.toString()) === -1)
+                    toAdd.push(department);
+            }
+            for (let department of this.departments) {
+                if (newDoc.departments.indexOf(department.toString()) === -1)
+                    toRemove.push(department);
+            }
+            if (toRemove)
+                await Department.update({_id: {$in: toRemove}}, {client: null}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+            if (toAdd)
+                await Department.update({_id: {$in: toAdd}}, {client: this._id}, {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                });
+        } else {
+            throw new Error('Not found related model Department!');
+        }
+    }
+    if (newDoc.hasOwnProperty('favoritePlaces')) {
+        let count = await Place.count({_id: newDoc.favoritePlaces});
+        if (!(count == newDoc.favoritePlaces.length)) {
+            throw new Error('Not found related model Place!');
+        }
+    }
+    objectHelper.load(this, newDoc);
+    return await this.save();
+};
 
 module.exports = mongoose.model('Client', ClientSchema);
 
@@ -86,124 +248,41 @@ let DrinkApplication = require('./DrinkApplication');
 let Place = require('./Place');
 let Rating = require('./Rating');
 let Department = require('./Department');
+let Message = require('./Message');
 ClientSchema.pre('remove', async function (next) {
     try {
-        let complaints = await Complaint.find({client: this._id});
-        let drinkApplications = await DrinkApplication.find({client: this._id});
-        let ratings = await Rating.find({client: this._id});
-        let departments = await Department.find({client: this._id});
-        let ownPlaces = await Place.find({boss: this._id});
-
-        await complaints.forEach(async function (complaint) {
-            return await complaint.remove();
-        });
-        await drinkApplications.forEach(async function (drinkApplication) {
-            return await drinkApplication.remove();
-        });
-        await ratings.forEach(async function (rating) {
-            return await rating.remove();
-        });
-        await departments.forEach(async function (department) {
-            return await department.remove();
-        });
-        await Place.update({_id: this.ownPlaces}, {boss: null}, {multi: true, runValidators: true, context: 'query'});
+        await Complaint.remove({client: this._id});
+        await DrinkApplication.remove({organizer: this._id});
+        await Rating.remove({client: this._id});
+        await Department.remove({client: this._id});
+        await Place.update(
+            {boss: this._id},
+            {boss: null},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            });
+        await Message.update(
+            {sender: this._id},
+            {sender: null},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            }
+        );
+        await Message.update(
+            {receiver: this._id},
+            {receiver: null},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            }
+        );
         return next();
     } catch (e) {
         return next(e);
     }
 });
-//
-// ClientSchema.pre('save', async function (next) {
-//     try {
-//         let self = this;
-//         if (this.ownPlaces) {
-//             let places = await Place.find({_id: this.ownPlaces});
-//             this.ownPlaces = [];
-//             if (places) {
-//                 places.forEach(function (place) {
-//                     self.ownPlaces.push(place._id);
-//                 });
-//                 places.forEach(async function (place) {
-//                     if (place.boss) {
-//                         return self.ownPlaces.splice(self.ownPlaces.indexOf(place), 1);
-//                     } else {
-//                         return await Place.findByIdAndUpdate(place._id, {boss: self}, {
-//                             runValidators: true,
-//                             context: 'query'
-//                         });
-//                     }
-//                 });
-//             }
-//         }
-//         if (this.drinkApplications) {
-//             let apps = await DrinkApplication.find({_id: this.drinkApplications});
-//             this.drinkApplications = [];
-//             if (apps) {
-//                 apps.forEach(function (app) {
-//                     self.drinkApplications.push(app._id);
-//                 });
-//                 apps.forEach(async function (app) {
-//                     if (app.client) {
-//                         return self.drinkApplications.splice(self.drinkApplications.indexOf(app), 1);
-//                     } else {
-//                         return await DrinkApplication.findByIdAndUpdate(app._id, {organizer: self}, {runValidators: true});
-//                     }
-//                 });
-//             }
-//         }
-//         if (this.ratings) {
-//             let ratings = await Rating.find({_id: this.ratings});
-//             this.ratings = [];
-//             if (ratings) {
-//                 ratings.forEach(function (rating) {
-//                     self.ratings.push(rating._id);
-//                 });
-//                 ratings.forEach(async function (rating) {
-//                     if (rating.client) {
-//                         return self.ratings.splice(self.ratings.indexOf(rating), 1);
-//                     } else {
-//                         return await Rating.findByIdAndUpdate(rating._id, {client: self}, {runValidators: true});
-//                     }
-//                 });
-//             }
-//         }
-//         if (this.complaints) {
-//             let complaints = await Rating.find({_id: this.complaints});
-//             this.complaints = [];
-//             if (complaints) {
-//                 complaints.forEach(function (complaint) {
-//                     self.complaints.push(complaint._id);
-//                 });
-//                 complaints.forEach(async function (complaint) {
-//                     if (complaint.client) {
-//                         return self.complaints.splice(self.complaints.indexOf(complaint), 1);
-//                     } else {
-//                         return await Complaint.findByIdAndUpdate(complaint._id, {client: self}, {runValidators: true});
-//                     }
-//                 });
-//             }
-//         }
-//         if (this.departments) {
-//             let departments = await Department.find({_id: this.departments});
-//             this.departments = [];
-//             if (departments) {
-//                 departments.forEach(function (department) {
-//                     self.departments.push(department._id);
-//                 });
-//                 departments.forEach(async function (department) {
-//                     if (department.client) {
-//                         return self.departments.splice(self.departments.indexOf(department), 1);
-//                     } else {
-//                         return await Department.findByIdAndUpdate(department._id, {client: self}, {
-//                             runValidators: true,
-//                             context: 'query'
-//                         });
-//                     }
-//                 });
-//             }
-//         }
-//         return next();
-//     } catch (e) {
-//         return next(e);
-//     }
-// });

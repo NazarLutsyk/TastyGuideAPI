@@ -85,16 +85,10 @@ describe('API endpoint /api/departments', function () {
                 .post('/api/departments')
                 .send({
                     roles: ['a'],
-                    place: new mongoose.Types.ObjectId,
-                    client: new mongoose.Types.ObjectId,
-                    promos : new mongoose.Types.ObjectId,
                 });
             res.status.should.equal(201);
             res.body.should.be.a('object');
             res.body.roles.should.include('a');
-            should.equal(res.body.place, null);
-            should.equal(res.body.client, null);
-            should.equal(res.body.promos.length,0);
         });
         it('(unknown field)should return status 400', async function () {
             try {

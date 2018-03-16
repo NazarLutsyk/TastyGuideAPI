@@ -37,11 +37,11 @@ HashTagSchema.methods.superupdate = async function (newDoc) {
             let toAdd = [];
             let toRemove = [];
             for (let place of newDoc.places) {
-                if (this.places.indexOf(place) == -1)
+                if (this.places.indexOf(place.toString()) === -1)
                     toAdd.push(place);
             }
             for (let place of this.places) {
-                if (newDoc.places.indexOf(place) != -1)
+                if (newDoc.places.indexOf(place.toString()) === -1)
                     toRemove.push(place);
             }
             if (toRemove)

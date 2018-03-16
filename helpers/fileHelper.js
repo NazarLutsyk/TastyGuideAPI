@@ -8,10 +8,16 @@ module.exports = {
         if (files.length > 0) {
             for (let file in files) {
                 if (file.indexOf('default.jpg') == -1) {
-                    fs.unlink(file, function (err) {
-                        if (err) {
-                            console.log('From file helper');
-                            console.log(err);
+                    fs.exists(file,function (exists) {
+                        if (exists){
+                            fs.unlink(file, function (err) {
+                                if (err) {
+                                    console.log('From file helper');
+                                    console.log(err);
+                                    throw new Error(err);
+                                }
+                                return;
+                            });
                         }
                     });
                 }

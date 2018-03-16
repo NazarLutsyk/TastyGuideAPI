@@ -43,7 +43,8 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let department = await Department.create(req.body);
+                let department = new Department(req.body);
+                department = await department.supersave();
                 res.status(201).json(department);
             }
         } catch (e) {
@@ -59,8 +60,7 @@ module.exports = {
             } else {
                 let department = await Department.findById(departmentId);
                 if (department) {
-                    objectHelper.load(department, req.body);
-                    let updated = await department.save();
+                    let updated = await department.superupdate(req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

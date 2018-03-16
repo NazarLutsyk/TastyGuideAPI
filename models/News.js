@@ -20,12 +20,12 @@ NewsSchema.methods.supersave = async function () {
     let author = await Department.findById(this.author);
     let place = await Place.findById(this.place);
     let newsMultilangExists = await NewsMultilang.count({_id: this.multilang});
-    let image = await Image.finById(this.image);
-
+    let image = await Image.findById(this.image);
+    
     if ((newsMultilangExists === 0 && this.multilang.length !== 0) || (newsMultilangExists !== this.multilang.length)) {
         throw new Error('Not found related model NewsMultilang!');
     } else if (newsMultilangExists === this.multilang.length) {
-        await NewsMultilang.update({_id: this.multilang}, {placeType: this._id}, {
+        await NewsMultilang.update({_id: this.multilang}, {news: this._id}, {
             multi: true,
             runValidators: true,
             context: 'query'
@@ -62,7 +62,6 @@ NewsSchema.methods.superupdate = async function (newDoc) {
     let NewsMultilang = require('./NewsMultilang');
     let Place = require('./Place');
     let Image = require('./Image');
-
     if (newDoc.author && newDoc.author != this.author) {
         let newDepartment = await Department.findById(newDoc.author);
         if (newDepartment) {
@@ -99,11 +98,11 @@ NewsSchema.methods.superupdate = async function (newDoc) {
             let toAdd = [];
             let toRemove = [];
             for (let multilang of newDoc.multilang) {
-                if (this.multilang.indexOf(multilang) == -1)
+                if (this.multilang.indexOf(multilang.toString()) === -1)
                     toAdd.push(multilang);
             }
             for (let multilang of this.multilang) {
-                if (newDoc.multilang.indexOf(multilang) != -1)
+                if (newDoc.multilang.indexOf(multilang.toString()) === -1)
                     toRemove.push(multilang);
             }
             if (toRemove)
@@ -133,13 +132,27 @@ NewsSchema.methods.superupdate = async function (newDoc) {
 module.exports = Promo.discriminator('News', NewsSchema);
 
 let Multilang = require('./NewsMultilang');
-
+let Place = require('./Place');
+let Department = require('./Department');
 NewsSchema.pre('remove', async function (next) {
     try {
-        let multilangs = await Multilang.find({news: this._id});
-        multilangs.forEach(async function (multilang) {
-            return await multilang.remove();
-        });
+        await Multilang.remove({news : this._id});
+        await Place.update(
+            {promos : this._id},
+            {$pull : {promos : this._id}},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            });
+        await Department.update(
+            {promos : this._id},
+            {$pull : {promos : this._id}},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            });
         return next();
     } catch (e) {
         return next(e);

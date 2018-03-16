@@ -44,7 +44,8 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let bonuse = await Bonuse.create(req.body);
+                let bonuse = new Bonuse(req.body);
+                bonuse = await bonuse.supersave();
                 res.status(201).json(bonuse);
             }
         } catch (e) {
@@ -60,8 +61,7 @@ module.exports = {
             } else {
                 let bonuse = await Bonuse.findById(bonuseId);
                 if (bonuse) {
-                    objectHelper.load(bonuse, req.body);
-                    let updated = await bonuse.save();
+                    let updated = await bonuse.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);

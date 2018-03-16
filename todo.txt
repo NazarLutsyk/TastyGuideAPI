@@ -21,6 +21,9 @@
 //todo place location or locations?
 //todo delete pre save pre delete add statics supersave,superupdate,superdelete
 //todo add transactions to supersave and superupdate
+//todo check push pull relations
+//todo check newDoc in superupdate
+//todo add test to update [id] => []
 //+change update controllers to save instead update
 //+stack of places
 //+top place planning

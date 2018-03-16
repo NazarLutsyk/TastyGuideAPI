@@ -1,7 +1,6 @@
 let Client = require(global.paths.MODELS + '/Client');
 let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getClients(req, res) {
@@ -55,8 +54,7 @@ module.exports = {
             } else {
                 let client = await Client.findById(clientId);
                 if (client) {
-                    objectHelper.load(client, req.body);
-                    let updated = await client.save();
+                    let updated = await client.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);

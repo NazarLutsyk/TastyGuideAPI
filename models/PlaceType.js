@@ -37,11 +37,11 @@ PlaceTypeSchema.methods.superupdate = async function (newDoc) {
             let toAdd = [];
             let toRemove = [];
             for (let multilang of newDoc.multilang) {
-                if (this.multilang.indexOf(multilang) == -1)
+                if (this.multilang.indexOf(multilang.toString()) === -1)
                     toAdd.push(multilang);
             }
             for (let multilang of this.multilang) {
-                if (newDoc.multilang.indexOf(multilang) != -1)
+                if (newDoc.multilang.indexOf(multilang.toString()) === -1)
                     toRemove.push(multilang);
             }
             if (toRemove)

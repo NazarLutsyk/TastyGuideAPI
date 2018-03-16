@@ -32,7 +32,6 @@ DepartmentSchema.methods.supersave = async function () {
     let client = await Client.findById(this.client);
     let place = await Place.findById(this.place);
 
-
     let count = await Promo.count({_id: this.promos});
 
     if ((count === 0 && this.promos.length !== 0) || (count !== this.promos.length)) {
@@ -80,11 +79,11 @@ DepartmentSchema.methods.superupdate = async function (newDoc) {
             let toAdd = [];
             let toRemove = [];
             for (let promos of newDoc.promos) {
-                if (this.promos.indexOf(promos) == -1)
+                if (this.promos.indexOf(promos.toString()) === -1)
                     toAdd.push(promos);
             }
             for (let promos of this.promos) {
-                if (newDoc.promos.indexOf(promos) != -1)
+                if (newDoc.promos.indexOf(promos.toString()) === -1)
                     toRemove.push(promos);
             }
             if (toRemove)

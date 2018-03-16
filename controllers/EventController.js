@@ -44,7 +44,8 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let event = await Event.create(req.body);
+                let event = new Event(req.body);
+                event = await event.supersave();
                 res.status(201).json(event);
             }
         } catch (e) {
@@ -60,8 +61,7 @@ module.exports = {
             } else {
                 let event = await Event.findById(eventId);
                 if (event) {
-                    objectHelper.load(event, req.body);
-                    let updated = await event.save();
+                    let updated = await event.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);
