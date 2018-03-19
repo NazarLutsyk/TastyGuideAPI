@@ -24,7 +24,7 @@ let DepartmentSchema = new Schema({
     timestamps: true,
 });
 
-DepartmentSchema.methods.supersave = async function () {
+DepartmentSchema.methods.supersave = async function (context) {
     let Place = require('./Place');
     let Client = require('./Client');
     let Promo = require('./Promo');
@@ -33,10 +33,18 @@ DepartmentSchema.methods.supersave = async function () {
     let place = await Place.findById(this.place);
 
     let count = await Promo.count({_id: this.promos});
-
-    if ((count === 0 && this.promos.length !== 0) || (count !== this.promos.length)) {
+    if (this.promos.length > 0 && this.promos.length !== count) {
         throw new Error('Not found related model Promo!');
     } else if (count === this.promos.length) {
+        await context.update(
+            {promos: {$in: this.promos}},
+            {$pullAll: {promos: this.promos}},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            }
+        );
         await Promo.update({_id: this.promos}, {author: this._id}, {
             multi: true,
             runValidators: true,
@@ -67,7 +75,7 @@ DepartmentSchema.methods.supersave = async function () {
     return await this.save();
 };
 
-DepartmentSchema.methods.superupdate = async function (newDoc) {
+DepartmentSchema.methods.superupdate = async function (context,newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let Place = require('./Place');
     let Client = require('./Client');
@@ -93,6 +101,15 @@ DepartmentSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
+                await context.update(
+                    {promos: {$in: toAdd}},
+                    {$pullAll: {promos: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
                 await Promo.update({_id: {$in: toAdd}}, {author: this._id}, {
                     multi: true,
                     runValidators: true,

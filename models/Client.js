@@ -78,7 +78,7 @@ ClientSchema.methods.encryptPassword = function (password) {
 ClientSchema.methods.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
-ClientSchema.methods.superupdate = async function (newDoc) {
+ClientSchema.methods.superupdate = async function (context,newDoc) {
     let Place = require('./Place');
     let DrinkApplication = require('./DrinkApplication');
     let Rating = require('./Rating');
@@ -106,6 +106,15 @@ ClientSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
+                await context.update(
+                    {ownPlaces: {$in: toAdd}},
+                    {$pullAll: {ownPlaces: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
                 await Place.update({_id: {$in: toAdd}}, {boss: this._id}, {
                     multi: true,
                     runValidators: true,
@@ -135,6 +144,15 @@ ClientSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
+                await context.update(
+                    {drinkApplications: {$in: toAdd}},
+                    {$pullAll: {drinkApplications: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
                 await DrinkApplication.update({_id: {$in: toAdd}}, {organizer: this._id}, {
                     multi: true,
                     runValidators: true,
@@ -164,6 +182,15 @@ ClientSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
+                await context.update(
+                    {ratings: {$in: toAdd}},
+                    {$pullAll: {ratings: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
                 await Rating.update({_id: {$in: toAdd}}, {client: this._id}, {
                     multi: true,
                     runValidators: true,
@@ -193,6 +220,15 @@ ClientSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
+                await context.update(
+                    {complaints: {$in: toAdd}},
+                    {$pullAll: {complaints: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
                 await Complaint.update({_id: {$in: toAdd}}, {client: this._id}, {
                     multi: true,
                     runValidators: true,
@@ -222,6 +258,15 @@ ClientSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
+                await context.update(
+                    {departments: {$in: toAdd}},
+                    {$pullAll: {departments: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
                 await Department.update({_id: {$in: toAdd}}, {client: this._id}, {
                     multi: true,
                     runValidators: true,

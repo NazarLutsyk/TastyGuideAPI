@@ -1,8 +1,6 @@
 let News = require(global.paths.MODELS + '/News');
-let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let path = require('path');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getNews(req, res) {
@@ -45,7 +43,7 @@ module.exports = {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let news = new News(req.body);
-                news = await news.supersave();
+                news = await news.supersave(News);
                 res.status(201).json(news);
             }
         } catch (e) {
@@ -62,7 +60,7 @@ module.exports = {
             } else {
                 let news = await News.findById(newsId);
                 if (news) {
-                    let updated = await news.superupdate(req.body);
+                    let updated = await news.superupdate(News,req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
@@ -91,8 +89,10 @@ module.exports = {
         let multilangId = req.params.idMultilang;
         try {
             if (modelId && multilangId) {
-                await relationHelper.addRelation
-                ('News', 'NewsMultilang', modelId, multilangId, 'multilang', 'news');
+                let news = await News.findById(modelId);
+                await news.superupdate(News,{
+                    multilang: news.multilang.concat(multilangId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -106,8 +106,11 @@ module.exports = {
         let multilangId = req.params.idMultilang;
         try {
             if (modelId && multilangId) {
-                await relationHelper.removeRelation
-                ('News', 'NewsMultilang', modelId, multilangId, 'multilang', 'news');
+                let news = await News.findById(modelId);
+                news.multilang.splice(news.multilang.indexOf(multilangId),1);
+                await news.superupdate(News,{
+                    multilang: news.multilang
+                });
                 res.sendStatus(204);
             } else {
                 throw new Error('Id in path eq null');

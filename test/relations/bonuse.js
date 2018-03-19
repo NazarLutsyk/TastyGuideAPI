@@ -23,6 +23,8 @@ describe('bonuse relations', function () {
             let idMultilang2 = new mongoose.Types.ObjectId;
             let idImage = new mongoose.Types.ObjectId;
             let idDepartment = new mongoose.Types.ObjectId;
+
+
             beforeEach(async function () {
                 await Place.create({
                     _id: idPlace,
@@ -54,6 +56,35 @@ describe('bonuse relations', function () {
                 await Place.remove({});
                 await Image.remove({});
                 await Department.remove({});
+            });
+            it('normal create model with used relations', async function () {
+                let oldBonuse = new Bonuse({
+                    startDate: new Date(),
+                    endDate: new Date()
+                });
+                oldBonuse = await oldBonuse.superupdate(Bonuse, {
+                    multilang: [idMultilang1, idMultilang2]
+                });
+                let res = await chai.request('localhost:3000')
+                    .post('/api/bonuses')
+                    .send({
+                        startDate: new Date(),
+                        endDate: new Date(),
+                        multilang: [idMultilang1, idMultilang2]
+                    });
+                res.status.should.equal(201);
+                res.body.should.be.an('object');
+                res.body.multilang.should.lengthOf(2);
+                res.body.multilang.should.include(idMultilang1.toString());
+                res.body.multilang.should.include(idMultilang2.toString());
+
+                let oldMultilang1 = await Multilang.findById(idMultilang1);
+                let oldMultilang2 = await Multilang.findById(idMultilang2);
+                oldBonuse = await Bonuse.findById(oldBonuse);
+
+                oldMultilang1.bonuse.toString().should.equal(res.body._id.toString());
+                oldMultilang2.bonuse.toString().should.equal(res.body._id.toString());
+                should.equal(oldBonuse.multilang.length, 0);
             });
             it('normal create model with relations', async function () {
                 let res = await chai.request('localhost:3000')
@@ -200,7 +231,7 @@ describe('bonuse relations', function () {
                     startDate: new Date(),
                     endDate: new Date(),
                 });
-                bonuse = await bonuse.supersave();
+                bonuse = await bonuse.supersave(Bonuse);
 
                 let res = await chai.request('localhost:3000')
                     .put('/api/bonuses/' + bonuse._id)
@@ -239,6 +270,7 @@ describe('bonuse relations', function () {
                 should.equal(oldMultilang1.bonuse, null);
                 should.equal(oldMultilang2.bonuse, null);
             });
+
             it('invalid update empty model with wrong relations', async function () {
                 try {
                     let res = await chai.request('localhost:3000')
@@ -269,7 +301,7 @@ describe('bonuse relations', function () {
                         startDate: new Date(),
                         endDate: new Date(),
                     });
-                    bonuse = await bonuse.supersave();
+                    bonuse = await bonuse.supersave(Bonuse);
                     let res = await chai.request('localhost:3000')
                         .put('/api/bonuses/' + idBonuse)
                         .send({
@@ -351,7 +383,7 @@ describe('bonuse relations', function () {
                     startDate: new Date(),
                     endDate: new Date(),
                 });
-                bonuse = await bonuse.supersave();
+                bonuse = await bonuse.supersave(Bonuse);
                 let res = await chai.request('localhost:3000')
                     .delete('/api/bonuses/' + bonuse._id);
 
@@ -366,136 +398,6 @@ describe('bonuse relations', function () {
                 should.equal(oldPlace.promos.length, 0);
                 should.equal(oldMultilang1, null);
                 should.equal(oldMultilang2, null);
-            });
-        });
-    });
-
-    describe('push pull', function () {
-        let idMultilang = new mongoose.Types.ObjectId;
-        beforeEach(async function () {
-            await Multilang.create({
-                _id: idMultilang,
-                header: 'aas',
-                description: 'aas',
-                conditions: 'asd'
-            });
-        });
-        afterEach(async function () {
-            await Multilang.remove({});
-            await Bonuse.remove({});
-        });
-        describe('PUT', function () {
-            it('should add relation to empty model', async function () {
-                let bonuse = await Bonuse.create({
-                    startDate: new Date(),
-                    endDate: new Date(),
-                });
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/bonuses/${bonuse._id}/multilangs/${idMultilang}`);
-                let multilang = await Multilang.findById(idMultilang);
-                bonuse = await Bonuse.findById(bonuse._id);
-                res.status.should.equal(201);
-                multilang.bonuse.toString().should.equal(bonuse._id.toString());
-                bonuse.multilang.should.include(multilang._id.toString());
-            });
-            it('should add relation to not empty model', async function () {
-                let multilang1 = await Multilang.create({
-                    header: 'aas',
-                    description: 'aas',
-                    conditions: 'asd'
-                });
-                let bonuse = new Bonuse({
-                    multilang: [multilang1._id],
-                    startDate: new Date(),
-                    endDate: new Date(),
-                });
-                bonuse = await bonuse.supersave();
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/bonuses/${bonuse._id}/multilangs/${idMultilang}`);
-                multilang1 = await Multilang.findById(multilang1._id);
-                let multilang2 = await Multilang.findById(idMultilang);
-                bonuse = await Bonuse.findById(bonuse._id);
-                res.status.should.equal(201);
-                multilang1.bonuse.toString().should.equal(bonuse._id.toString());
-                multilang2.bonuse.toString().should.equal(bonuse._id.toString());
-                bonuse.multilang.should.include(multilang1._id.toString());
-                bonuse.multilang.should.include(multilang2._id.toString());
-                bonuse.multilang.should.lengthOf(2);
-            });
-            it('should not add duplicated relation', async function () {
-                let bonuse = new Bonuse({
-                    multilang: [idMultilang],
-                    startDate: new Date(),
-                    endDate: new Date(),
-                });
-                bonuse = await bonuse.supersave();
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/bonuses/${bonuse._id}/multilangs/${idMultilang}`);
-                let multilang = await Multilang.findById(idMultilang);
-                bonuse = await Bonuse.findById(bonuse._id);
-                res.status.should.equal(201);
-                multilang.bonuse.toString().should.equal(bonuse._id.toString());
-                bonuse.multilang.should.include(multilang._id.toString());
-                bonuse.multilang.should.lengthOf(1);
-            });
-            it('should not add wrong relation', async function () {
-                try {
-                    var bonuse = await Bonuse.create({
-                        startDate: new Date(),
-                        endDate: new Date(),
-                    });
-                    let res = await chai.request('localhost:3000')
-                        .put(`/api/bonuses/${bonuse._id}/multilangs/${new mongoose.Types.ObjectId}`);
-                    if (res.status) should.fail();
-                } catch (e) {
-                    bonuse = await Bonuse.findById(bonuse._id);
-                    e.status.should.equal(400);
-                    should.equal(bonuse.multilang.length, 0);
-                }
-            });
-        });
-        describe('DELETE', function () {
-            let idMultilang = new mongoose.Types.ObjectId;
-            let idBonuse = new mongoose.Types.ObjectId;
-            beforeEach(async function () {
-                let multilang = await Multilang.create({
-                    _id: idMultilang,
-                    header: 'aas',
-                    description: 'aas',
-                    conditions: 'asd'
-                });
-                let bonuse = await Bonuse({
-                    _id: idBonuse,
-                    multilang: [multilang],
-                    startDate: new Date(),
-                    endDate: new Date(),
-                });
-                bonuse = await bonuse.supersave();
-            });
-            afterEach(async function () {
-                await Multilang.remove({});
-                await Bonuse.remove({});
-            });
-            it('should delete relation', async function () {
-                let res = await chai.request('localhost:3000')
-                    .delete(`/api/bonuses/${idBonuse}/multilangs/${idMultilang}`);
-                let multilang = await Multilang.findById(idMultilang);
-                let bonuse = await Bonuse.findById(idBonuse);
-                res.status.should.equal(204);
-                should.equal(multilang.bonuse, null);
-                should.equal(bonuse.multilang.length, 0);
-            });
-            it('should not remove wrong relation', async function () {
-                try {
-                    let res = await chai.request('localhost:3000')
-                        .delete(`/api/bonuses/${idBonuse}/multilangs/${new mongoose.Types.ObjectId}`);
-                } catch (e) {
-                    let multilang = await Multilang.findById(idMultilang);
-                    let bonuse = await Bonuse.findById(idBonuse);
-                    e.status.should.equal(400);
-                    should.equal(bonuse.multilang.length, 1);
-                    should.equal(multilang.bonuse.toString(), bonuse._id.toString());
-                }
             });
         });
     });

@@ -28,6 +28,31 @@ describe('location relations', function () {
                 await Location.remove();
                 await Place.remove();
             });
+            it('normal create model with used relations', async function () {
+                let oldLocation = new Location({
+                    ltg: 45,
+                    lng: 45
+                });
+                oldLocation = await oldLocation.superupdate(Location,{
+                    place: idPlace
+                });
+                let res = await chai.request('localhost:3000')
+                    .post('/api/locations')
+                    .send({
+                        ltg: 45,
+                        lng: 45,
+                        place: idPlace
+                    });
+                res.status.should.equal(201);
+                res.body.should.be.an('object');
+                res.body.place.toString().should.equal(res.body.place.toString());
+
+                let place = await Place.findById(idPlace);
+                oldLocation = await Location.findById(oldLocation._id);
+
+                place.location.toString().should.equal(res.body._id.toString());
+                should.equal(oldLocation.place,null);
+            });
             it('normal create model with relations', async function () {
                 let res = await chai.request('localhost:3000')
                     .post('/api/locations')
@@ -115,7 +140,7 @@ describe('location relations', function () {
                         lng : 100,
                         place : idPlace
                     });
-                    location = await location.supersave();
+                    location = await location.supersave(Location);
 
                     let res = await chai.request('localhost:3000')
                         .put('/api/locations/' + location._id)
@@ -130,6 +155,32 @@ describe('location relations', function () {
                     location.place.should.eql(place._id);
                     place.location.should.eql(location._id);
                 }
+            });
+            it('update model with used relations', async function () {
+                let oldLocation = new Location({
+                    ltg:232,
+                    lng:23,
+                    place: idPlace
+                });
+                oldLocation = await oldLocation.supersave(Location);
+                let newLocation = await Location.create({
+                    ltg:232,
+                    lng:23
+                });
+                let res = await chai.request('localhost:3000')
+                    .put('/api/locations/'+newLocation._id)
+                    .send({
+                        place: idPlace
+                    });
+                res.status.should.equal(201);
+                res.body.should.be.an('object');
+                res.body.place.toString().should.equal(idPlace.toString());
+
+                let place = await Place.findById(idPlace);
+                oldLocation = await Location.findById(oldLocation._id);
+
+                place.location.toString().should.equal(res.body._id.toString());
+                should.equal(oldLocation.place,null);
             });
         });
 
@@ -153,7 +204,7 @@ describe('location relations', function () {
                     lng : 100,
                     place : idPlace
                 });
-                location = await location.supersave();
+                location = await location.supersave(Location);
                 let res = await chai.request('localhost:3000')
                     .delete('/api/locations/' + location._id);
                 res.status.should.equal(204);

@@ -53,6 +53,30 @@ describe('event relations', function () {
                 await Image.remove({});
                 await Department.remove({});
             });
+            it('normal create model with used relations', async function () {
+                let oldEvent = new Event({});
+                oldEvent = await oldEvent.superupdate(Event, {
+                    multilang: [idMultilang1, idMultilang2]
+                });
+                let res = await chai.request('localhost:3000')
+                    .post('/api/events')
+                    .send({
+                        multilang: [idMultilang1, idMultilang2]
+                    });
+                res.status.should.equal(201);
+                res.body.should.be.an('object');
+                res.body.multilang.should.lengthOf(2);
+                res.body.multilang.should.include(idMultilang1.toString());
+                res.body.multilang.should.include(idMultilang2.toString());
+
+                let oldMultilang1 = await Multilang.findById(idMultilang1);
+                let oldMultilang2 = await Multilang.findById(idMultilang2);
+                oldEvent = await Event.findById(oldEvent);
+
+                oldMultilang1.event.toString().should.equal(res.body._id.toString());
+                oldMultilang2.event.toString().should.equal(res.body._id.toString());
+                should.equal(oldEvent.multilang.length, 0);
+            });
             it('normal create model with relations', async function () {
                 let res = await chai.request('localhost:3000')
                     .post('/api/events')
@@ -189,7 +213,7 @@ describe('event relations', function () {
                     image: idImage,
                     multilang: [idMultilang1, idMultilang2]
                 });
-                event = await event.supersave();
+                event = await event.supersave(Event);
 
                 let res = await chai.request('localhost:3000')
                     .put('/api/events/' + event._id)
@@ -256,7 +280,7 @@ describe('event relations', function () {
                         image: idImage,
                         multilang: [idMultilang1, idMultilang2]
                     });
-                    event = await event.supersave();
+                    event = await event.supersave(Event);
                     let res = await chai.request('localhost:3000')
                         .put('/api/events/' + idEvent)
                         .send({
@@ -288,6 +312,31 @@ describe('event relations', function () {
                     oldMultilang1.event.toString().should.equal(event._id.toString());
                     oldMultilang2.event.toString().should.equal(event._id.toString());
                 }
+            });
+            it('update model with used relations', async function () {
+                let oldEvent = new Event({});
+                oldEvent = await oldEvent.superupdate(Event, {
+                    multilang: [idMultilang1, idMultilang2]
+                });
+                let newEvent = await Event.create({});
+                let res = await chai.request('localhost:3000')
+                    .put('/api/events/' + newEvent._id)
+                    .send({
+                        multilang: [idMultilang2]
+                    });
+                res.status.should.equal(201);
+                res.body.should.be.an('object');
+                res.body.multilang.should.lengthOf(1);
+                res.body.multilang.should.include(idMultilang2.toString());
+
+                let oldMultilang1 = await Multilang.findById(idMultilang1);
+                let oldMultilang2 = await Multilang.findById(idMultilang2);
+                oldEvent = await Event.findById(oldEvent._id);
+
+                oldMultilang1.event.toString().should.equal(oldEvent._id.toString());
+                oldMultilang2.event.toString().should.equal(res.body._id.toString());
+                should.equal(res.body.multilang.length, 1);
+                should.equal(oldEvent.multilang.length, 1);
             });
         });
 
@@ -334,7 +383,7 @@ describe('event relations', function () {
                     image: idImage,
                     multilang: [idMultilang1, idMultilang2]
                 });
-                event = await event.supersave();
+                event = await event.supersave(Event);
                 let res = await chai.request('localhost:3000')
                     .delete('/api/events/' + event._id);
 
@@ -349,117 +398,6 @@ describe('event relations', function () {
                 should.equal(oldPlace.promos.length, 0);
                 should.equal(oldMultilang1, null);
                 should.equal(oldMultilang2, null);
-            });
-        });
-    });
-
-    describe('push pull', function () {
-        let idMultilang = new mongoose.Types.ObjectId;
-        beforeEach(async function () {
-            await Multilang.create({
-                _id: idMultilang,
-                header: 'aas',
-                description: 'aas',
-            });
-        });
-        afterEach(async function () {
-            await Multilang.remove({});
-            await Event.remove({});
-        });
-        describe('PUT', function () {
-            it('should add relation to empty model', async function () {
-                let event = await Event.create({});
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/events/${event._id}/multilangs/${idMultilang}`);
-                let multilang = await Multilang.findById(idMultilang);
-                event = await Event.findById(event._id);
-                res.status.should.equal(201);
-                multilang.event.toString().should.equal(event._id.toString());
-                event.multilang.should.include(multilang._id.toString());
-            });
-            it('should add relation to not empty model', async function () {
-                let multilang1 = await Multilang.create({
-                    header: 'aas',
-                    description: 'aas',
-                });
-                let event = new Event({multilang: [multilang1._id]});
-                event = await event.supersave();
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/events/${event._id}/multilangs/${idMultilang}`);
-                multilang1 = await Multilang.findById(multilang1._id);
-                let multilang2 = await Multilang.findById(idMultilang);
-                event = await Event.findById(event._id);
-                res.status.should.equal(201);
-                multilang1.event.toString().should.equal(event._id.toString());
-                multilang2.event.toString().should.equal(event._id.toString());
-                event.multilang.should.include(multilang1._id.toString());
-                event.multilang.should.include(multilang2._id.toString());
-                event.multilang.should.lengthOf(2);
-            });
-            it('should not add duplicated relation', async function () {
-                let event = new Event({multilang: [idMultilang]});
-                event = await event.supersave();
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/events/${event._id}/multilangs/${idMultilang}`);
-                let multilang = await Multilang.findById(idMultilang);
-                event = await Event.findById(event._id);
-                res.status.should.equal(201);
-                multilang.event.toString().should.equal(event._id.toString());
-                event.multilang.should.include(multilang._id.toString());
-                event.multilang.should.lengthOf(1);
-            });
-            it('should not add wrong relation', async function () {
-                try {
-                    var event = await Event.create({});
-                    let res = await chai.request('localhost:3000')
-                        .put(`/api/events/${event._id}/multilangs/${new mongoose.Types.ObjectId}`);
-                    if (res.status) should.fail();
-                } catch (e) {
-                    event = await Event.findById(event._id);
-                    e.status.should.equal(400);
-                    should.equal(event.multilang.length, 0);
-                }
-            });
-        });
-        describe('DELETE', function () {
-            let idMultilang = new mongoose.Types.ObjectId;
-            let idEvent = new mongoose.Types.ObjectId;
-            beforeEach(async function () {
-                let multilang = await Multilang.create({
-                    _id: idMultilang,
-                    header: 'aas',
-                    description: 'aas',
-                });
-                let event = await Event({
-                    _id: idEvent,
-                    multilang: [multilang]
-                });
-                event = await event.supersave();
-            });
-            afterEach(async function () {
-                await Multilang.remove({});
-                await Event.remove({});
-            });
-            it('should delete relation', async function () {
-                let res = await chai.request('localhost:3000')
-                    .delete(`/api/events/${idEvent}/multilangs/${idMultilang}`);
-                let multilang = await Multilang.findById(idMultilang);
-                let event = await Event.findById(idEvent);
-                res.status.should.equal(204);
-                should.equal(multilang.event, null);
-                should.equal(event.multilang.length, 0);
-            });
-            it('should not remove wrong relation', async function () {
-                try {
-                    let res = await chai.request('localhost:3000')
-                        .delete(`/api/events/${idEvent}/multilangs/${new mongoose.Types.ObjectId}`);
-                } catch (e) {
-                    let multilang = await Multilang.findById(idMultilang);
-                    let event = await Event.findById(idEvent);
-                    e.status.should.equal(400);
-                    should.equal(event.multilang.length, 1);
-                    should.equal(multilang.event.toString(), event._id.toString());
-                }
             });
         });
     });

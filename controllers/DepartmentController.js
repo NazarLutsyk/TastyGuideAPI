@@ -1,7 +1,5 @@
 let Department = require(global.paths.MODELS + '/Department');
-let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getDepartments(req, res) {
@@ -44,7 +42,7 @@ module.exports = {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let department = new Department(req.body);
-                department = await department.supersave();
+                department = await department.supersave(Department);
                 res.status(201).json(department);
             }
         } catch (e) {
@@ -60,7 +58,7 @@ module.exports = {
             } else {
                 let department = await Department.findById(departmentId);
                 if (department) {
-                    let updated = await department.superupdate(req.body);
+                    let updated = await department.superupdate(Department,req.body);
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
@@ -89,8 +87,10 @@ module.exports = {
         let promoId = req.params.idPromo;
         try {
             if (modelId && promoId) {
-                await relationHelper.addRelation
-                ('Department', 'Promo', modelId, promoId, 'promos', 'author');
+                let department = await Department.findById(modelId);
+                await department.superupdate(Department,{
+                    promos: department.promos.concat(promoId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -104,8 +104,11 @@ module.exports = {
         let promoId = req.params.idPromo;
         try {
             if (modelId && promoId) {
-                await relationHelper.removeRelation
-                ('Department', 'Promo', modelId, promoId, 'promos', 'author');
+                let department = await Department.findById(modelId);
+                department.promos.splice(department.promos.indexOf(promoId),1);
+                await department.superupdate(Department,{
+                    departments: department.promos
+                });
                 res.sendStatus(204);
             } else {
                 throw new Error('Id in path eq null');

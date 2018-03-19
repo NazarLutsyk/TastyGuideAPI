@@ -1,6 +1,5 @@
 let BonuseMultilang = require(global.paths.MODELS + '/BonuseMultilang');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getBonuseMultilangs(req, res) {

@@ -1,8 +1,6 @@
 let Bonuse = require(global.paths.MODELS + '/Bonuse');
-let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let path = require('path');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getBonuses(req, res) {
@@ -45,10 +43,11 @@ module.exports = {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let bonuse = new Bonuse(req.body);
-                bonuse = await bonuse.supersave();
+                bonuse = await bonuse.supersave(Bonuse);
                 res.status(201).json(bonuse);
             }
         } catch (e) {
+            console.log(e);
             res.status(400).send(e.toString());
         }
     },
@@ -61,7 +60,7 @@ module.exports = {
             } else {
                 let bonuse = await Bonuse.findById(bonuseId);
                 if (bonuse) {
-                    let updated = await bonuse.superupdate(req.body);
+                    let updated = await bonuse.superupdate(Bonuse,req.body);
                     res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);
@@ -90,8 +89,10 @@ module.exports = {
         let multilangId = req.params.idMultilang;
         try {
             if (modelId && multilangId) {
-                await relationHelper.addRelation
-                ('Bonuse', 'BonuseMultilang', modelId, multilangId, 'multilang', 'bonuse');
+                let bonuse = await Bonuse.findById(modelId);
+                await bonuse.superupdate(Bonuse,{
+                    multilang : bonuse.multilang.concat(multilangId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -105,8 +106,11 @@ module.exports = {
         let multilangId = req.params.idMultilang;
         try {
             if (modelId && multilangId) {
-                await relationHelper.removeRelation
-                ('Bonuse', 'BonuseMultilang', modelId, multilangId, 'multilang', 'bonuse');
+                let bonuse = await Bonuse.findById(modelId);
+                bonuse.multilang.splice(bonuse.multilang.indexOf(multilangId),1);
+                await bonuse.superupdate(bonuse,{
+                    multilang: bonuse.multilang
+                });
                 res.sendStatus(204);
             } else {
                 throw new Error('Id in path eq null');

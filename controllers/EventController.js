@@ -1,7 +1,5 @@
 let Event = require(global.paths.MODELS + '/Event');
-let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 let path = require('path');
 module.exports = {
@@ -45,7 +43,7 @@ module.exports = {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let event = new Event(req.body);
-                event = await event.supersave();
+                event = await event.supersave(Event);
                 res.status(201).json(event);
             }
         } catch (e) {
@@ -61,7 +59,7 @@ module.exports = {
             } else {
                 let event = await Event.findById(eventId);
                 if (event) {
-                    let updated = await event.superupdate(req.body);
+                    let updated = await event.superupdate(Event,req.body);
                     res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);
@@ -90,8 +88,10 @@ module.exports = {
         let multilangId = req.params.idMultilang;
         try {
             if (modelId && multilangId) {
-                await relationHelper.addRelation
-                ('Event', 'EventMultilang', modelId, multilangId, 'multilang', 'event');
+                let event = await Event.findById(modelId);
+                await event.superupdate(Event,{
+                    multilang: event.multilang.concat(multilangId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -105,8 +105,11 @@ module.exports = {
         let multilangId = req.params.idMultilang;
         try {
             if (modelId && multilangId) {
-                await relationHelper.removeRelation
-                ('Event', 'EventMultilang', modelId, multilangId, 'multilang', 'event');
+                let event = await Event.findById(modelId);
+                event.multilang.splice(event.multilang.indexOf(multilangId),1);
+                await event.superupdate(Event,{
+                    multilang: event.multilang
+                });
                 res.sendStatus(204);
             } else {
                 throw new Error('Id in path eq null');

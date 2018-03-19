@@ -74,6 +74,7 @@ ComplaintSchema.methods.superupdate = async function (newDoc) {
         let newClient = await Client.findById(newDoc.client);
         if (newClient) {
             await Client.findByIdAndUpdate(this.client, {$pull: {complaints: this._id}}, {
+                multi: true,
                 runValidators: true,
                 context: 'query'
             });

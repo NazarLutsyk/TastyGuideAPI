@@ -1,7 +1,5 @@
 let Place = require(global.paths.MODELS + '/Place');
-let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 let path = require('path');
 module.exports = {
@@ -44,10 +42,12 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let place = await Place.create(req.body);
+                let place = new Place(req.body);
+                place = await place.supersave(Place);
                 res.status(201).json(place);
             }
         } catch (e) {
+            console.log(e);
             res.status(400).send(e.toString());
         }
     },
@@ -60,14 +60,14 @@ module.exports = {
             } else {
                 let place = await Place.findById(placeId);
                 if (place) {
-                    objectHelper.load(place, req.body);
-                    let updated = await place.save();
+                    let updated = await place.superupdate(Place, req.body);
                     res.status(201).json(updated);
                 } else {
                     res.sendStatus(404);
                 }
             }
         } catch (e) {
+            console.log(e);
             res.status(400).send(e.toString());
         }
     },
@@ -90,8 +90,10 @@ module.exports = {
         let typeId = req.params.idType;
         try {
             if (modelId && typeId) {
-                await relationHelper.addRelation
-                ('Place', 'PlaceType', modelId, typeId, 'types');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    types: place.types.concat(typeId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -105,8 +107,11 @@ module.exports = {
         let typeId = req.params.idType;
         try {
             if (modelId && typeId) {
-                await relationHelper.removeRelation
-                ('Place', 'PlaceType', modelId, typeId, 'types');
+                let place = await Place.findById(modelId);
+                place.types.splice(place.types.indexOf(typeId), 1);
+                await place.superupdate(Place, {
+                    types: place.types
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -120,8 +125,10 @@ module.exports = {
         let promoId = req.params.idPromo;
         try {
             if (modelId && promoId) {
-                await relationHelper.addRelation
-                ('Place', 'Promo', modelId, promoId, 'promos', 'place');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    promos: place.promos.concat(promoId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -135,8 +142,11 @@ module.exports = {
         let promoId = req.params.idPromo;
         try {
             if (modelId && promoId) {
-                await relationHelper.removeRelation
-                ('Place', 'Promo', modelId, promoId, 'promos', 'place');
+                let place = await Place.findById(modelId);
+                place.promos.splice(place.promos.indexOf(promoId), 1);
+                await place.superupdate(Place, {
+                    promos: place.promos
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -150,8 +160,10 @@ module.exports = {
         let complaintId = req.params.idComplaint;
         try {
             if (modelId && complaintId) {
-                await relationHelper.addRelation
-                ('Place', 'Complaint', modelId, complaintId, 'complaints', 'place');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    complaints: place.complaints.concat(complaintId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -165,8 +177,11 @@ module.exports = {
         let complaintId = req.params.idComplaint;
         try {
             if (modelId && complaintId) {
-                await relationHelper.removeRelation
-                ('Place', 'Complaint', modelId, complaintId, 'complaints', 'place');
+                let place = await Place.findById(modelId);
+                place.complaints.splice(place.complaints.indexOf(complaintId), 1);
+                await place.superupdate(Place, {
+                    complaints: place.complaints
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -180,8 +195,10 @@ module.exports = {
         let appId = req.params.idApp;
         try {
             if (modelId && appId) {
-                await relationHelper.addRelation
-                ('Place', 'DrinkApplication', modelId, appId, 'drinkApplications', 'place');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    drinkApplications: place.drinkApplications.concat(appId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -195,8 +212,11 @@ module.exports = {
         let appId = req.params.idApp;
         try {
             if (modelId && appId) {
-                await relationHelper.removeRelation
-                ('Place', 'DrinkApplication', modelId, appId, 'drinkApplications', 'place');
+                let place = await Place.findById(modelId);
+                place.drinkApplications.splice(place.drinkApplications.indexOf(appId), 1);
+                await place.superupdate(Place, {
+                    drinkApplications: place.drinkApplications
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -210,8 +230,10 @@ module.exports = {
         let ratingId = req.params.idRating;
         try {
             if (modelId && ratingId) {
-                await relationHelper.addRelation
-                ('Place', 'Rating', modelId, ratingId, 'ratings', 'place');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    ratings: place.ratings.concat(ratingId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -225,8 +247,11 @@ module.exports = {
         let ratingId = req.params.idRating;
         try {
             if (modelId && ratingId) {
-                await relationHelper.removeRelation
-                ('Place', 'Rating', modelId, ratingId, 'ratings', 'place');
+                let place = await Place.findById(modelId);
+                place.ratings.splice(place.ratings.indexOf(ratingId), 1);
+                await place.superupdate(Place, {
+                    ratings: place.ratings
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -240,8 +265,10 @@ module.exports = {
         let departmentId = req.params.idDepartment;
         try {
             if (modelId && departmentId) {
-                await relationHelper.addRelation
-                ('Place', 'Department', modelId, departmentId, 'departments', 'place');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    departments: place.departments.concat(departmentId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -255,8 +282,11 @@ module.exports = {
         let departmentId = req.params.idDepartment;
         try {
             if (modelId && departmentId) {
-                await relationHelper.removeRelation
-                ('Place', 'Department', modelId, departmentId, 'departments', 'place');
+                let place = await Place.findById(modelId);
+                place.departments.splice(place.departments.indexOf(departmentId), 1);
+                await place.superupdate(Place, {
+                    departments: place.departments
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -270,8 +300,10 @@ module.exports = {
         let multilangId = req.params.idMultilang;
         try {
             if (modelId && multilangId) {
-                await relationHelper.addRelation
-                ('Place', 'PlaceMultilang', modelId, multilangId, 'multilang', 'place');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    multilang: place.multilang.concat(multilangId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -285,8 +317,11 @@ module.exports = {
         let multilangId = req.params.idMultilang;
         try {
             if (modelId && multilangId) {
-                await relationHelper.removeRelation
-                ('Place', 'PlaceMultilang', modelId, multilangId, 'multilang', 'place');
+                let place = await Place.findById(modelId);
+                place.multilang.splice(place.multilang.indexOf(multilangId), 1);
+                await place.superupdate(Place, {
+                    multilang: place.multilang
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -300,8 +335,10 @@ module.exports = {
         let dayId = req.params.idDay;
         try {
             if (modelId && dayId) {
-                await relationHelper.addRelation
-                ('Place', 'Day', modelId, dayId, 'days', 'place');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    days: place.days.concat(dayId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -315,8 +352,11 @@ module.exports = {
         let dayId = req.params.idDay;
         try {
             if (modelId && dayId) {
-                await relationHelper.removeRelation
-                ('Place', 'Day', modelId, dayId, 'days', 'place');
+                let place = await Place.findById(modelId);
+                place.days.splice(place.days.indexOf(dayId), 1);
+                await place.superupdate(Place, {
+                    days: place.days
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -330,8 +370,10 @@ module.exports = {
         let hashTagId = req.params.idHashTag;
         try {
             if (modelId && hashTagId) {
-                await relationHelper.addRelation
-                ('Place', 'HashTag', modelId, hashTagId, 'hashTags', 'place');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    hashTags: place.hashTags.concat(hashTagId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -345,8 +387,11 @@ module.exports = {
         let hashTagId = req.params.idHashTag;
         try {
             if (modelId && hashTagId) {
-                await relationHelper.removeRelation
-                ('Place', 'HashTag', modelId, hashTagId, 'hashTags', 'place');
+                let place = await Place.findById(modelId);
+                place.hashTags.splice(place.hashTags.indexOf(hashTagId), 1);
+                await place.superupdate(Place, {
+                    hashTags: place.hashTags
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -360,8 +405,10 @@ module.exports = {
         let topId = req.params.idTop;
         try {
             if (modelId && topId) {
-                await relationHelper.addRelation
-                ('Place', 'TopPlace', modelId, topId, 'tops', 'place');
+                let place = await Place.findById(modelId);
+                await place.superupdate(Place, {
+                    tops: place.tops.concat(tops)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -375,8 +422,11 @@ module.exports = {
         let topId = req.params.idTop;
         try {
             if (modelId && topId) {
-                await relationHelper.removeRelation
-                ('Place', 'TopPlace', modelId, topId, 'tops', 'place');
+                let place = await Place.findById(modelId);
+                place.tops.splice(place.tops.indexOf(topId), 1);
+                await place.superupdate(Place, {
+                    tops: place.tops
+                });
                 res.sendStatus(204);
             } else {
                 throw new Error('Id in path eq null');

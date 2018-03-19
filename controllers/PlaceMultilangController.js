@@ -1,6 +1,5 @@
 let PlaceMultilang = require(global.paths.MODELS + '/PlaceMultilang');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getPlaceMultilangs(req, res) {

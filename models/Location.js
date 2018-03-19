@@ -19,7 +19,7 @@ let LocationSchema = new Schema({
     timestamps: true,
 });
 
-LocationSchema.methods.supersave = async function () {
+LocationSchema.methods.supersave = async function (context) {
     let Place = require('./Place');
 
     let place = await Place.findById(this.place);
@@ -27,6 +27,15 @@ LocationSchema.methods.supersave = async function () {
     if (!place && this.place) {
         throw new Error('Not found related model Place!');
     } else if (place) {
+        await context.update(
+            {place: this.place},
+            {place: null},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            }
+        );
         await Place.findByIdAndUpdate(place._id, {location: this._id}, {
             new: true,
             runValidators: true,
@@ -35,14 +44,23 @@ LocationSchema.methods.supersave = async function () {
     }
     return await this.save();
 };
-LocationSchema.methods.superupdate = async function (newDoc) {
+LocationSchema.methods.superupdate = async function (context, newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let Place = require('./Place');
 
     if (newDoc.place && newDoc.place != this.place) {
         let newPlace = await Place.findById(newDoc.place);
         if (newPlace) {
-            await Place.findByIdAndUpdate(this.place, {location: null},{runValidators: true, context: 'query'});
+            await context.update(
+                {place: newDoc.place},
+                {place: null},
+                {
+                    multi: true,
+                    runValidators: true,
+                    context: 'query'
+                }
+            );
+            await Place.findByIdAndUpdate(this.place, {location: null}, {runValidators: true, context: 'query'});
             await Place.update(
                 {_id: newPlace._id},
                 {location: this._id},

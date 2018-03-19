@@ -1,7 +1,5 @@
 let HashTag = require(global.paths.MODELS + '/HashTag');
-let relationHelper = require(global.paths.HELPERS + '/relationHelper');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getHashTags(req, res) {
@@ -89,8 +87,10 @@ module.exports = {
         let placeId = req.params.idPlace;
         try {
             if (modelId && placeId) {
-                await relationHelper.addRelation
-                ('HashTag', 'Place', modelId, placeId, 'places', 'hashTags');
+                let hashTag = await HashTag.findById(modelId);
+                await hashTag.superupdate(HashTag,{
+                    places: hashTag.places.concat(placeId)
+                });
                 res.sendStatus(201);
             } else {
                 throw new Error('Id in path eq null');
@@ -104,8 +104,11 @@ module.exports = {
         let placeId = req.params.idPlace;
         try {
             if (modelId && placeId) {
-                await relationHelper.removeRelation
-                ('HashTag', 'Place', modelId, placeId, 'places', 'hashTags');
+                let hashTag = await HashTag.findById(modelId);
+                hashTag.places.splice(hashTag.places.indexOf(placeId),1);
+                await hashTag.superupdate(HashTag,{
+                    places: hashTag.places
+                });
                 res.sendStatus(204);
             } else {
                 throw new Error('Id in path eq null');

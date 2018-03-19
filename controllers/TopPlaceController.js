@@ -1,6 +1,5 @@
 let TopPlace = require(global.paths.MODELS + '/TopPlace');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getTopPlaces(req, res) {

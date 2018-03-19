@@ -42,6 +42,30 @@ describe('department relations', function () {
                 await Place.remove();
                 await Promo.remove();
             });
+            it('normal create model with used relations', async function () {
+                let oldDepartment = new Department({
+                    startDate: new Date(),
+                    endDate: new Date()
+                });
+                oldDepartment = await oldDepartment.superupdate(Department,{
+                    promos: [idPromo]
+                });
+                let res = await chai.request('localhost:3000')
+                    .post('/api/departments')
+                    .send({
+                        promos: [idPromo]
+                    });
+                res.status.should.equal(201);
+                res.body.should.be.an('object');
+                res.body.promos.should.lengthOf(1);
+                res.body.promos.should.include(idPromo.toString());
+
+                let promo = await Promo.findById(idPromo);
+                oldDepartment = await Department.findById(oldDepartment);
+
+                promo.author.toString().should.equal(res.body._id.toString());
+                should.equal(oldDepartment.promos.length,0);
+            });
             it('normal create model with relations', async function () {
                 let res = await chai.request('localhost:3000')
                     .post('/api/departments')
@@ -169,7 +193,7 @@ describe('department relations', function () {
                     client: idClient,
                     promos: [idPromo]
                 });
-                department = await department.supersave();
+                department = await department.supersave(Department);
                 let res = await chai.request('localhost:3000')
                     .put('/api/departments/' + department._id)
                     .send({
@@ -205,7 +229,7 @@ describe('department relations', function () {
                         place : idPlace,
                         promos: [idPromo]
                     });
-                    department = await department.supersave();
+                    department = await department.supersave(Department);
                     let res = await chai.request('localhost:3000')
                         .put('/api/departments/' + department._id)
                         .send({
@@ -228,6 +252,29 @@ describe('department relations', function () {
                     client.departments.should.include(department._id);
                     promos.author.toString().should.equal(department._id.toString());
                 }
+            });
+            it('update model with used relations', async function () {
+                let oldDepartment = new Department({});
+                oldDepartment = await oldDepartment.superupdate(Department,{
+                    promos: [idPromo]
+                });
+                let newDepartment = await Department.create({
+                });
+                let res = await chai.request('localhost:3000')
+                    .put('/api/departments/'+newDepartment._id)
+                    .send({
+                        promos: [idPromo]
+                    });
+                res.status.should.equal(201);
+                res.body.should.be.an('object');
+                res.body.promos.should.lengthOf(1);
+                res.body.promos.should.include(idPromo.toString());
+
+                oldDepartment = await Department.findById(oldDepartment._id);
+                let promo = await Promo.findById(idPromo);
+
+                promo.author.toString().should.equal(res.body._id.toString());
+                should.equal(oldDepartment.promos.length,0);
             });
         });
 
@@ -263,7 +310,7 @@ describe('department relations', function () {
                     place: idPlace,
                     promos: [idPromo]
                 });
-                department = await department.supersave();
+                department = await department.supersave(Department);
                 let res = await chai.request('localhost:3000')
                     .delete('/api/departments/' + department._id);
                 res.status.should.equal(204);
@@ -279,107 +326,5 @@ describe('department relations', function () {
         });
     });
 
-    describe('push pull', function () {
-        let idPromo = new mongoose.Types.ObjectId;
-        beforeEach(async function () {
-            await Promo.create({
-                _id: idPromo,
-            });
-        });
-        afterEach(async function () {
-            await Promo.remove({});
-            await Department.remove({});
-        });
-        describe('PUT', function () {
-            it('should add relation to empty model', async function () {
-                let author = await Department.create({});
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/departments/${author._id}/promos/${idPromo}`);
-                let promos = await Promo.findById(idPromo);
-                author = await Department.findById(author._id);
-                res.status.should.equal(201);
-                promos.author.toString().should.equal(author._id.toString());
-                author.promos.should.include(promos._id.toString());
-            });
-            it('should add relation to not empty model', async function () {
-                let promo1 = await Promo.create({});
-                let author = new Department({promos: [promo1._id]});
-                author = await author.supersave();
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/departments/${author._id}/promos/${idPromo}`);
-                promo1 = await Promo.findById(promo1._id);
-                let promo2 = await Promo.findById(idPromo);
-                author = await Department.findById(author._id);
-                res.status.should.equal(201);
-                promo1.author.toString().should.equal(author._id.toString());
-                promo2.author.toString().should.equal(author._id.toString());
-                author.promos.should.include(promo1._id.toString());
-                author.promos.should.include(promo2._id.toString());
-                author.promos.should.lengthOf(2);
-            });
-            it('should not add duplicated relation', async function () {
-                let author = new Department({promos: [idPromo]});
-                author = await author.supersave();
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/departments/${author._id}/promos/${idPromo}`);
-                let promos = await Promo.findById(idPromo);
-                author = await Department.findById(author._id);
-                res.status.should.equal(201);
-                promos.author.toString().should.equal(author._id.toString());
-                author.promos.should.include(promos._id.toString());
-                author.promos.should.lengthOf(1);
-            });
-            it('should not add wrong relation', async function () {
-                try {
-                    var author = await Department.create({});
-                    let res = await chai.request('localhost:3000')
-                        .put(`/api/departments/${author._id}/promos/${new mongoose.Types.ObjectId}`);
-                    if (res.status) should.fail();
-                } catch (e) {
-                    author = await Department.findById(author._id);
-                    e.status.should.equal(400);
-                    should.equal(author.promos.length, 0);
-                }
-            });
-        });
-        describe('DELETE', function () {
-            let idPromo = new mongoose.Types.ObjectId;
-            let idPLaceType = new mongoose.Types.ObjectId;
-            beforeEach(async function () {
-                let promos = await Promo.create({
-                    _id: idPromo,
-                });
-                let author = await Department({
-                    _id : idPLaceType,
-                    promos: [promos]
-                });
-                author = await author.supersave();
-            });
-            afterEach(async function () {
-                await Promo.remove({});
-                await Department.remove({});
-            });
-            it('should delete relation', async function () {
-                let res = await chai.request('localhost:3000')
-                    .delete(`/api/departments/${idPLaceType}/promos/${idPromo}`);
-                let promos = await Promo.findById(idPromo);
-                let author = await Department.findById(idPLaceType);
-                res.status.should.equal(204);
-                should.equal(promos.author,null);
-                should.equal(author.promos.length,0);
-            });
-            it('should not remove wrong relation', async function () {
-                try {
-                    let res = await chai.request('localhost:3000')
-                        .delete(`/api/departments/${idPLaceType}/promos/${new mongoose.Types.ObjectId}`);
-                } catch (e) {
-                    let promos = await Promo.findById(idPromo);
-                    let author = await Department.findById(idPLaceType);
-                    e.status.should.equal(400);
-                    should.equal(author.promos.length, 1);
-                    should.equal(promos.author.toString(), author._id.toString());
-                }
-            });
-        });
-    });
+
 });

@@ -1,6 +1,5 @@
 let Day = require(global.paths.MODELS + '/Day');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getDays(req, res) {

@@ -11,7 +11,7 @@ let EventSchema = new Schema({
     discriminatorKey: 'kind'
 });
 
-EventSchema.methods.supersave = async function () {
+EventSchema.methods.supersave = async function (context) {
     let Department = require('./Department');
     let EventMultilang = require('./EventMultilang');
     let Place = require('./Place');
@@ -25,6 +25,15 @@ EventSchema.methods.supersave = async function () {
     if ((newsMultilangExists === 0 && this.multilang.length !== 0) || (newsMultilangExists !== this.multilang.length)) {
         throw new Error('Not found related model EventMultilang!');
     } else if (newsMultilangExists === this.multilang.length) {
+        await context.update(
+            {multilang: {$in: this.multilang}},
+            {$pullAll: {multilang: this.multilang}},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            }
+        );
         await EventMultilang.update({_id: this.multilang}, {event: this._id}, {
             multi: true,
             runValidators: true,
@@ -56,7 +65,7 @@ EventSchema.methods.supersave = async function () {
     return await this.save();
 };
 
-EventSchema.methods.superupdate = async function (newDoc) {
+EventSchema.methods.superupdate = async function (context,newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let Department = require('./Department');
     let EventMultilang = require('./EventMultilang');
@@ -112,11 +121,20 @@ EventSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
-                await EventMultilang.update({_id: {$in: toAdd}}, {event: this._id}, {
-                    multi: true,
-                    runValidators: true,
-                    context: 'query'
-                });
+                await context.update(
+                    {multilang: {$in: toAdd}},
+                    {$pullAll: {multilang: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
+            await EventMultilang.update({_id: {$in: toAdd}}, {event: this._id}, {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            });
         } else {
             throw new Error('Not found related model multilang!');
         }
@@ -137,18 +155,18 @@ let Place = require('./Place');
 let Department = require('./Department');
 EventSchema.pre('remove', async function (next) {
     try {
-        await Multilang.remove({event : this._id});
+        await Multilang.remove({event: this._id});
         await Place.update(
-            {promos : this._id},
-            {$pull : {promos : this._id}},
+            {promos: this._id},
+            {$pull: {promos: this._id}},
             {
                 multi: true,
                 runValidators: true,
                 context: 'query'
             });
         await Department.update(
-            {promos : this._id},
-            {$pull : {promos : this._id}},
+            {promos: this._id},
+            {$pull: {promos: this._id}},
             {
                 multi: true,
                 runValidators: true,

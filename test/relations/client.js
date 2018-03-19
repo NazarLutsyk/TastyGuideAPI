@@ -305,14 +305,14 @@ describe('client relations', function () {
                     email: 'asda@asd.sds',
                 });
                 await Message.create({
-                    _id:idMessageSender,
-                    value:'aaa',
-                    sender:idClient
+                    _id: idMessageSender,
+                    value: 'aaa',
+                    sender: idClient
                 });
                 await Message.create({
-                    _id:idMessageReceiver,
-                    value:'aaa',
-                    receiver:idClient
+                    _id: idMessageReceiver,
+                    value: 'aaa',
+                    receiver: idClient
                 });
                 let client = await Client.create({
                     _id: idClient,
@@ -335,6 +335,7 @@ describe('client relations', function () {
                 await Department.remove();
                 await Place.remove();
                 await Client.remove();
+                await Message.remove();
             });
             it('normal delete model with relations', async function () {
                 let res = await chai.request('localhost:3000')
@@ -349,40 +350,13 @@ describe('client relations', function () {
                 let messageSender1 = await Message.findById(idMessageSender);
                 let messageReceiver1 = await Message.findById(idMessageReceiver);
 
-                should.equal(complaint1,null);
-                should.equal(rating1,null);
-                should.equal(drinkApp1,null);
-                should.equal(department1,null);
-                should.equal(ownPlace1.boss,null);
-                should.equal(messageSender1.sender,null);
-                should.equal(messageReceiver1.receiver,null);
-            });
-        });
-    });
-    //todo
-    describe('push pull', function () {
-        beforeEach(async function () {
-        });
-        afterEach(async function () {
-        });
-        describe('PUT', function () {
-            it('should add relation to empty model', async function () {
-            });
-            it('should add relation to not empty model', async function () {
-            });
-            it('should not add duplicated relation', async function () {
-            });
-            it('should not add wrong relation', async function () {
-            });
-        });
-        describe('DELETE', function () {
-            beforeEach(async function () {
-            });
-            afterEach(async function () {
-            });
-            it('should delete relation', async function () {
-            });
-            it('should not remove wrong relation', async function () {
+                should.equal(complaint1, null);
+                should.equal(rating1, null);
+                should.equal(drinkApp1, null);
+                should.equal(department1, null);
+                should.equal(ownPlace1.boss, null);
+                should.equal(messageSender1.sender, null);
+                should.equal(messageReceiver1.receiver, null);
             });
         });
     });

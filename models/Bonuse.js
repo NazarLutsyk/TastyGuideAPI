@@ -19,7 +19,7 @@ let BonuseSchema = new Schema({
     discriminatorKey: 'kind'
 });
 
-BonuseSchema.methods.supersave = async function () {
+BonuseSchema.methods.supersave = async function (context) {
     let Department = require('./Department');
     let BonuseMultilang = require('./BonuseMultilang');
     let Place = require('./Place');
@@ -30,9 +30,18 @@ BonuseSchema.methods.supersave = async function () {
     let bonuseMultilangExists = await BonuseMultilang.count({_id: this.multilang});
     let image = await Image.findById(this.image);
 
-    if ((bonuseMultilangExists === 0 && this.multilang.length !== 0) || (bonuseMultilangExists !== this.multilang.length)) {
+    if (this.multilang && this.multilang.length !== bonuseMultilangExists) {
         throw new Error('Not found related model BonuseMultilang!');
     } else if (bonuseMultilangExists === this.multilang.length) {
+        await context.update(
+            {multilang: {$in: this.multilang}},
+            {$pullAll: {multilang: this.multilang}},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            }
+        );
         await BonuseMultilang.update({_id: this.multilang}, {bonuse: this._id}, {
             multi: true,
             runValidators: true,
@@ -64,7 +73,7 @@ BonuseSchema.methods.supersave = async function () {
     return await this.save();
 };
 
-BonuseSchema.methods.superupdate = async function (newDoc) {
+BonuseSchema.methods.superupdate = async function (context, newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let Department = require('./Department');
     let BonuseMultilang = require('./BonuseMultilang');
@@ -110,8 +119,9 @@ BonuseSchema.methods.superupdate = async function (newDoc) {
                     toAdd.push(multilang);
             }
             for (let multilang of this.multilang) {
-                if (newDoc.multilang.indexOf(multilang.toString()) === -1)
+                if (newDoc.multilang.indexOf(multilang) === -1) {
                     toRemove.push(multilang);
+                }
             }
             if (toRemove)
                 await BonuseMultilang.update({_id: {$in: toRemove}}, {bonuse: null}, {
@@ -120,11 +130,20 @@ BonuseSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
-                await BonuseMultilang.update({_id: {$in: toAdd}}, {bonuse: this._id}, {
-                    multi: true,
-                    runValidators: true,
-                    context: 'query'
-                });
+                await context.update(
+                    {multilang: {$in: toAdd}},
+                    {$pullAll: {multilang: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
+            await BonuseMultilang.update({_id: {$in: toAdd}}, {bonuse: this._id}, {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            });
         } else {
             throw new Error('Not found related model multilang!');
         }
@@ -145,18 +164,18 @@ let Place = require('./Place');
 let Department = require('./Department');
 BonuseSchema.pre('remove', async function (next) {
     try {
-        await Multilang.remove({bonuse : this._id});
+        await Multilang.remove({bonuse: this._id});
         await Place.update(
-            {promos : this._id},
-            {$pull : {promos : this._id}},
+            {promos: this._id},
+            {$pull: {promos: this._id}},
             {
                 multi: true,
                 runValidators: true,
                 context: 'query'
             });
         await Department.update(
-            {promos : this._id},
-            {$pull : {promos : this._id}},
+            {promos: this._id},
+            {$pull: {promos: this._id}},
             {
                 multi: true,
                 runValidators: true,

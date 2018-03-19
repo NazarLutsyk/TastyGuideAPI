@@ -23,7 +23,7 @@ HashTagSchema.methods.supersave = async function () {
     if ((count === 0 && this.places.length !== 0) || (count !== this.places.length)) {
         throw new Error('Not found related model Place!');
     } else if (count === this.places.length) {
-        await Place.update({_id: this.places}, {$addToSet: {hashTags: this}}, {multi: true});
+        await Place.update({_id: this.places}, {$addToSet: {hashTags: this}}, {multi: true,runValidators:true});
     }
     return await this.save();
 };

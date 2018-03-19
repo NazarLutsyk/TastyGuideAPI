@@ -11,7 +11,7 @@ let PlaceTypeSchema = new Schema({
     timestamps: true,
 });
 
-PlaceTypeSchema.methods.supersave = async function () {
+PlaceTypeSchema.methods.supersave = async function (context) {
     let PlaceTypeMultilang = require('./PlaceTypeMultilang');
 
     let count = await PlaceTypeMultilang.count({_id: this.multilang});
@@ -19,6 +19,15 @@ PlaceTypeSchema.methods.supersave = async function () {
     if ((count === 0 && this.multilang.length !== 0) || (count !== this.multilang.length)) {
         throw new Error('Not found related model PlaceTypeMultilang!');
     } else if (count === this.multilang.length) {
+        await context.update(
+            {multilang: {$in: this.multilang}},
+            {$pullAll: {multilang: this.multilang}},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            }
+        );
         await PlaceTypeMultilang.update({_id: this.multilang}, {placeType: this._id}, {
             multi: true,
             runValidators: true,
@@ -27,7 +36,7 @@ PlaceTypeSchema.methods.supersave = async function () {
     }
     return await this.save();
 };
-PlaceTypeSchema.methods.superupdate = async function (newDoc) {
+PlaceTypeSchema.methods.superupdate = async function (context, newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let PlaceTypeMultilang = require('./PlaceTypeMultilang');
 
@@ -51,11 +60,20 @@ PlaceTypeSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
-                await PlaceTypeMultilang.update({_id: {$in: toAdd}}, {placeType: this._id}, {
-                    multi: true,
-                    runValidators: true,
-                    context: 'query'
-                });
+                await context.update(
+                    {multilang: {$in: toAdd}},
+                    {$pullAll: {multilang: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
+            await PlaceTypeMultilang.update({_id: {$in: toAdd}}, {placeType: this._id}, {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            });
         } else {
             throw new Error('Not found related model Place!');
         }

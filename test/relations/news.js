@@ -53,6 +53,31 @@ describe('news relations', function () {
                 await Image.remove({});
                 await Department.remove({});
             });
+            it('normal create model with used relations', async function () {
+                let oldNews = new News({
+                });
+                oldNews = await oldNews.superupdate(News,{
+                    multilang: [idMultilang1,idMultilang2]
+                });
+                let res = await chai.request('localhost:3000')
+                    .post('/api/news')
+                    .send({
+                        multilang: [idMultilang1, idMultilang2]
+                    });
+                res.status.should.equal(201);
+                res.body.should.be.an('object');
+                res.body.multilang.should.lengthOf(2);
+                res.body.multilang.should.include(idMultilang1.toString());
+                res.body.multilang.should.include(idMultilang2.toString());
+
+                let oldMultilang1 = await Multilang.findById(idMultilang1);
+                let oldMultilang2 = await Multilang.findById(idMultilang2);
+                oldNews = await News.findById(oldNews);
+
+                oldMultilang1.news.toString().should.equal(res.body._id.toString());
+                oldMultilang2.news.toString().should.equal(res.body._id.toString());
+                should.equal(oldNews.multilang.length,0);
+            });
             it('normal create model with relations', async function () {
                 let res = await chai.request('localhost:3000')
                     .post('/api/news')
@@ -189,7 +214,7 @@ describe('news relations', function () {
                     image: idImage,
                     multilang: [idMultilang1, idMultilang2]
                 });
-                news = await news.supersave();
+                news = await news.supersave(News);
 
                 let res = await chai.request('localhost:3000')
                     .put('/api/news/' + news._id)
@@ -256,7 +281,7 @@ describe('news relations', function () {
                         image: idImage,
                         multilang: [idMultilang1, idMultilang2]
                     });
-                    news = await news.supersave();
+                    news = await news.supersave(News);
                     let res = await chai.request('localhost:3000')
                         .put('/api/news/' + idNews)
                         .send({
@@ -288,6 +313,33 @@ describe('news relations', function () {
                     oldMultilang1.news.toString().should.equal(news._id.toString());
                     oldMultilang2.news.toString().should.equal(news._id.toString());
                 }
+            });
+            it('update model with used relations', async function () {
+                let oldNews = new News({
+                });
+                oldNews = await oldNews.superupdate(News,{
+                    multilang: [idMultilang1,idMultilang2]
+                });
+                let newNews = await News.create({
+                });
+                let res = await chai.request('localhost:3000')
+                    .put('/api/news/'+newNews._id)
+                    .send({
+                        multilang: [idMultilang2]
+                    });
+                res.status.should.equal(201);
+                res.body.should.be.an('object');
+                res.body.multilang.should.lengthOf(1);
+                res.body.multilang.should.include(idMultilang2.toString());
+
+                let oldMultilang1 = await Multilang.findById(idMultilang1);
+                let oldMultilang2 = await Multilang.findById(idMultilang2);
+                oldNews = await News.findById(oldNews._id);
+
+                oldMultilang1.news.toString().should.equal(oldNews._id.toString());
+                oldMultilang2.news.toString().should.equal(res.body._id.toString());
+                should.equal(res.body.multilang.length,1);
+                should.equal(oldNews.multilang.length,1);
             });
         });
 
@@ -334,7 +386,7 @@ describe('news relations', function () {
                     image: idImage,
                     multilang: [idMultilang1, idMultilang2]
                 });
-                news = await news.supersave();
+                news = await news.supersave(News);
                 let res = await chai.request('localhost:3000')
                     .delete('/api/news/' + news._id);
 
@@ -353,115 +405,5 @@ describe('news relations', function () {
         });
     });
 
-    describe('push pull', function () {
-        let idMultilang = new mongoose.Types.ObjectId;
-        beforeEach(async function () {
-            await Multilang.create({
-                _id: idMultilang,
-                header: 'aas',
-                description: 'aas',
-            });
-        });
-        afterEach(async function () {
-            await Multilang.remove({});
-            await News.remove({});
-        });
-        describe('PUT', function () {
-            it('should add relation to empty model', async function () {
-                let news = await News.create({});
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/news/${news._id}/multilangs/${idMultilang}`);
-                let multilang = await Multilang.findById(idMultilang);
-                news = await News.findById(news._id);
-                res.status.should.equal(201);
-                multilang.news.toString().should.equal(news._id.toString());
-                news.multilang.should.include(multilang._id.toString());
-            });
-            it('should add relation to not empty model', async function () {
-                let multilang1 = await Multilang.create({
-                    header: 'aas',
-                    description: 'aas',
-                });
-                let news = new News({multilang: [multilang1._id]});
-                news = await news.supersave();
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/news/${news._id}/multilangs/${idMultilang}`);
-                multilang1 = await Multilang.findById(multilang1._id);
-                let multilang2 = await Multilang.findById(idMultilang);
-                news = await News.findById(news._id);
-                res.status.should.equal(201);
-                multilang1.news.toString().should.equal(news._id.toString());
-                multilang2.news.toString().should.equal(news._id.toString());
-                news.multilang.should.include(multilang1._id.toString());
-                news.multilang.should.include(multilang2._id.toString());
-                news.multilang.should.lengthOf(2);
-            });
-            it('should not add duplicated relation', async function () {
-                let news = new News({multilang: [idMultilang]});
-                news = await news.supersave();
-                let res = await chai.request('localhost:3000')
-                    .put(`/api/news/${news._id}/multilangs/${idMultilang}`);
-                let multilang = await Multilang.findById(idMultilang);
-                news = await News.findById(news._id);
-                res.status.should.equal(201);
-                multilang.news.toString().should.equal(news._id.toString());
-                news.multilang.should.include(multilang._id.toString());
-                news.multilang.should.lengthOf(1);
-            });
-            it('should not add wrong relation', async function () {
-                try {
-                    var news = await News.create({});
-                    let res = await chai.request('localhost:3000')
-                        .put(`/api/news/${news._id}/multilangs/${new mongoose.Types.ObjectId}`);
-                    if (res.status) should.fail();
-                } catch (e) {
-                    news = await News.findById(news._id);
-                    e.status.should.equal(400);
-                    should.equal(news.multilang.length, 0);
-                }
-            });
-        });
-        describe('DELETE', function () {
-            let idMultilang = new mongoose.Types.ObjectId;
-            let idNews = new mongoose.Types.ObjectId;
-            beforeEach(async function () {
-                let multilang = await Multilang.create({
-                    _id: idMultilang,
-                    header: 'aas',
-                    description: 'aas',
-                });
-                let news = await News({
-                    _id: idNews,
-                    multilang: [multilang]
-                });
-                news = await news.supersave();
-            });
-            afterEach(async function () {
-                await Multilang.remove({});
-                await News.remove({});
-            });
-            it('should delete relation', async function () {
-                let res = await chai.request('localhost:3000')
-                    .delete(`/api/news/${idNews}/multilangs/${idMultilang}`);
-                let multilang = await Multilang.findById(idMultilang);
-                let news = await News.findById(idNews);
-                res.status.should.equal(204);
-                should.equal(multilang.news, null);
-                should.equal(news.multilang.length, 0);
-            });
-            it('should not remove wrong relation', async function () {
-                try {
-                    let res = await chai.request('localhost:3000')
-                        .delete(`/api/news/${idNews}/multilangs/${new mongoose.Types.ObjectId}`);
-                } catch (e) {
-                    let multilang = await Multilang.findById(idMultilang);
-                    let news = await News.findById(idNews);
-                    e.status.should.equal(400);
-                    should.equal(news.multilang.length, 1);
-                    should.equal(multilang.news.toString(), news._id.toString());
-                }
-            });
-        });
-    });
 })
 ;

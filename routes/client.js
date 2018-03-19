@@ -32,4 +32,5 @@ router.route('/:id/favoritePlaces/:idPlace')
     .put(permission(),ClientController.addFavouritePlace)
     .delete(permission(),ClientController.removeFavouritePlace);
 
+//todo
 module.exports = router;

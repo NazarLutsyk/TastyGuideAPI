@@ -1,6 +1,5 @@
 let DrinkApplication = require(global.paths.MODELS + '/DrinkApplication');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getDrinkApplications(req, res) {

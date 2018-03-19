@@ -1,6 +1,5 @@
 let Rating = require(global.paths.MODELS + '/Rating');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getRatings(req, res) {

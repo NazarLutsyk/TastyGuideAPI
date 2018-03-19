@@ -11,7 +11,7 @@ let NewsSchema = new Schema({
     discriminatorKey: 'kind'
 });
 
-NewsSchema.methods.supersave = async function () {
+NewsSchema.methods.supersave = async function (context) {
     let Department = require('./Department');
     let NewsMultilang = require('./NewsMultilang');
     let Place = require('./Place');
@@ -25,6 +25,15 @@ NewsSchema.methods.supersave = async function () {
     if ((newsMultilangExists === 0 && this.multilang.length !== 0) || (newsMultilangExists !== this.multilang.length)) {
         throw new Error('Not found related model NewsMultilang!');
     } else if (newsMultilangExists === this.multilang.length) {
+        await context.update(
+            {multilang: {$in: this.multilang}},
+            {$pullAll: {multilang: this.multilang}},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            }
+        );
         await NewsMultilang.update({_id: this.multilang}, {news: this._id}, {
             multi: true,
             runValidators: true,
@@ -56,7 +65,7 @@ NewsSchema.methods.supersave = async function () {
     return await this.save();
 };
 
-NewsSchema.methods.superupdate = async function (newDoc) {
+NewsSchema.methods.superupdate = async function (context,newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let Department = require('./Department');
     let NewsMultilang = require('./NewsMultilang');
@@ -112,6 +121,15 @@ NewsSchema.methods.superupdate = async function (newDoc) {
                     context: 'query'
                 });
             if (toAdd)
+                await context.update(
+                    {multilang: {$in: toAdd}},
+                    {$pullAll: {multilang: toAdd}},
+                    {
+                        multi: true,
+                        runValidators: true,
+                        context: 'query'
+                    }
+                );
                 await NewsMultilang.update({_id: {$in: toAdd}}, {news: this._id}, {
                     multi: true,
                     runValidators: true,
