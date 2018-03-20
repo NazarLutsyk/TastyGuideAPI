@@ -18,12 +18,11 @@
 //todo cors?
 //todo clusters?
 //todo pagination&aggregation?
-//todo place location or locations?
-//todo delete pre save pre delete add statics supersave,superupdate,superdelete
-//todo add transactions to supersave and superupdate
-//todo check push pull relations
-//todo check newDoc in superupdate
-//todo add test to update [id] => []
+//+delete pre save add statics supersave,superupdate,
+//+add transactions
+//todo check authorization
+//+automatically create runtime/logs
+//+check push pull relations
 //+change update controllers to save instead update
 //+stack of places
 //+top place planning

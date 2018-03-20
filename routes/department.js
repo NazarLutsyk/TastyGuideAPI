@@ -13,8 +13,4 @@ router.route('/:id')
     .get(DepartmentController.getDepartmentById)
     .put(permission(Rule.updateDepartment),DepartmentController.updateDepartment)
     .delete(permission(Rule.updateDepartment),DepartmentController.removeDepartment);
-router.route('/:id/promos/:idPromo')
-    .put(permission(),DepartmentController.addPromo)
-    .delete(permission(),DepartmentController.removePromo);
-
 module.exports = router;

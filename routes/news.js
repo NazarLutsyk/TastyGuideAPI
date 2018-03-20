@@ -12,8 +12,4 @@ router.route('/:id')
     .get(NewsController.getNewsById)
     .put(permission(Rule.updatePromo),NewsController.updateNews)
     .delete(permission(Rule.updatePromo),NewsController.removeNews);
-router.route('/:id/multilangs/:idMultilang')
-    .put(permission(),NewsController.addMultilang)
-    .delete(permission(),NewsController.removeMultilang);
-
 module.exports = router;

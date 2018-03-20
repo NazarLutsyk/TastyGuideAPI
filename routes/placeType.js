@@ -11,7 +11,4 @@ router.route('/:id')
     .get(PlaceTypeController.getPlaceTypeById)
     .put(permission(),PlaceTypeController.updatePlaceType)
     .delete(permission(),PlaceTypeController.removePlaceType);
-router.route('/:id/multilangs/:idMultilang')
-    .put(permission(),PlaceTypeController.addMultilang)
-    .delete(permission(),PlaceTypeController.removeMultilang);
 module.exports = router;

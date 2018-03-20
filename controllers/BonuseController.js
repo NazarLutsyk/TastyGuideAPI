@@ -1,7 +1,8 @@
 let Bonuse = require(global.paths.MODELS + '/Bonuse');
 let path = require('path');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-
+let upload = require(global.paths.MIDDLEWARE + '/multer');
+upload = upload.array('images');
 module.exports = {
     async getBonuses(req, res) {
         try {
@@ -43,11 +44,28 @@ module.exports = {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let bonuse = new Bonuse(req.body);
-                bonuse = await bonuse.supersave(Bonuse);
-                res.status(201).json(bonuse);
+                if (bonuse) {
+                    upload(req, res, async function (err) {
+                        if (err) {
+                            return res.status(400).send(err.toString());
+                        } else {
+                            if(!bonuse.images)
+                                bonuse.images = [];
+                            for (let file in req.files) {
+                                let image = req.files[file].path;
+                                bonuse.images.push(image);
+                            }
+                            try {
+                                bonuse = await bonuse.supersave();
+                                res.status(201).json(bonuse);
+                            } catch (e) {
+                                res.status(400).send(e.toString());
+                            }
+                        }
+                    });
+                }
             }
         } catch (e) {
-            console.log(e);
             res.status(400).send(e.toString());
         }
     },
@@ -60,8 +78,24 @@ module.exports = {
             } else {
                 let bonuse = await Bonuse.findById(bonuseId);
                 if (bonuse) {
-                    let updated = await bonuse.superupdate(Bonuse,req.body);
-                    res.status(201).json(updated);
+                    upload(req, res, async function (err) {
+                        if (err) {
+                            return res.status(400).send(err.toString());
+                        } else {
+                            if(!req.body.images)
+                                req.body.images = [];
+                            for (let file in req.files) {
+                                let image = req.files[file].path;
+                                req.body.images.push(image);
+                            }
+                            try {
+                                let updated = await news.superupdate(req.body);
+                                res.status(201).json(updated);
+                            } catch (e) {
+                                res.status(400).send(e.toString());
+                            }
+                        }
+                    });
                 } else {
                     res.sendStatus(404);
                 }
@@ -75,8 +109,20 @@ module.exports = {
         try {
             let bonuse = await Bonuse.findById(bonuseId);
             if (bonuse) {
-                bonuse = await bonuse.remove();
-                res.status(204).json(bonuse);
+                upload(req, res, async function (err) {
+                    if (err) {
+                        return res.status(400).send(err.toString());
+                    } else {
+                        let files = [];
+                        for (let file of req.files) {
+                            let image = file.path;
+                            files.push(image);
+                        }
+                        req.body.images.push(...files);
+                        let updated = await bonuse.superupdate(req.body);
+                        res.status(201).json(updated);
+                    }
+                });
             } else {
                 res.sendStatus(404);
             }
@@ -84,39 +130,4 @@ module.exports = {
             res.status(400).send(e.toString());
         }
     },
-    async addMultilang(req, res) {
-        let modelId = req.params.id;
-        let multilangId = req.params.idMultilang;
-        try {
-            if (modelId && multilangId) {
-                let bonuse = await Bonuse.findById(modelId);
-                await bonuse.superupdate(Bonuse,{
-                    multilang : bonuse.multilang.concat(multilangId)
-                });
-                res.sendStatus(201);
-            } else {
-                throw new Error('Id in path eq null');
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async removeMultilang(req, res) {
-        let modelId = req.params.id;
-        let multilangId = req.params.idMultilang;
-        try {
-            if (modelId && multilangId) {
-                let bonuse = await Bonuse.findById(modelId);
-                bonuse.multilang.splice(bonuse.multilang.indexOf(multilangId),1);
-                await bonuse.superupdate(bonuse,{
-                    multilang: bonuse.multilang
-                });
-                res.sendStatus(204);
-            } else {
-                throw new Error('Id in path eq null');
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    }
 };

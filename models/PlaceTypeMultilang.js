@@ -10,6 +10,7 @@ let PlaceTypeMultilangSchema = new Schema({
     placeType : {
         type : Schema.Types.ObjectId,
         ref: 'PlaceType',
+        required:true
     },
 }, {
     discriminatorKey: 'kind'
@@ -19,52 +20,31 @@ PlaceTypeMultilangSchema.methods.supersave = async function () {
     let PlaceType = require('./PlaceType');
 
     let placeType = await PlaceType.findById(this.placeType);
+    let lang = await Lang.findById(this.lang);
 
     if (!placeType && this.placeType) {
         throw new Error('Not found related model PlaceType!');
-    } else if (placeType) {
-        await PlaceType.findByIdAndUpdate(placeType._id, {$push: {multilang: this._id}}, {
-            new: true,
-            runValidators: true,
-            context: 'query'
-        });
     }
+    if (!lang && this.lang)  {
+        throw new Error('Not found related model Lang!');
+    }
+
     return await this.save();
 };
 PlaceTypeMultilangSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
-    let PlaceType = require('./PlaceType');
+    let Lang = require('./Lang');
 
-    if (newDoc.placeType && newDoc.placeType != this.placeType) {
-        let newPlace = await PlaceType.findById(newDoc.placeType);
-        if (newPlace) {
-            await PlaceType.findByIdAndUpdate(this.placeType, {$pull: {multilang: this._id}}, {
-                runValidators: true,
-                context: 'query'
-            });
-            await PlaceType.update(
-                {_id: newPlace._id},
-                {$addToSet: {multilang: this._id}},
-                {runValidators: true, context: 'query'});
-        } else {
-            throw new Error('Not found related model PlaceType!');
-        }
+    if (newDoc.placeType || newDoc.lang) {
+        throw new Error('Can`t update relations!');
+    }
+    if (newDoc.hasOwnProperty('lang')) {
+        let lang = await Lang.count({_id: newDoc.lang});
+        if (!lang)
+            throw new Error('Not found related model Lang!');
     }
     objectHelper.load(this, newDoc);
     return await this.save();
 };
 
 module.exports = Multilang.discriminator('PlaceTypeMultilang', PlaceTypeMultilangSchema);
-
-let PlaceType = require('./PlaceType');
-PlaceTypeMultilangSchema.pre('remove',async function (next) {
-    try {
-        await PlaceType.update(
-            {multilang: this._id},
-            {$pull: {multilang: this._id}},
-            {multi: true,runValidators: true,context:'query'});
-        return next();
-    } catch (e) {
-        return next(e);
-    }
-});

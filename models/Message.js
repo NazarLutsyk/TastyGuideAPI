@@ -18,10 +18,12 @@ let MessageSchema = new Schema({
     sender: {
         type: Schema.Types.ObjectId,
         ref: 'Client',
+        required:true
     },
     receiver: {
         type: Schema.Types.ObjectId,
         ref: 'Client',
+        required: true
     }
 });
 
@@ -31,7 +33,7 @@ MessageSchema.methods.supersave = async function () {
     let sender = await Client.findById(this.sender);
     let receiver = await Client.findById(this.receiver);
 
-    if ((!sender && this.sender) || (!receiver && this.receiver)) {
+    if (!sender || !receiver) {
         throw new Error('Not found related model Client!');
     }
     return await this.save();

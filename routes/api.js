@@ -24,8 +24,6 @@ router.use('/placeTypeMultilangs', require('./placeTypeMultilang'));
 router.use('/newsMultilangs', require('./newsMultilang'));
 router.use('/bonuseMultilangs', require('./bonuseMultilang'));
 router.use('/eventMultilangs', require('./eventMultilang'));
-router.use('/locations', require('./location'));
 router.use('/messages', require('./message'));
-router.use('/images', require('./image'));
 
 module.exports = router;

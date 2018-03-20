@@ -13,5 +13,4 @@ router.route('/:id')
     .get(ComplaintController.getComplaintById)
     .put(permission(Rule.deleteMessage),ComplaintController.updateComplaint)
     .delete(permission(Rule.deleteMessage),ComplaintController.removeComplaint);
-
 module.exports = router;

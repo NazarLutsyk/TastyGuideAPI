@@ -1,7 +1,8 @@
 let News = require(global.paths.MODELS + '/News');
 let path = require('path');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-
+let upload = require(global.paths.MIDDLEWARE + '/multer');
+upload = upload.array('images');
 module.exports = {
     async getNews(req, res) {
         try {
@@ -43,11 +44,28 @@ module.exports = {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let news = new News(req.body);
-                news = await news.supersave(News);
-                res.status(201).json(news);
+                if (news) {
+                    upload(req, res, async function (err) {
+                        if (err) {
+                            return res.status(400).send(err.toString());
+                        } else {
+                            if(!news.images)
+                                news.images = [];
+                            for (let file in req.files) {
+                                let image = req.files[file].path;
+                                news.images.push(image);
+                            }
+                            try {
+                                news = await news.supersave();
+                                res.status(201).json(news);
+                            } catch (e) {
+                                res.status(400).send(e.toString());
+                            }
+                        }
+                    });
+                }
             }
         } catch (e) {
-            console.log(e);
             res.status(400).send(e.toString());
         }
     },
@@ -60,8 +78,24 @@ module.exports = {
             } else {
                 let news = await News.findById(newsId);
                 if (news) {
-                    let updated = await news.superupdate(News,req.body);
-                    res.status(201).json(updated);
+                    upload(req, res, async function (err) {
+                        if (err) {
+                            return res.status(400).send(err.toString());
+                        } else {
+                            if(!req.body.images)
+                                req.body.images = [];
+                            for (let file in req.files) {
+                                let image = req.files[file].path;
+                                req.body.images.push(image);
+                            }
+                            try {
+                                let updated = await news.superupdate(req.body);
+                                res.status(201).json(updated);
+                            } catch (e) {
+                                res.status(400).send(e.toString());
+                            }
+                        }
+                    });
                 }else {
                     res.sendStatus(404);
                 }
@@ -84,39 +118,4 @@ module.exports = {
             res.status(400).send(e.toString());
         }
     },
-    async addMultilang(req, res) {
-        let modelId = req.params.id;
-        let multilangId = req.params.idMultilang;
-        try {
-            if (modelId && multilangId) {
-                let news = await News.findById(modelId);
-                await news.superupdate(News,{
-                    multilang: news.multilang.concat(multilangId)
-                });
-                res.sendStatus(201);
-            } else {
-                throw new Error('Id in path eq null');
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async removeMultilang(req, res) {
-        let modelId = req.params.id;
-        let multilangId = req.params.idMultilang;
-        try {
-            if (modelId && multilangId) {
-                let news = await News.findById(modelId);
-                news.multilang.splice(news.multilang.indexOf(multilangId),1);
-                await news.superupdate(News,{
-                    multilang: news.multilang
-                });
-                res.sendStatus(204);
-            } else {
-                throw new Error('Id in path eq null');
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    }
 };

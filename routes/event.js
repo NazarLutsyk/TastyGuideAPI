@@ -12,7 +12,5 @@ router.route('/:id')
     .get(EventController.getEventById)
     .put(permission(Rule.updatePromo),EventController.updateEvent)
     .delete(permission(Rule.updatePromo),EventController.removeEvent);
-router.route('/:id/multilangs/:idMultilang')
-    .put(permission(),EventController.addMultilang)
-    .delete(permission(),EventController.removeMultilang);
+
 module.exports = router;

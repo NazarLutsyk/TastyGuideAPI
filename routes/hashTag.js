@@ -12,8 +12,4 @@ router.route('/:id')
     .get(HashTagController.getHashTagById)
     .put(permission(),HashTagController.updateHashTag)
     .delete(permission(),HashTagController.removeHashTag);
-router.route('/:id/places/:idPlace')
-    .put(permission(),HashTagController.addPlace)
-    .delete(permission(),HashTagController.removePlace);
-
 module.exports = router;

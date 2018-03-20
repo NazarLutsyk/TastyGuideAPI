@@ -82,39 +82,4 @@ module.exports = {
             res.status(400).send(e.toString());
         }
     },
-    async addPlace(req, res) {
-        let modelId = req.params.id;
-        let placeId = req.params.idPlace;
-        try {
-            if (modelId && placeId) {
-                let hashTag = await HashTag.findById(modelId);
-                await hashTag.superupdate(HashTag,{
-                    places: hashTag.places.concat(placeId)
-                });
-                res.sendStatus(201);
-            } else {
-                throw new Error('Id in path eq null');
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async removePlace(req, res) {
-        let modelId = req.params.id;
-        let placeId = req.params.idPlace;
-        try {
-            if (modelId && placeId) {
-                let hashTag = await HashTag.findById(modelId);
-                hashTag.places.splice(hashTag.places.indexOf(placeId),1);
-                await hashTag.superupdate(HashTag,{
-                    places: hashTag.places
-                });
-                res.sendStatus(204);
-            } else {
-                throw new Error('Id in path eq null');
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    }
 };

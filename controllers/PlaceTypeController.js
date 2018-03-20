@@ -1,5 +1,6 @@
 let PlaceType = require(global.paths.MODELS + '/PlaceType');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getPlaceTypes(req, res) {
@@ -41,8 +42,7 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
-                let placeType = new PlaceType(req.body);
-                placeType = await placeType.supersave(PlaceType);
+                let placeType = await PlaceType.create(req.body);
                 res.status(201).json(placeType);
             }
         } catch (e) {
@@ -58,7 +58,8 @@ module.exports = {
             } else {
                 let placeType = await PlaceType.findById(placeTypeId);
                 if (placeType) {
-                    let updated = await placeType.superupdate(PlaceType,req.body);
+                    objectHelper.load(placeType, req.body);
+                    let updated = await placeType.save();
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);
@@ -82,39 +83,4 @@ module.exports = {
             res.status(400).send(e.toString());
         }
     },
-    async addMultilang(req, res) {
-        let placeTypeId = req.params.id;
-        let multilangId = req.params.idMultilang;
-        try {
-            if (placeTypeId && multilangId) {
-                let placeType = await PlaceType.findById(placeTypeId);
-                await placeType.superupdate(PlaceType,{
-                    multilang: placeType.multilang.concat(multilangId)
-                });
-                res.sendStatus(201);
-            } else {
-                throw new Error('Id in path eq null');
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    },
-    async removeMultilang(req, res) {
-        let placeTypeId = req.params.id;
-        let multilangId = req.params.idMultilang;
-        try {
-            if (placeTypeId && multilangId) {
-                let placeType = await PlaceType.findById(placeTypeId);
-                placeType.multilang.splice(placeType.multilang.indexOf(multilangId),1);
-                await placeType.superupdate(PlaceType,{
-                    multilang: placeType.multilang
-                });
-                res.sendStatus(204);
-            } else {
-                throw new Error('Id in path eq null');
-            }
-        } catch (e) {
-            res.status(400).send(e.toString());
-        }
-    }
 };

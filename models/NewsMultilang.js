@@ -14,6 +14,7 @@ let NewsMultilangSchema = new Schema({
     news: {
         type: Schema.Types.ObjectId,
         ref: 'News',
+        required: true
     },
 }, {
     discriminatorKey: 'kind'
@@ -23,52 +24,31 @@ NewsMultilangSchema.methods.supersave = async function () {
     let News = require('./News');
 
     let news = await News.findById(this.news);
+    let lang = await Lang.findById(this.lang);
 
     if (!news && this.news) {
         throw new Error('Not found related model News!');
-    } else if (news) {
-        await News.findByIdAndUpdate(news._id, {$push: {multilang: this._id}}, {
-            new: true,
-            runValidators: true,
-            context: 'query'
-        });
     }
+    if (!lang && this.lang)  {
+        throw new Error('Not found related model Lang!');
+    }
+
     return await this.save();
 };
 NewsMultilangSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
-    let News = require('./News');
+    let Lang = require('./Lang');
 
-    if (newDoc.news && newDoc.news != this.news) {
-        let newPlace = await News.findById(newDoc.news);
-        if (newPlace) {
-            await News.findByIdAndUpdate(this.news, {$pull: {multilang: this._id}}, {
-                runValidators: true,
-                context: 'query'
-            });
-            await News.update(
-                {_id: newPlace._id},
-                {$addToSet: {multilang: this._id}},
-                {runValidators: true, context: 'query'});
-        } else {
-            throw new Error('Not found related model News!');
-        }
+    if (newDoc.news || newDoc.lang) {
+        throw new Error('Can`t update relations!');
+    }
+    if (newDoc.hasOwnProperty('lang')) {
+        let lang = await Lang.count({_id: newDoc.lang});
+        if (!lang)
+            throw new Error('Not found related model Lang!');
     }
     objectHelper.load(this, newDoc);
     return await this.save();
 };
 
 module.exports = Multilang.discriminator('NewsMultilang', NewsMultilangSchema);
-
-let Promo = require('./News');
-NewsMultilangSchema.pre('remove', async function (next) {
-    try {
-        await Promo.update(
-            {multilang: this._id},
-            {$pull: {multilang: this._id}},
-            {multi: true,runValidators:true,context:'query'});
-        return next();
-    } catch (e) {
-        return next(e);
-    }
-});
