@@ -13,4 +13,3 @@ router.route('/:id')
     .put(permission(Rules.updatePlace),PlaceController.updatePlace)
     .delete(permission(Rules.updatePlace),PlaceController.removePlace);
 module.exports = router;
-//todo

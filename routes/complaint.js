@@ -11,6 +11,6 @@ router.route('/')
     .post(ComplaintController.createComplaint);
 router.route('/:id')
     .get(ComplaintController.getComplaintById)
-    .put(permission(Rule.deleteMessage),ComplaintController.updateComplaint)
-    .delete(permission(Rule.deleteMessage),ComplaintController.removeComplaint);
+    .put(permission(Rule.updateComplaint),ComplaintController.updateComplaint)
+    .delete(permission(Rule.updateComplaint),ComplaintController.removeComplaint);
 module.exports = router;

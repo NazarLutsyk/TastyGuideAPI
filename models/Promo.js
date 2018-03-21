@@ -25,15 +25,10 @@ let PromoSchema = new Schema({
 module.exports = mongoose.model('Promo', PromoSchema);
 
 PromoSchema.methods.supersave = async function () {
-    let Department = require('./Department');
     let Place = require('./Place');
 
-    let author = await Department.findById(this.author);
     let place = await Place.findById(this.place);
 
-    if (!author && this.author) {
-        throw new Error('Not found related model Department!');
-    }
     if (!place && this.place) {
         throw new Error('Not found related model Place!');
     }
@@ -44,14 +39,17 @@ PromoSchema.methods.supersave = async function () {
 PromoSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let fileHelper = require(global.paths.HELPERS + '/fileHelper');
+    let path = require('path');
 
     if (newDoc.author || newDoc.place) {
         throw new Error('Can`t update relations!');
     }
     if (newDoc.images) {
-        for (let oldImage of this.images) {
+        for (let i = 0; i < this.images.length; i++) {
+            let oldImage = this.images[i];
             if (newDoc.images.indexOf(oldImage) === -1) {
-                fileHelper.deleteFiles(oldImage)
+                let toDelete = global.paths.PUBLIC+"/upload/promo/"+oldImage;
+                fileHelper.deleteFiles(toDelete);
             }
         }
     }
@@ -60,9 +58,14 @@ PromoSchema.methods.superupdate = async function (newDoc) {
 };
 PromoSchema.pre('remove', async function (next) {
     let fileHelper = require(global.paths.HELPERS + '/fileHelper');
+    let path = require('path');
     try {
         if (this.images.length > 0) {
-            fileHelper.deleteFiles(this.images)
+            for (let i = 0; i < this.images.length; i++) {
+                let image = this.images[i];
+                let toDelete = global.paths.PUBLIC+"/upload/promo/"+image;
+                fileHelper.deleteFiles(toDelete);
+            }
         }
         return next();
     } catch (e) {

@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.route('/')
     .get(PlaceMultilangController.getPlaceMultilangs)
-    .post(permission(Rule.updatePlaceMultilang),PlaceMultilangController.createPlaceMultilang);
+    .post(permission(Rule.createPlaceMultilang),PlaceMultilangController.createPlaceMultilang);
 router.route('/:id')
     .get(PlaceMultilangController.getPlaceMultilangById)
     .put(permission(Rule.updatePlaceMultilang),PlaceMultilangController.updatePlaceMultilang)

@@ -15,7 +15,7 @@ let BonuseMultilangSchema = new Schema({
         type: String,
         required: true
     },
-    bonuse: {
+    promo: {
         type: Schema.Types.ObjectId,
         ref: 'Bonuse',
         required: true
@@ -28,10 +28,10 @@ BonuseMultilangSchema.methods.supersave = async function () {
     let Bonuse = require('./Bonuse');
     let Lang = require('./Lang');
 
-    let bonuse = await Bonuse.findById(this.bonuse);
+    let promo = await Bonuse.findById(this.promo);
     let lang = await Lang.findById(this.lang);
 
-    if (!bonuse && this.bonuse) {
+    if (!promo && this.promo) {
         throw new Error('Not found related model Bonuse!');
     }
     if (!lang && this.lang)  {
@@ -43,7 +43,7 @@ BonuseMultilangSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let Lang = require('./Lang');
 
-    if (newDoc.bonuse || newDoc.lang) {
+    if (newDoc.promo || newDoc.lang) {
         throw new Error('Can`t update relations!');
     }
     if (newDoc.hasOwnProperty('lang')) {

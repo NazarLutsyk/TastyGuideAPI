@@ -1,10 +1,11 @@
+let path = require('path');
 let Place = require(global.paths.MODELS + '/Place');
+let Department = require(global.paths.MODELS + '/Department');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 let ROLES = require(global.paths.CONFIG + '/roles');
-let upload = require(global.paths.MIDDLEWARE + '/multer');
+let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC,'upload','place'));
 upload = upload.array('images');
 
-let path = require('path');
 module.exports = {
     async getPlaces(req, res) {
         try {
@@ -54,12 +55,16 @@ module.exports = {
                             if (!place.images)
                                 place.images = [];
                             for (let file in req.files) {
-                                let image = req.files[file].path;
+                                let image = req.files[file].filename;
                                 place.images.push(image);
                             }
                             try {
-                                place.boss = req.user._id;
                                 place = await place.supersave();
+                                await Department.create({
+                                    client: req.user._id,
+                                    place: place._id,
+                                    roles: [ROLES.PLACE_ROLES.BOSS_ROLE]
+                                });
                                 res.status(201).json(place);
                             } catch (e) {
                                 res.status(400).send(e.toString());
@@ -81,28 +86,24 @@ module.exports = {
             } else {
                 let place = await Place.findById(placeId);
                 if (place) {
-                    if (req.body.boss && req.user.roles.indexOf(ROLES.GLOBAL_ROLES.ADMIN_ROLE) == -1) {
-                        res.sendStatus(403);
-                    } else {
-                        upload(req, res, async function (err) {
-                            if (err) {
-                                return res.status(400).send(err.toString());
-                            } else {
-                                if (!req.body.images)
-                                    req.body.images = [];
-                                for (let file in req.files) {
-                                    let image = req.files[file].path;
-                                    req.body.images.push(image);
-                                }
-                                try {
-                                    let updated = await place.superupdate(req.body);
-                                    res.status(201).json(updated);
-                                } catch (e) {
-                                    res.status(400).send(e.toString());
-                                }
+                    upload(req, res, async function (err) {
+                        if (err) {
+                            return res.status(400).send(err.toString());
+                        } else {
+                            if (!req.body.images)
+                                req.body.images = [];
+                            for (let file in req.files) {
+                                let image = req.files[file].filename;
+                                req.body.images.push(image);
                             }
-                        });
-                    }
+                            try {
+                                let updated = await place.superupdate(req.body);
+                                res.status(201).json(updated);
+                            } catch (e) {
+                                res.status(400).send(e.toString());
+                            }
+                        }
+                    });
                 } else {
                     res.sendStatus(404);
                 }
@@ -122,7 +123,6 @@ module.exports = {
                 res.sendStatus(404);
             }
         } catch (e) {
-            console.log(e);
             res.status(400).send(e.toString());
         }
     },

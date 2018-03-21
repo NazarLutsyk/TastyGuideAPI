@@ -1,7 +1,7 @@
 let News = require(global.paths.MODELS + '/News');
 let path = require('path');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let upload = require(global.paths.MIDDLEWARE + '/multer');
+let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC,'upload','promo'));
 upload = upload.array('images');
 module.exports = {
     async getNews(req, res) {
@@ -52,10 +52,11 @@ module.exports = {
                             if(!news.images)
                                 news.images = [];
                             for (let file in req.files) {
-                                let image = req.files[file].path;
+                                let image = req.files[file].filename;
                                 news.images.push(image);
                             }
                             try {
+                                news.author = req.user._id;
                                 news = await news.supersave();
                                 res.status(201).json(news);
                             } catch (e) {
@@ -85,7 +86,7 @@ module.exports = {
                             if(!req.body.images)
                                 req.body.images = [];
                             for (let file in req.files) {
-                                let image = req.files[file].path;
+                                let image = req.files[file].filename;
                                 req.body.images.push(image);
                             }
                             try {

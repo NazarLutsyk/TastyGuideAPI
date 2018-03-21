@@ -1,22 +1,34 @@
 let Department = require(global.paths.MODELS + '/Department');
 let Place = require(global.paths.MODELS + '/Place');
-let PlaceMultilang = require(global.paths.MODELS + '/PlaceMultilang');
+let Multilang = require(global.paths.MODELS + '/PlaceMultilang');
 module.exports = {
+    async createPlaceMultilang(req, res, next) {
+        let user = req.user;
+        let placeId = req.body.place;
+
+        let allowed = await Department.count({
+            client: user._id,
+            place: placeId
+        });
+        if (allowed > 0) {
+            next();
+        } else {
+            res.sendStatus(403);
+        }
+    },
     async updatePlaceMultilang(req, res, next) {
         let user = req.user;
-        let multilangId = req.params.id;
-        if (user && user.departments && user.departments.length > 0) {
-            let placeMultilang = await PlaceMultilang.findById(multilangId);
-            let place = await Place.findById(placeMultilang.place);
-            let allowed = await Department.count({
-                place: place.place,
-                client: user.departments
-            });
-            if (allowed > 0) {
-                next();
-            } else {
-                res.sendStatus(403);
-            }
+        let multilangId = req.body.id;
+
+        let multilang = await Multilang.findById(multilangId);
+        let place = await Place.findOne({_id: multilang.place});
+
+        let allowed = await Department.count({
+            client: user._id,
+            place: place._id
+        });
+        if (allowed > 0) {
+            next();
         } else {
             res.sendStatus(403);
         }

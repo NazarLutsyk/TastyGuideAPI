@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.route('/')
     .get(EventController.getEvents)
-    .post(permission(Rule.updatePromo),EventController.createEvent);
+    .post(permission(Rule.createPromo),EventController.createEvent);
 router.route('/:id')
     .get(EventController.getEventById)
     .put(permission(Rule.updatePromo),EventController.updateEvent)

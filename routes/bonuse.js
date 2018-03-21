@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.route('/')
     .get(BonuseController.getBonuses)
-    .post(permission(Rule.updatePromo),BonuseController.createBonuse);
+    .post(permission(Rule.createPromo),BonuseController.createBonuse);
 router.route('/:id')
     .get(BonuseController.getBonuseById)
     .put(permission(Rule.updatePromo),BonuseController.updateBonuse)

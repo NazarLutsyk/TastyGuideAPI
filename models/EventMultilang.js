@@ -11,7 +11,7 @@ let EventMultilangSchema = new Schema({
         type: String,
         required: true
     },
-    event: {
+    promo: {
         type: Schema.Types.ObjectId,
         ref: 'Event',
         required: true
@@ -23,10 +23,10 @@ let EventMultilangSchema = new Schema({
 EventMultilangSchema.methods.supersave = async function () {
     let Event = require('./Event');
 
-    let event = await Event.findById(this.event);
+    let promo = await Event.findById(this.promo);
     let lang = await Lang.findById(this.lang);
 
-    if (!event) {
+    if (!promo) {
         throw new Error('Not found related model Event!');
     }
     if (!lang) {
@@ -38,7 +38,7 @@ EventMultilangSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let Lang = require('./Lang');
 
-    if (newDoc.event) {
+    if (newDoc.promo) {
         throw new Error('Can`t update relations!');
     }
     if (newDoc.hasOwnProperty('lang')) {

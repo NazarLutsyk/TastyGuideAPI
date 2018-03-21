@@ -1,8 +1,8 @@
 let Event = require(global.paths.MODELS + '/Event');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let upload = require(global.paths.MIDDLEWARE + '/multer');
-upload = upload.array('images');
 let path = require('path');
+let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC,'upload','promo'));
+upload = upload.array('images');
 module.exports = {
     async getEvents(req, res) {
         try {
@@ -52,10 +52,11 @@ module.exports = {
                             if(!event.images)
                                 event.images = [];
                             for (let file in req.files) {
-                                let image = req.files[file].path;
+                                let image = req.files[file].filename;
                                 event.images.push(image);
                             }
                             try {
+                                event.author = req.user._id;
                                 event = await event.supersave();
                                 res.status(201).json(event);
                             } catch (e) {
@@ -87,7 +88,7 @@ module.exports = {
                             if(!req.body.images)
                                 req.body.images = [];
                             for (let file in req.files) {
-                                let image = req.files[file].path;
+                                let image = req.files[file].filename;
                                 req.body.images.push(image);
                             }
                             try {

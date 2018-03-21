@@ -11,7 +11,7 @@ let NewsMultilangSchema = new Schema({
         type: String,
         required: true
     },
-    news: {
+    promo: {
         type: Schema.Types.ObjectId,
         ref: 'News',
         required: true
@@ -23,10 +23,10 @@ let NewsMultilangSchema = new Schema({
 NewsMultilangSchema.methods.supersave = async function () {
     let News = require('./News');
 
-    let news = await News.findById(this.news);
+    let promo = await News.findById(this.promo);
     let lang = await Lang.findById(this.lang);
 
-    if (!news && this.news) {
+    if (!promo && this.promo) {
         throw new Error('Not found related model News!');
     }
     if (!lang && this.lang)  {
@@ -39,7 +39,7 @@ NewsMultilangSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let Lang = require('./Lang');
 
-    if (newDoc.news || newDoc.lang) {
+    if (newDoc.promo || newDoc.lang) {
         throw new Error('Can`t update relations!');
     }
     if (newDoc.hasOwnProperty('lang')) {

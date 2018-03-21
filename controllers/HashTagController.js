@@ -1,5 +1,6 @@
 let HashTag = require(global.paths.MODELS + '/HashTag');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 
 module.exports = {
     async getHashTags(req, res) {
@@ -41,8 +42,7 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let hashTag = new HashTag(req.body);
-                hashTag = await hashTag.supersave();
+                let hashTag = await HashTag.create(req.body);
                 res.status(201).json(hashTag);
             }
         } catch (e) {
@@ -58,7 +58,8 @@ module.exports = {
             } else {
                 let hashTag = await HashTag.findById(hashTagId);
                 if (hashTag) {
-                    let updated = await hashTag.superupdate(req.body);
+                    objectHelper.load(lang, req.body);
+                    let updated = await hashTag.save();
                     res.status(201).json(updated);
                 }else {
                     res.sendStatus(404);

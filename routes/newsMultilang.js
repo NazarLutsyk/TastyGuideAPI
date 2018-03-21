@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.route('/')
     .get(NewsMultilangController.getNewsMultilangs)
-    .post(permission(Rules.updatePromoMultilang),NewsMultilangController.createNewsMultilang);
+    .post(permission(Rules.createPromoMultilang),NewsMultilangController.createNewsMultilang);
 router.route('/:id')
     .get(NewsMultilangController.getNewsMultilangById)
     .put(permission(Rules.updatePromoMultilang),NewsMultilangController.updateNewsMultilang)

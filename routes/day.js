@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.route('/')
     .get(DayController.getDays)
-    .post(permission(Rule.updateDay),DayController.createDay);
+    .post(permission(Rule.createDay),DayController.createDay);
 router.route('/:id')
     .get(DayController.getDayById)
     .put(permission(Rule.updateDay),DayController.updateDay)

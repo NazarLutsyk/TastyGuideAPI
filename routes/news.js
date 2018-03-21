@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.route('/')
     .get(NewsController.getNews)
-    .post(permission(Rule.updatePromo),NewsController.createNews);
+    .post(permission(Rule.createPromo),NewsController.createNews);
 router.route('/:id')
     .get(NewsController.getNewsById)
     .put(permission(Rule.updatePromo),NewsController.updateNews)

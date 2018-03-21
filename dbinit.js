@@ -13,11 +13,9 @@ Promo = require('./models/Promo');
 PlaceType = require('./models/PlaceType');
 Lang = require('./models/Lang');
 Day = require('./models/Day');
-Location = require('./models/Location');
 TopPlace = require('./models/TopPlace');
 HashTag = require('./models/HashTag');
 Place = require('./models/Place');
-Image = require('./models/Image');
 Complaint = require('./models/Complaint');
 DrinkApplication = require('./models/DrinkApplication');
 Rating = require('./models/Rating');
@@ -105,255 +103,38 @@ let message2;
 async function createModels() {
     lang1 = await Lang.create({name: 'eng'});
     lang2 = await Lang.create({name: 'ukr'});
-    lang3 = await Lang.create({name: 'fr'});
-    location1 = await Location.create({ltg: 50, lng: 45.5});
-    location2 = await Location.create({ltg: 78, lng: 32});
     placeType1 = await PlaceType.create({});
     placeType2 = await PlaceType.create({});
-    topPlace1 = await TopPlace.create({
-        startDate: Date(),
-        endDate: Date(),
-        price: 10000,
-        actual: true
+    placeTypeM1 = await PlaceTypeMultilang.create({
+        name: 'placeType',
+        placeType: placeType1,
+        lang: lang1
     });
-    topPlace2 = await TopPlace.create({
-        startDate: Date(),
-        endDate: Date(),
-        price: 888,
-        actual: true
+    placeTypeM2 = await PlaceTypeMultilang.create({
+        name: 'placeType',
+        placeType: placeType1,
+        lang: lang2
     });
-    topPlace3 = await TopPlace.create({
-        startDate: Date(),
-        endDate: Date(),
-        price: 755,
-        actual: true
+    placeTypeM3 = await PlaceTypeMultilang.create({
+        name: 'placeType',
+        placeType: placeType2,
+        lang: lang1
     });
-    topPlace4 = await TopPlace.create({
-        startDate: Date(),
-        endDate: Date(),
-        price: 9999,
-        actual: false
+    placeTypeM4 = await PlaceTypeMultilang.create({
+        name: 'placeType',
+        placeType: placeType2,
+        lang: lang2
     });
     hashTag1 = await HashTag.create({value: '#hash'});
     hashTag2 = await HashTag.create({value: '#buhar'});
     hashTag3 = await HashTag.create({value: '#lalalala'});
     hashTag4 = await HashTag.create({value: '#qqqq'});
-    day1 = await Day.create({
-        startTime: Date(),
-        endTime: Date()
-    });
-    day2 = await Day.create({
-        startTime: Date(),
-        endTime: Date()
-    });
-    day3 = await Day.create({
-        startTime: Date(),
-        endTime: Date()
-    });
-    day4 = await Day.create({
-        startTime: Date(),
-        endTime: Date()
-    });
-    day5 = await Day.create({
-        startTime: Date(),
-        endTime: Date()
-    });
-    news1 = await News.create({});
-    news2 = await News.create({});
-    bonuse1 = await Bonuse.create({
-        startDate: Date(),
-        endDate: Date()
-    });
-    bonuse2 = await Bonuse.create({
-        startDate: Date(),
-        endDate: Date()
-    });
-    event1 = await Event.create({});
-    event2 = await Event.create({});
-    eventM1 = await EventMultilang.create({
-        header: 'header',
-        description: 'descr'
-    });
-    eventM2 = await EventMultilang.create({
-        header: 'header',
-        description: 'descr'
-    });
-    eventM3 = await EventMultilang.create({
-        header: 'header',
-        description: 'descr'
-    });
-    eventM4 = await EventMultilang.create({
-        header: 'header',
-        description: 'descr'
-    });
-    bonuseM1 = await BonuseMultilang.create({
-        header: 'header',
-        description: 'descr',
-        conditions: 'conditions'
-    });
-    bonuseM2 = await BonuseMultilang.create({
-        header: 'header',
-        description: 'descr',
-        conditions: 'conditions'
-    });
-    bonuseM3 = await BonuseMultilang.create({
-        header: 'header',
-        description: 'descr',
-        conditions: 'conditions'
-    });
-    bonuseM4 = await BonuseMultilang.create({
-        header: 'header',
-        description: 'descr',
-        conditions: 'conditions'
-    });
-    newsM1 = await NewsMultilang.create({
-        header: 'header',
-        description: 'descr'
-    });
-    newsM2 = await NewsMultilang.create({
-        header: 'header',
-        description: 'descr'
-    });
-    newsM3 = await NewsMultilang.create({
-        header: 'header',
-        description: 'descr'
-    });
-    newsM4 = await NewsMultilang.create({
-        header: 'header',
-        description: 'descr'
-    });
-    placeTypeM1 = await PlaceTypeMultilang.create({
-        name: 'placeType'
-    });
-    placeTypeM2 = await PlaceTypeMultilang.create({
-        name: 'placeType'
-    });
-    placeTypeM3 = await PlaceTypeMultilang.create({
-        name: 'placeType'
-    });
-    placeTypeM4 = await PlaceTypeMultilang.create({
-        name: 'placeType'
-    });
-    placeM1 = await PlaceMultilang.create({
-        name: 'place name',
-        description: 'descr'
-    });
-    placeM2 = await PlaceMultilang.create({
-        name: 'place name',
-        description: 'descr'
-    });
-    placeM3 = await PlaceMultilang.create({
-        name: 'place name',
-        description: 'descr'
-    });
-    placeM4 = await PlaceMultilang.create({
-        name: 'place name',
-        description: 'descr'
-    });
-    place1 = await Place.create({
-        phone: '355875545722',
-        email: 'someemail@mail.com',
-        averagePrice: 7000,
-        reviews: 300,
-        allowed: true
-    });
-    place2 = await Place.create({
-        phone: '355875545722',
-        email: 'someemail@mail.com',
-        averagePrice: 7000,
-        reviews: 300,
-        allowed: true
-    });
-    image1 = await Image.create({
-        name: 'xxx',
-        extension: '.jpg',
-        path: '/public/upload'
-    });
-    image2 = await Image.create({
-        name: 'porn',
-        extension: '.png',
-        path: '/public/upload'
-    });
-    image3 = await Image.create({
-        name: 'yaaah',
-        extension: '.jpeg',
-        path: '/public/upload'
-    });
-    complaint1 = await Complaint.create({
-        value: 'So,so,so! huevo!'
-    });
-    complaint2 = await Complaint.create({
-        value: 'So,so,so! huevo!'
-    });
-    complaint3 = await Complaint.create({
-        value: 'So,so,so! huevo!'
-    });
-    complaint4 = await Complaint.create({
-        value: 'So,so,so! huevo!'
-    });
-    app1 = await DrinkApplication.create({
-        friends: 'I with my friends',
-        goal: 'poebatsa',
-        budged: 30,
-        date: Date(),
-    });
-    app2 = await DrinkApplication.create({
-        friends: 'I with my friends',
-        goal: 'poebatsa',
-        budged: 30,
-        date: Date(),
-    });
-    app3 = await DrinkApplication.create({
-        friends: 'I with my friends',
-        goal: 'poebatsa',
-        budged: 30,
-        date: Date(),
-    });
-    app4 = await DrinkApplication.create({
-        friends: 'I with my friends',
-        goal: 'poebatsa',
-        budged: 30,
-        date: Date(),
-    });
-    rating1 = await Rating.create({
-        value: 5,
-        comment: 'Duze faino',
-        price: 200,
-    });
-    rating2 = await Rating.create({
-        value: 5,
-        comment: 'Duze faino',
-        price: 200,
-    });
-    rating3 = await Rating.create({
-        value: 5,
-        comment: 'Duze faino',
-        price: 200,
-    });
-    rating4 = await Rating.create({
-        value: 5,
-        comment: 'Duze faino',
-        price: 200,
-    });
-    department1 = await Department.create({
-        roles: ['ADMIN_PLACE']
-    });
-    department2 = await Department.create({
-        roles: ['ADMIN_PLACE']
-    });
-    department3 = await Department.create({
-        roles: ['ADMIN_PLACE']
-    });
-    department4 = await Department.create({
-        roles: ['ADMIN_PLACE']
-    });
     client1 = await Client.create({
         name: 'Tasik',
         surname: 'Panasik',
         city: 'Jopsk',
         phone: '355875545722',
         email: 'someemail@mail.com',
-        roles: ['USER'],
         avatar: '/public/upload/default.jpg'
     });
     client2 = await Client.create({
@@ -362,9 +143,9 @@ async function createModels() {
         city: 'Jopsk',
         phone: '355875545722',
         email: 'someemail@mail.com',
-        roles: ['USER'],
         avatar: '/public/upload/default.jpg'
     });
+    //todo favorite place
     message1 = await Message.create({
         value: 'Idi suka nahui!',
         sender: client2,
@@ -375,91 +156,323 @@ async function createModels() {
         sender: client1,
         receiver: client2,
     });
+    place1 = await Place.create({
+        phone: '355875545722',
+        email: 'someemail@mail.com',
+        averagePrice: 7000,
+        reviews: 300,
+        allowed: true,
+        location:{
+            ltg : 442,
+            lng: 774
+        },
+        images : ['/public/upload/default.jpg'],
+        types: [placeType1],
+        hashTags: [hashTag1,hashTag2]
+    });
+    place2 = await Place.create({
+        phone: '355875545722',
+        email: 'someemail@mail.com',
+        averagePrice: 7000,
+        reviews: 300,
+        allowed: true,
+        location:{
+            ltg : 442,
+            lng: 774
+        },
+        images : ['/public/upload/default.jpg'],
+        types: [placeType2],
+        hashTags: [hashTag3,hashTag4]
+    });
+    topPlace1 = await TopPlace.create({
+        startDate: Date(),
+        endDate: Date(),
+        price: 10000,
+        actual: true,
+        place:place1
+    });
+    topPlace2 = await TopPlace.create({
+        startDate: Date(),
+        endDate: Date(),
+        price: 888,
+        actual: true,
+        place:place1
+    });
+    topPlace3 = await TopPlace.create({
+        startDate: Date(),
+        endDate: Date(),
+        price: 755,
+        actual: true,
+        place:place2
+    });
+    topPlace4 = await TopPlace.create({
+        startDate: Date(),
+        endDate: Date(),
+        price: 9999,
+        actual: false,
+        place:place2
+    });
+    day1 = await Day.create({
+        startTime: Date(),
+        endTime: Date(),
+        place:place1
+    });
+    day2 = await Day.create({
+        startTime: Date(),
+        endTime: Date(),
+        place:place1
+    });
+    day4 = await Day.create({
+        startTime: Date(),
+        endTime: Date(),
+        place:place2
+    });
+    day5 = await Day.create({
+        startTime: Date(),
+        endTime: Date(),
+        place:place2
+    });
+    placeM1 = await PlaceMultilang.create({
+        name: 'place name',
+        description: 'descr',
+        place:place1,
+        lang: lang1
+    });
+    placeM2 = await PlaceMultilang.create({
+        name: 'place name',
+        description: 'descr',
+        place:place1,
+        lang: lang2
+    });
+    placeM3 = await PlaceMultilang.create({
+        name: 'place name',
+        description: 'descr',
+        place:place2,
+        lang: lang1
+    });
+    placeM4 = await PlaceMultilang.create({
+        name: 'place name',
+        description: 'descr',
+        place:place2,
+        lang: lang2
+    });
+    department1 = await Department.create({
+        roles: ['BOSS_PLACE'],
+        client:client1,
+        place:place1
+    });
+    department2 = await Department.create({
+        roles: ['ADMIN_PLACE'],
+        client:client1,
+        place:place1
+    });
+    department3 = await Department.create({
+        roles: ['BOSS_PLACE'],
+        client:client2,
+        place:place2
+    });
+    department4 = await Department.create({
+        roles: ['ADMIN_PLACE'],
+        client:client2,
+        place:place2
+    });
+    complaint1 = await Complaint.create({
+        value: 'So,so,so! huevo!',
+        client:client1,
+        place:place1
+    });
+    complaint2 = await Complaint.create({
+        value: 'So,so,so! huevo!',
+        client:client1,
+        place:place1
+    });
+    complaint3 = await Complaint.create({
+        value: 'So,so,so! huevo!',
+        client:client2,
+        place:place2
+    });
+    complaint4 = await Complaint.create({
+        value: 'So,so,so! huevo!',
+        client:client2,
+        place:place2
+    });
+    app1 = await DrinkApplication.create({
+        friends: 'I with my friends',
+        goal: 'poebatsa',
+        budged: 30,
+        date: Date(),
+        organizer:client1,
+        place:place1
+    });
+    app2 = await DrinkApplication.create({
+        friends: 'I with my friends',
+        goal: 'poebatsa',
+        budged: 30,
+        date: Date(),
+        organizer:client1,
+        place:place1
+    });
+    app3 = await DrinkApplication.create({
+        friends: 'I with my friends',
+        goal: 'poebatsa',
+        budged: 30,
+        date: Date(),
+        organizer:client2,
+        place:place2
+    });
+    app4 = await DrinkApplication.create({
+        friends: 'I with my friends',
+        goal: 'poebatsa',
+        budged: 30,
+        date: Date(),
+        organizer:client2,
+        place:place2
+    });
+    rating1 = await Rating.create({
+        value: 5,
+        comment: 'Duze faino',
+        price: 200,
+        client:client1,
+        place:place1
+    });
+    rating2 = await Rating.create({
+        value: 5,
+        comment: 'Duze faino',
+        price: 200,
+        client:client1,
+        place:place1
+    });
+    rating3 = await Rating.create({
+        value: 5,
+        comment: 'Duze faino',
+        price: 200,
+        client:client2,
+        place:place2
+    });
+    rating4 = await Rating.create({
+        value: 5,
+        comment: 'Duze faino',
+        price: 200,
+        client:client2,
+        place:place2
+    });
+    news1 = await News.create({
+        author:department1,
+        place:place1,
+        images:['/public/upload/default.jpg']
+    });
+    news2 = await News.create({
+        author:department2,
+        place:place2,
+        images:['/public/upload/default.jpg']
+    });
+    bonuse1 = await Bonuse.create({
+        startDate: Date(),
+        endDate: Date(),
+        author:department1,
+        place:place1,
+        images:['/public/upload/default.jpg']
+    });
+    bonuse2 = await Bonuse.create({
+        startDate: Date(),
+        endDate: Date(),
+        author:department2,
+        place:place2,
+        images:['/public/upload/default.jpg']
+    });
+    event1 = await Event.create({
+        author:department1,
+        place:place1,
+        images:['/public/upload/default.jpg']
+    });
+    event2 = await Event.create({
+        author:department2,
+        place:place2,
+        images:['/public/upload/default.jpg']
+    });
+    eventM1 = await EventMultilang.create({
+        header: 'header',
+        description: 'descr',
+        promo: event1,
+        lang:lang1,
+    });
+    eventM2 = await EventMultilang.create({
+        header: 'header',
+        description: 'descr',
+        promo: event1,
+        lang:lang2
+    });
+    eventM3 = await EventMultilang.create({
+        header: 'header',
+        description: 'descr',
+        promo: event2,
+        lang:lang1
+    });
+    eventM4 = await EventMultilang.create({
+        header: 'header',
+        description: 'descr',
+        promo: event2,
+        lang:lang2
+    });
+    bonuseM1 = await BonuseMultilang.create({
+        header: 'header',
+        description: 'descr',
+        conditions: 'conditions',
+        promo: bonuse1,
+        lang: lang1
+    });
+    bonuseM2 = await BonuseMultilang.create({
+        header: 'header',
+        description: 'descr',
+        conditions: 'conditions',
+        promo: bonuse1,
+        lang: lang2
+    });
+    bonuseM3 = await BonuseMultilang.create({
+        header: 'header',
+        description: 'descr',
+        conditions: 'conditions',
+        promo: bonuse2,
+        lang: lang1
+    });
+    bonuseM4 = await BonuseMultilang.create({
+        header: 'header',
+        description: 'descr',
+        conditions: 'conditions',
+        promo: bonuse2,
+        lang: lang2
+    });
+    newsM1 = await NewsMultilang.create({
+        header: 'header',
+        description: 'descr',
+        promo: news1,
+        lang: lang1
+    });
+    newsM2 = await NewsMultilang.create({
+        header: 'header',
+        description: 'descr',
+        promo: news1,
+        lang: lang2
+    });
+    newsM3 = await NewsMultilang.create({
+        header: 'header',
+        description: 'descr',
+        promo: news2,
+        lang: lang1
+    });
+    newsM4 = await NewsMultilang.create({
+        header: 'header',
+        description: 'descr',
+        promo: news2,
+        lang: lang2
+    });
+    await Client.update({_id:client1},{$push:{favoritePlaces:place1}});
+    await Client.update({_id:client2},{$push:{favoritePlaces:place2}});
     return 'done';
-}
-
-async function addRelations() {
-    await place1.superupdate(Place,{
-        location : location1,
-        images: [image1,image2],
-        types : [placeType1],
-        boss: client1,
-        promos: [event1,bonuse1,news1],
-        complaints:[complaint1,complaint2],
-        drinkApplications:[app1,app2],
-        ratings:[rating1,rating2],
-        departments:[department1,department2],
-        multilang:[placeM1,placeM2],
-        days: [day1,day2,day3],
-        hashTags: [hashTag1,hashTag2,hashTag3],
-        tops:[topPlace1,topPlace2]
-    });
-    await place2.superupdate(Place,{
-        location : location2,
-        images: [image2,image3],
-        types : [placeType2],
-        boss: client2,
-        promos: [event2,bonuse2,news2],
-        complaints:[complaint4,complaint3],
-        drinkApplications:[app4,app3],
-        ratings:[rating4,rating3],
-        departments:[department4,department3],
-        multilang:[placeM3,placeM4],
-        days: [day4],
-        hashTags: [hashTag3,hashTag4],
-        tops:[topPlace3,topPlace4]
-    });
-    await client1.superupdate(Client,{
-        ownPlaces:[place1],
-        drinkApplications:[app1,app2],
-        complaints:[complaint1,complaint2],
-        ratings:[rating1,rating2],
-        departments:[department1,department2],
-        favoritePlaces:[place1]
-    });
-    await client2.superupdate(Client,{
-        ownPlaces:[place2],
-        drinkApplications:[app3,app4],
-        complaints:[complaint3,complaint4],
-        ratings:[rating3,rating4],
-        departments:[department3,department4],
-        favoritePlaces:[place2]
-    });
-    await placeType1.superupdate(PlaceType,{
-        multilang: [placeTypeM1,placeTypeM2]
-    });
-    await placeType2.superupdate(PlaceType,{
-        multilang: [placeTypeM3,placeTypeM4]
-    });
-    await news1.superupdate(News,{
-        multilang:[newsM1,newsM2],
-        author:department1
-    });
-    await news2.superupdate(News,{
-        multilang:[newsM3,newsM4],
-        author:department2
-    });
-    await event1.superupdate(Event,{
-        multilang:[eventM1,eventM2],
-        author:department3
-    });
-    await event2.superupdate(Event,{
-        multilang:[eventM3,eventM4],
-        author:department4
-    });
-    await bonuse1.superupdate(Bonuse,{
-        multilang:[bonuseM1,bonuseM2],
-        author:department1
-    });
-    await bonuse2.superupdate(Bonuse,{
-        multilang:[bonuseM3,bonuseM4],
-        author:department4
-    });
 }
 
 async function dbInit() {
     await createModels();
-    await addRelations();
 }
 
 dbInit()

@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.route('/')
     .get(DepartmentController.getDepartments)
-    .post(permission(Rule.updateDepartment),DepartmentController.createDepartment);
+    .post(permission(Rule.createDepartment),DepartmentController.createDepartment);
 router.route('/:id')
     .get(DepartmentController.getDepartmentById)
     .put(permission(Rule.updateDepartment),DepartmentController.updateDepartment)

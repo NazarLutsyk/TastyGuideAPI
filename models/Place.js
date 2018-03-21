@@ -42,36 +42,33 @@ let PlaceSchema = new Schema({
             type: Number,
         },
     },
-    images: {
-        type: [{
-            type: String
-        }]
-    },
-    boss: {
+    images: [String],
+    types: [{
         type: Schema.Types.ObjectId,
-        ref: 'Client',
-        required: true
-    },
-    types: {
-        type: [{
-            type: Schema.Types.ObjectId,
-            ref: 'PlaceType',
-        }],
-    },
+        ref: 'PlaceType',
+    }],
+    hashTags: [{
+        type: Schema.Types.ObjectId,
+        ref: 'HashTag'
+    }],
 }, {
     timestamps: true,
 });
 
 PlaceSchema.methods.supersave = async function () {
     let PlaceType = require('./PlaceType');
-    let Client = require('./Client');
+    let HashTag = require('./HashTag');
 
-    let client = await Client.findById(this.boss);
     let placeTypeExists = await PlaceType.count(this.types);
+    let hashTagExists = await HashTag.count({_id: this.hashTags});
 
+    if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== this.hashTags.length)) {
+        throw new Error('Not found related model HashTag!');
+    }
     if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== this.types.length)) {
         throw new Error('Not found related model PlaceType!');
     }
+
     return await this.save();
 };
 
@@ -80,20 +77,24 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let fileHelper = require(global.paths.HELPERS + '/fileHelper');
     let PlaceType = require('./PlaceType');
-    let Client = require('./Client');
+    let HashTag = require('./HashTag');
 
-    let count = await PlaceType.count({_id: newDoc.types});
-    let clientExists = await Client.count({_id: newDoc.boss});
-    if ((count === 0 && this.types.length !== 0) || (count !== this.types.length)) {
+    let placeTypeExists = await PlaceType.count({_id: newDoc.types});
+    let hashTagExists = await HashTag.count({_id: newDoc.hashTags});
+
+
+    if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== this.hashTags.length)) {
+        throw new Error('Not found related model HashTag!');
+    }
+    if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== this.types.length)) {
         throw new Error('Not found related model PlaceType!');
     }
-    if (!clientExists && newDoc.boss) {
-        throw new Error('Not found related model Client!');
-    }
     if (newDoc.images) {
-        for (let oldImage of this.images) {
+        for (let i = 0; i < this.images.length; i++) {
+            let oldImage = this.images[i];
             if (newDoc.images.indexOf(oldImage) === -1) {
-                fileHelper.deleteFiles(oldImage)
+                let toDelete = global.paths.PUBLIC+"/upload/place/"+oldImage;
+                fileHelper.deleteFiles(toDelete);
             }
         }
     }
@@ -125,16 +126,16 @@ PlaceSchema.pre('remove', async function (next) {
         let multilangs = await Multilang.remove({place: this._id});
         let fileHelper = require(global.paths.HELPERS + '/fileHelper');
 
-        await HashTag.update(
-            {places: this._id},
-            {$pull: {places: this._id}},
-            {multi: true, runValidators: true, context: 'query'});
         await Client.update(
             {favoritePlaces: this._id},
             {$pull: {favoritePlaces: this._id}},
             {multi: true, runValidators: true, context: 'query'});
         if (this.images.length > 0) {
-            fileHelper.deleteFiles(this.images)
+            for (let i = 0; i < this.images.length; i++) {
+                let image = this.images[i];
+                let toDelete = global.paths.PUBLIC+"/upload/place/"+image;
+                fileHelper.deleteFiles(toDelete);
+            }
         }
         return next();
     } catch (e) {

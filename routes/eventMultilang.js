@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.route('/')
     .get(EventMultilangController.getEventMultilangs)
-    .post(permission(Rules.updatePromoMultilang),EventMultilangController.createEventMultilang);
+    .post(permission(Rules.createPromoMultilang),EventMultilangController.createEventMultilang);
 router.route('/:id')
     .get(EventMultilangController.getEventMultilangById)
     .put(permission(Rules.updatePromoMultilang),EventMultilangController.updateEventMultilang)

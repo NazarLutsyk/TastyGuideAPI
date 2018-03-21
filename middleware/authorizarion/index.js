@@ -11,9 +11,9 @@ module.exports = function (rule, ...allowed) {
     }
 
     return (req, res, next) => {
-        //todo
-        // if (req.user.roles.indexOf(ROLES.GLOBAL_ROLES.ADMIN_ROLE) != -1 || req.user.roles.indexOf(ROLES.GLOBAL_ROLES.USER_ROLE) != -1){
+        // if (req.user.roles.indexOf(ROLES.GLOBAL_ROLES.ADMIN_ROLE) != -1){
             return next();
+            //todo
         // }
         if (typeof rule != 'function' && rule) {
             allowed.push(rule);

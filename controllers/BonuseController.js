@@ -1,7 +1,7 @@
 let Bonuse = require(global.paths.MODELS + '/Bonuse');
 let path = require('path');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let upload = require(global.paths.MIDDLEWARE + '/multer');
+let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC,'upload','promo'));
 upload = upload.array('images');
 module.exports = {
     async getBonuses(req, res) {
@@ -52,10 +52,11 @@ module.exports = {
                             if(!bonuse.images)
                                 bonuse.images = [];
                             for (let file in req.files) {
-                                let image = req.files[file].path;
+                                let image = req.files[file].filename;
                                 bonuse.images.push(image);
                             }
                             try {
+                                bonuse.author = req.user._id;
                                 bonuse = await bonuse.supersave();
                                 res.status(201).json(bonuse);
                             } catch (e) {
@@ -85,7 +86,7 @@ module.exports = {
                             if(!req.body.images)
                                 req.body.images = [];
                             for (let file in req.files) {
-                                let image = req.files[file].path;
+                                let image = req.files[file].filename;
                                 req.body.images.push(image);
                             }
                             try {

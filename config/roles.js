@@ -5,6 +5,7 @@ module.exports = {
         CRITIC : "CRITIC"
     },
     PLACE_ROLES: {
-        ADMIN_ROLE : "ADMIN_PLACE"
+        BOSS_ROLE : "BOSS_PLACE",
+        ADMIN_ROLE : "ADMIN_PLACE",
     }
 };
