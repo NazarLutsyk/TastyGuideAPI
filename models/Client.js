@@ -85,14 +85,6 @@ ClientSchema.pre('remove', async function (next) {
         await DrinkApplication.remove({organizer: this._id});
         await Rating.remove({client: this._id});
         await Department.remove({client: this._id});
-        await Place.update(
-            {boss: this._id},
-            {boss: null},
-            {
-                multi: true,
-                runValidators: true,
-                context: 'query'
-            });
         await Message.update(
             {sender: this._id},
             {sender: null},

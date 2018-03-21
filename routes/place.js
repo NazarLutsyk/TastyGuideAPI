@@ -11,5 +11,5 @@ router.route('/')
 router.route('/:id')
     .get(PlaceController.getPlaceById)
     .put(permission(Rules.updatePlace),PlaceController.updatePlace)
-    .delete(permission(Rules.updatePlace),PlaceController.removePlace);
+    .delete(permission(Rules.deletePlace),PlaceController.removePlace);
 module.exports = router;

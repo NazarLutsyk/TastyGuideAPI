@@ -9,7 +9,7 @@ let MessageSchema = new Schema({
     },
     date: {
         type: Date,
-        default: Date.now(),
+        default: new Date(),
     },
     seen: {
         type: Boolean,

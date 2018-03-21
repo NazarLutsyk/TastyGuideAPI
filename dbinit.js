@@ -145,7 +145,6 @@ async function createModels() {
         email: 'someemail@mail.com',
         avatar: '/public/upload/default.jpg'
     });
-    //todo favorite place
     message1 = await Message.create({
         value: 'Idi suka nahui!',
         sender: client2,

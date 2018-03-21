@@ -41,6 +41,7 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
+                req.body.organizer = req.user._id;
                 let drinkApp = new DrinkApplication(req.body);
                 drinkApp = await drinkApp.supersave();
                 res.status(201).json(drinkApp);

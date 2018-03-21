@@ -41,6 +41,7 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
+                req.body.client = req.user._id;
                 let complaint = new Complaint(req.body);
                 complaint = await complaint.supersave();
                 res.status(201).json(complaint);

@@ -8,7 +8,6 @@ const router = express.Router();
 
 router.route('/')
     .get(ClientController.getClients);
-    // .post(ClientController.createClient);
 router.route('/:id')
     .get(ClientController.getClientById)
     .put(permission(Rule.updateClient),ClientController.updateClient)

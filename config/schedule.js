@@ -29,7 +29,6 @@ setInterval(async function () {
         for (let topPlace of topPlaces) {
             if (now >= topPlace.endDate) {
                 await TopPlace.findByIdAndUpdate(topPlace._id,{actual : false});
-                console.log('ok');
             }
         }
     }

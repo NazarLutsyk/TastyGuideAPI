@@ -43,24 +43,19 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', index);
-app.use('/api',/*passportMiddleware.isLoggedIn,*/ api);//todo
+app.use('/api',passportMiddleware.isLoggedIn, api);
 app.use('/auth',user);
 app.use('/mail',mail);
 
-// catch 404 and forward to error handler
 app.use(function (req, res, next) {
     let err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
-// error handler
 app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-    // render the error page
     res.sendStatus(err.status || 500);
 });
 

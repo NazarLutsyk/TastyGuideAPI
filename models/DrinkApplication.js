@@ -57,10 +57,18 @@ DrinkApplicationSchema.methods.supersave = async function () {
 
 DrinkApplicationSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let Place = require('./Place');
 
-    if (newDoc.place || newDoc.organizer) {
+    if (newDoc.organizer) {
         throw new Error('Can`t update relations!');
     }
+    if (newDoc.hasOwnProperty('place')) {
+        let place = await Place.count({_id: newDoc.place});
+        if (!place) {
+            throw new Error('Not found related model Place!');
+        }
+    }
+
     objectHelper.load(this, newDoc);
     return await this.save()
 };

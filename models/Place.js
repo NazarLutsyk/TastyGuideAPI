@@ -31,8 +31,7 @@ let PlaceSchema = new Schema({
         default: false,
     },
     avatar: {
-        type: Schema.Types.ObjectId,
-        ref: 'Image'
+        type: String
     },
     location: {
         ltg: {

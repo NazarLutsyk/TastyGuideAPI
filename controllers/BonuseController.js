@@ -108,22 +108,10 @@ module.exports = {
     async removeBonuse(req, res) {
         let bonuseId = req.params.id;
         try {
-            let bonuse = await Bonuse.findById(bonuseId);
+            let bonuse = await Event.findById(bonuseId);
             if (bonuse) {
-                upload(req, res, async function (err) {
-                    if (err) {
-                        return res.status(400).send(err.toString());
-                    } else {
-                        let files = [];
-                        for (let file of req.files) {
-                            let image = file.path;
-                            files.push(image);
-                        }
-                        req.body.images.push(...files);
-                        let updated = await bonuse.superupdate(req.body);
-                        res.status(201).json(updated);
-                    }
-                });
+                bonuse = await bonuse.remove();
+                res.status(204).json(bonuse);
             } else {
                 res.sendStatus(404);
             }
