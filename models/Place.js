@@ -58,7 +58,7 @@ PlaceSchema.methods.supersave = async function () {
     let PlaceType = require('./PlaceType');
     let HashTag = require('./HashTag');
 
-    let placeTypeExists = await PlaceType.count(this.types);
+    let placeTypeExists = await PlaceType.count({_id: this.types});
     let hashTagExists = await HashTag.count({_id: this.hashTags});
 
     if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== this.hashTags.length)) {

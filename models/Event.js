@@ -11,7 +11,7 @@ module.exports = Promo.discriminator('Event', EventSchema);
 let Multilang = require('./EventMultilang');
 EventSchema.pre('remove', async function (next) {
     try {
-        await Multilang.remove({event: this._id});
+        await Multilang.remove({promo: this._id});
         return next();
     } catch (e) {
         return next(e);

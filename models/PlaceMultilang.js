@@ -38,7 +38,7 @@ PlaceMultilangSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require(global.paths.HELPERS + '/objectHelper');
     let Lang = require('./Lang');
 
-    if (newDoc.place || newDoc.lang) {
+    if (newDoc.place) {
         throw new Error('Can`t update relations!');
     }
     if (newDoc.hasOwnProperty('lang')) {
