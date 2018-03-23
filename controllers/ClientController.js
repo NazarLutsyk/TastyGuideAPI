@@ -7,7 +7,9 @@ module.exports = {
             let clientsQuery = Client
                 .find(req.query.query)
                 .sort(req.query.sort)
-                .select(req.query.fields);
+                .select(req.query.fields)
+                .skip(req.query.skip)
+                .limit(req.query.limit);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
                     clientsQuery.populate(populateField);

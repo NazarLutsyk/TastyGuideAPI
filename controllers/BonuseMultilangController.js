@@ -7,7 +7,9 @@ module.exports = {
             let bonuseMultilangQuery = BonuseMultilang
                 .find(req.query.query)
                 .sort(req.query.sort)
-                .select(req.query.fields);
+                .select(req.query.fields)
+                .skip(req.query.skip)
+                .limit(req.query.limit);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
                     bonuseMultilangQuery.populate(populateField);

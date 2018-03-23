@@ -20,7 +20,6 @@ Complaint = require('./models/Complaint');
 DrinkApplication = require('./models/DrinkApplication');
 Rating = require('./models/Rating');
 Department = require('./models/Department');
-Currency = require('./models/Currency');
 Client = require('./models/Client');
 Message = require('./models/Message');
 
@@ -29,9 +28,6 @@ mongoose.connect('mongodb://localhost/drinker');
 
 let lang1;
 let lang2;
-let lang3;
-let location1;
-let location2;
 let placeType1;
 let placeType2;
 let topPlace1;
@@ -46,7 +42,6 @@ let day1;
 let day2;
 let day3;
 let day4;
-let day5;
 let news1;
 let news2;
 let bonuse1;
@@ -75,9 +70,6 @@ let placeM3;
 let placeM4;
 let place1;
 let place2;
-let image1;
-let image2;
-let image3;
 let complaint1;
 let complaint2;
 let complaint3;
@@ -221,12 +213,12 @@ async function createModels() {
         endTime: Date(),
         place:place1
     });
-    day4 = await Day.create({
+    day3 = await Day.create({
         startTime: Date(),
         endTime: Date(),
         place:place2
     });
-    day5 = await Day.create({
+    day4 = await Day.create({
         startTime: Date(),
         endTime: Date(),
         place:place2

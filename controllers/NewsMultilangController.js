@@ -7,7 +7,9 @@ module.exports = {
             let newsMultilangQuery = NewsMultilang
                 .find(req.query.query)
                 .sort(req.query.sort)
-                .select(req.query.fields);
+                .select(req.query.fields)
+                .skip(req.query.skip)
+                .limit(req.query.limit);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
                     newsMultilangQuery.populate(populateField);

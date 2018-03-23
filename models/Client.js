@@ -18,6 +18,7 @@ let ClientSchema = new Schema({
     },
     password: {
         type: String,
+        select: false,
         validate: {
             validator: function () {
                 return this.password.length >= 4;
