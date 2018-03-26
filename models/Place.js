@@ -26,6 +26,10 @@ let PlaceSchema = new Schema({
         type: Number,
         default: 0
     },
+    rating: {
+        type: Number,
+        default: 0,
+    },
     allowed: {
         type: Boolean,
         default: false,
@@ -52,7 +56,32 @@ let PlaceSchema = new Schema({
     }],
 }, {
     timestamps: true,
+    toJSON: {
+        getters: true,
+    },
+    toObject: {
+        getters: true,
+    }
 });
+
+PlaceSchema.statics.loadAsyncValues = async function (docs) {
+    let Rating = require('./Rating');
+    if (docs) {
+        if (!Array.isArray(docs))
+            docs = [docs];
+        for (let doc of docs) {
+            let rating = await Rating.aggregate([
+                {$match: {place: doc._id}},
+                {$group: {_id: doc._id, avg: {$avg: '$value'}}}
+            ]);
+            if (rating && rating.length > 0)
+                doc.rating = rating[0].avg;
+            else
+                doc.rating = 0;
+        }
+    }
+};
+
 
 PlaceSchema.methods.supersave = async function () {
     let PlaceType = require('./PlaceType');
@@ -92,7 +121,7 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
         for (let i = 0; i < this.images.length; i++) {
             let oldImage = this.images[i];
             if (newDoc.images.indexOf(oldImage) === -1) {
-                let toDelete = global.paths.PUBLIC+"/upload/place/"+oldImage;
+                let toDelete = global.paths.PUBLIC + "/upload/place/" + oldImage;
                 fileHelper.deleteFiles(toDelete);
             }
         }
@@ -132,7 +161,7 @@ PlaceSchema.pre('remove', async function (next) {
         if (this.images.length > 0) {
             for (let i = 0; i < this.images.length; i++) {
                 let image = this.images[i];
-                let toDelete = global.paths.PUBLIC+"/upload/place/"+image;
+                let toDelete = global.paths.PUBLIC + "/upload/place/" + image;
                 fileHelper.deleteFiles(toDelete);
             }
         }

@@ -3,7 +3,7 @@ let Place = require(global.paths.MODELS + '/Place');
 let Department = require(global.paths.MODELS + '/Department');
 let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 let ROLES = require(global.paths.CONFIG + '/roles');
-let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC,'upload','place'));
+let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC, 'upload', 'place'));
 upload = upload.array('images');
 
 module.exports = {
@@ -21,6 +21,7 @@ module.exports = {
                 }
             }
             let places = await placeQuery.exec();
+            await Place.loadAsyncValues(places);
             res.json(places);
         } catch (e) {
             res.status(400).send(e.toString());
@@ -37,6 +38,7 @@ module.exports = {
                 }
             }
             let place = await PlaceQuery.exec();
+            await Place.loadAsyncValues(place);
             res.json(place);
         } catch (e) {
             res.status(400).send(e.toString());
