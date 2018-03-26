@@ -8,6 +8,7 @@ let session = require('express-session');
 let MongoStorage = require('connect-mongo')(session);
 let passport = require('passport');
 let helmet = require('helmet');
+let cors = require('cors');
 require('./config/path');
 require('./config/winston');
 require('./config/passport/index');
@@ -24,6 +25,7 @@ const app = express();
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/drinker');
 
+app.use(cors());
 app.use(helmet());
 app.use(express.static(path.join(__dirname,'public')));
 
