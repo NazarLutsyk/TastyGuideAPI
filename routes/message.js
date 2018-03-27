@@ -7,7 +7,7 @@ let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Message');
 const router = express.Router();
 
 router.route('/')
-    .get(permission(),MessageController.getMessages)
+    .get(MessageController.getMessages)
     .post(MessageController.createMessage);
 router.route('/:id')
     .get(permission(Rule.getMessage),MessageController.getMessageById)

@@ -5,6 +5,7 @@ module.exports = {
     async getMessages(req, res) {
         try {
             let messageQuery = Message
+                .find({$or:[{receiver:req.user._id},{sender:req.user._id}]})
                 .find(req.query.query)
                 .sort(req.query.sort)
                 .select(req.query.fields)
@@ -43,6 +44,7 @@ module.exports = {
             if (err){
                 throw new Error('Unknown fields ' + err);
             } else {
+                req.body.sender = req.user._id;
                 let message = new Message(req.body);
                 message = await message.supersave();
                 res.status(201).json(message);
