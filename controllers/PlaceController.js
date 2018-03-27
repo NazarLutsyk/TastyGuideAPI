@@ -69,6 +69,7 @@ module.exports = {
                                     place: place._id,
                                     roles: [ROLES.PLACE_ROLES.BOSS_ROLE]
                                 });
+                                await Place.loadAsyncValues(place);
                                 res.status(201).json(place);
                             } catch (e) {
                                 res.status(400).send(e.toString());
@@ -102,6 +103,7 @@ module.exports = {
                             }
                             try {
                                 let updated = await place.superupdate(req.body);
+                                await Place.loadAsyncValues(updated);
                                 res.status(201).json(updated);
                             } catch (e) {
                                 res.status(400).send(e.toString());

@@ -5,7 +5,7 @@ let UserController = require(global.paths.CONTROLLERS + '/UserController');
 
 router.post('/local/signup', PassportMiddleware.notLoggedIn, UserController.signUp);
 router.post('/local/signin', PassportMiddleware.notLoggedIn, UserController.signIn);
-router.post('/logout', PassportMiddleware.isLoggedIn, UserController.logout);
+router.get('/logout', PassportMiddleware.isLoggedIn, UserController.logout);
 
 router.get('/facebook', passport.authenticate('facebook'));
 router.get('/facebook/callback',
@@ -23,7 +23,7 @@ router.get('/google/callback',
     UserController.googleAuth);
 
 
-router.post('/principal', function (req, res) {
+router.get('/principal', function (req, res) {
     res.json({
         user: req.user
     });
