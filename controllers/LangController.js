@@ -5,15 +5,20 @@ let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 module.exports = {
     async getLangs(req, res) {
         try {
-            let langQuery = Lang
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    langQuery.populate(populateField);
+            let langQuery;
+            if (req.query.aggregate) {
+                langQuery = Lang.aggregate(req.query.aggregate);
+            } else {
+                langQuery = Lang
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        langQuery.populate(populateField);
+                    }
                 }
             }
             let langs = await langQuery.exec();

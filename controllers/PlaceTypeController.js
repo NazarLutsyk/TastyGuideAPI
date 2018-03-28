@@ -5,15 +5,20 @@ let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 module.exports = {
     async getPlaceTypes(req, res) {
         try {
-            let placeTypeQuery = PlaceType
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    placeTypeQuery.populate(populateField);
+            let placeTypeQuery;
+            if (req.query.aggregate) {
+                placeTypeQuery = PlaceType.aggregate(req.query.aggregate);
+            } else {
+                placeTypeQuery = PlaceType
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        placeTypeQuery.populate(populateField);
+                    }
                 }
             }
             let placeTypes = await placeTypeQuery.exec();

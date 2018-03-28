@@ -10,12 +10,14 @@ module.exports = {
                 let skip = req.query.skip;
                 let limit = req.query.limit;
                 let populate = req.query.populate;
-                req.query.fields = fields ? QueryHelper.toSelect(fields) : {};
-                req.query.sort = sort ? QueryHelper.toSort(sort) : {};
-                req.query.query = query ? JSON.parse(query) : {};
-                req.query.populate = populate ? QueryHelper.toPopulate(populate) : '';
+                let aggregate = req.query.aggregate;
+                req.query.fields = fields ? QueryHelper.toSelect(fields) : null;
+                req.query.sort = sort ? QueryHelper.toSort(sort) : null;
+                req.query.query = query ? JSON.parse(query) : null;
+                req.query.aggregate = aggregate ? JSON.parse(aggregate) : null;
+                req.query.populate = populate ? QueryHelper.toPopulate(populate) : null;
                 req.query.skip = skip ? +skip : 0;
-                req.query.limit = limit ? +limit : '';
+                req.query.limit = limit ? +limit : null;
                 return next();
             } catch (e) {
                 return next(e);

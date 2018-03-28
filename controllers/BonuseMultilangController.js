@@ -4,15 +4,20 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getBonuseMultilangs(req, res) {
         try {
-            let bonuseMultilangQuery = BonuseMultilang
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    bonuseMultilangQuery.populate(populateField);
+            let bonuseMultilangQuery;
+            if (req.query.aggregate) {
+                bonuseMultilangQuery = BonuseMultilang.aggregate(req.query.aggregate);
+            } else {
+                bonuseMultilangQuery = BonuseMultilang
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        bonuseMultilangQuery.populate(populateField);
+                    }
                 }
             }
             let bonuseMultilang = await bonuseMultilangQuery.exec();

@@ -7,9 +7,9 @@ const router = express.Router();
 
 router.route('/')
     .get(PlaceController.getPlaces)
-    .post(PlaceController.createPlace);
+    .post(permission(Rules.updatable),PlaceController.createPlace);
 router.route('/:id')
     .get(PlaceController.getPlaceById)
-    .put(permission(Rules.updatePlace),PlaceController.updatePlace)
+    .put(permission(Rules.updatePlace),permission(Rules.updatable),PlaceController.updatePlace)
     .delete(permission(Rules.deletePlace),PlaceController.removePlace);
 module.exports = router;

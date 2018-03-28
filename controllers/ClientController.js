@@ -4,18 +4,23 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getClients(req, res) {
         try {
-            let clientsQuery = Client
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    clientsQuery.populate(populateField);
+            let clientQuery;
+            if (req.query.aggregate) {
+                clientQuery = Client.aggregate(req.query.aggregate);
+            } else {
+                clientQuery = Client
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        clientQuery.populate(populateField);
+                    }
                 }
             }
-            let clients = await clientsQuery.exec();
+            let clients = await clientQuery.exec();
             res.json(clients);
         } catch (e) {
             res.status(400).send(e.toString());

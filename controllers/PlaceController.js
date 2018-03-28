@@ -9,15 +9,20 @@ upload = upload.array('images');
 module.exports = {
     async getPlaces(req, res) {
         try {
-            let placeQuery = Place
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    placeQuery.populate(populateField);
+            let placeQuery;
+            if (req.query.aggregate) {
+                placeQuery = Place.aggregate(req.query.aggregate);
+            } else {
+                placeQuery = Place
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        placeQuery.populate(populateField);
+                    }
                 }
             }
             let places = await placeQuery.exec();
@@ -38,6 +43,8 @@ module.exports = {
                 }
             }
             let place = await PlaceQuery.exec();
+            place.reviews++;
+            place = await place.save();
             await Place.loadAsyncValues(place);
             res.json(place);
         } catch (e) {

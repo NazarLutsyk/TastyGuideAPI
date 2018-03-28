@@ -4,15 +4,20 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getPlaceTypeMultilangs(req, res) {
         try {
-            let placeTypeMultilangQuery = PlaceTypeMultilang
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    placeTypeMultilangQuery.populate(populateField);
+            let placeTypeMultilangQuery;
+            if (req.query.aggregate) {
+                placeTypeMultilangQuery = PlaceTypeMultilang.aggregate(req.query.aggregate);
+            } else {
+                placeTypeMultilangQuery = PlaceTypeMultilang
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        placeTypeMultilangQuery.populate(populateField);
+                    }
                 }
             }
             let placeTypeMultilangs = await placeTypeMultilangQuery.exec();

@@ -4,15 +4,20 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getDays(req, res) {
         try {
-            let dayQuery = Day
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    dayQuery.populate(populateField);
+            let dayQuery;
+            if (req.query.aggregate) {
+                dayQuery = Day.aggregate(req.query.aggregate);
+            } else {
+                dayQuery = Day
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        dayQuery.populate(populateField);
+                    }
                 }
             }
             let days = await dayQuery.exec();

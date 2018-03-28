@@ -4,15 +4,20 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getRatings(req, res) {
         try {
-            let ratingQuery = Rating
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    ratingQuery.populate(populateField);
+            let ratingQuery;
+            if (req.query.aggregate) {
+                ratingQuery = Rating.aggregate(req.query.aggregate);
+            } else {
+                ratingQuery = Rating
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        ratingQuery.populate(populateField);
+                    }
                 }
             }
             let ratings = await ratingQuery.exec();
@@ -40,7 +45,7 @@ module.exports = {
     async createRating(req, res) {
         try {
             let err = keysValidator.diff(Rating.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 req.body.client = req.user._id;
@@ -63,7 +68,7 @@ module.exports = {
                 if (rating) {
                     let updated = await rating.superupdate(req.body);
                     res.status(201).json(updated);
-                }else {
+                } else {
                     res.sendStatus(404);
                 }
             }

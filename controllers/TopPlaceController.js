@@ -4,18 +4,22 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getTopPlaces(req, res) {
         try {
-            let topPlaceQuery = TopPlace
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    topPlaceQuery.populate(populateField);
+            let topPlaceQuery;
+            if (req.query.aggregate) {
+                topPlaceQuery = TopPlace.aggregate(req.query.aggregate);
+            } else {
+                topPlaceQuery = TopPlace
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        topPlaceQuery.populate(populateField);
+                    }
                 }
-            }
-            let topPlaces = await topPlaceQuery.exec();
+            } topPlaces = await topPlaceQuery.exec();
             res.json(topPlaces);
         } catch (e) {
             res.status(400).send(e.toString());

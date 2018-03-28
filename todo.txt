@@ -18,7 +18,7 @@
 //+cors?
 //+clusters?
 //+pagination?
-//todo message auth
+//+message auth
 //+image save path
 //+delete pre save add statics supersave,superupdate,
 //+add transactions
@@ -31,3 +31,8 @@
 //+logger
 //todo change global config
 //todo register facebook&google&gmail accounts
+//todo features in place(wifi...)
+//+Можливість додавання Топ-категорій типу “Найкращий заклад для весілля, корпоративу, дня народження”
+//+statistic reviews/aggregations
+//+disallow update secured fields
+//todo ionic facebook

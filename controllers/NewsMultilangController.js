@@ -4,15 +4,20 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getNewsMultilangs(req, res) {
         try {
-            let newsMultilangQuery = NewsMultilang
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    newsMultilangQuery.populate(populateField);
+            let newsMultilangQuery;
+            if (req.query.aggregate) {
+                newsMultilangQuery = NewsMultilang.aggregate(req.query.aggregate);
+            } else {
+                newsMultilangQuery = NewsMultilang
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        newsMultilangQuery.populate(populateField);
+                    }
                 }
             }
             let newsMultilangs = await newsMultilangQuery.exec();

@@ -5,15 +5,20 @@ let objectHelper = require(global.paths.HELPERS + '/objectHelper');
 module.exports = {
     async getHashTags(req, res) {
         try {
-            let hashTagQuery = HashTag
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    hashTagQuery.populate(populateField);
+            let hashTagQuery;
+            if (req.query.aggregate) {
+                hashTagQuery = HashTag.aggregate(req.query.aggregate);
+            } else {
+                hashTagQuery = HashTag
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        hashTagQuery.populate(populateField);
+                    }
                 }
             }
             let hashTags = await hashTagQuery.exec();

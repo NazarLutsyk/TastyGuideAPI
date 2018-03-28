@@ -4,16 +4,22 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getMessages(req, res) {
         try {
-            let messageQuery = Message
-                .find({$or:[{receiver:req.user._id},{sender:req.user._id}]})
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    messageQuery.populate(populateField);
+            let messageQuery;
+            if (req.query.aggregate) {
+                messageQuery = Message.aggregate(req.query.aggregate);
+            } else {
+                let messageQuery = Message
+                    .find({$or:[{receiver:req.user._id},{sender:req.user._id}]})
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .aggregate(req.query.aggregate)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        messageQuery.populate(populateField);
+                    }
                 }
             }
             let news = await messageQuery.exec();

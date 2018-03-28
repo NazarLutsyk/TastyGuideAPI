@@ -4,15 +4,20 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getDrinkApplications(req, res) {
         try {
-            let drinkApplicationsQuery = DrinkApplication
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    drinkApplicationsQuery.populate(populateField);
+            let drinkApplicationsQuery;
+            if (req.query.aggregate) {
+                drinkApplicationsQuery = DrinkApplication.aggregate(req.query.aggregate);
+            } else {
+                drinkApplicationsQuery = DrinkApplication
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        drinkApplicationsQuery.populate(populateField);
+                    }
                 }
             }
             let drinkApplications = await drinkApplicationsQuery.exec();

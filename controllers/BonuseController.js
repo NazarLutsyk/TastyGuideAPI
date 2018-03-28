@@ -6,15 +6,20 @@ upload = upload.array('images');
 module.exports = {
     async getBonuses(req, res) {
         try {
-            let bonuseQuery = Bonuse
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    bonuseQuery.populate(populateField);
+            let bonuseQuery;
+            if (req.query.aggregate) {
+                bonuseQuery = Bonuse.aggregate(req.query.aggregate);
+            } else {
+                bonuseQuery = Bonuse
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        bonuseQuery.populate(populateField);
+                    }
                 }
             }
             let bonuses = await bonuseQuery.exec();

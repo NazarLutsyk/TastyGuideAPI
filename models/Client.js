@@ -58,6 +58,9 @@ ClientSchema.methods.encryptPassword = function (password) {
 ClientSchema.methods.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
+ClientSchema.statics.notUpdatable = function(){
+    return ['avatar','roles'];
+};
 ClientSchema.methods.superupdate = async function (newDoc) {
     let Place = require('./Place');
 

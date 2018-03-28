@@ -6,15 +6,20 @@ upload = upload.array('images');
 module.exports = {
     async getEvents(req, res) {
         try {
-            let eventQuery = Event
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    eventQuery.populate(populateField);
+            let eventQuery;
+            if (req.query.aggregate) {
+                eventQuery = Event.aggregate(req.query.aggregate);
+            } else {
+                eventQuery = Event
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        eventQuery.populate(populateField);
+                    }
                 }
             }
             let events = await eventQuery.exec();

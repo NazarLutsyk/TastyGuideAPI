@@ -10,6 +10,6 @@ router.route('/')
     .get(ClientController.getClients);
 router.route('/:id')
     .get(ClientController.getClientById)
-    .put(permission(Rule.updateClient),ClientController.updateClient)
+    .put(permission(Rule.updateClient),permission(Rule.updatable),ClientController.updateClient)
     .delete(permission(Rule.updateClient),ClientController.removeClient);
 module.exports = router;

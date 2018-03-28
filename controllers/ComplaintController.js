@@ -4,15 +4,20 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getComplaints(req, res) {
         try {
-            let complaintQuery = Complaint
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    complaintQuery.populate(populateField);
+            let complaintQuery;
+            if (req.query.aggregate) {
+                complaintQuery = Complaint.aggregate(req.query.aggregate);
+            } else {
+                complaintQuery = Complaint
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        complaintQuery.populate(populateField);
+                    }
                 }
             }
             let complaints = await complaintQuery.exec();

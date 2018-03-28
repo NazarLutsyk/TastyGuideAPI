@@ -3,7 +3,7 @@ module.exports = function (rule, ...allowed) {
 
     function isAllowed(roles) {
         for (let role of roles) {
-            if (allowed.indexOf(role) != -1) {
+            if (allowed.indexOf(role) !== -1) {
                 return true;
             }
         }
@@ -11,15 +11,15 @@ module.exports = function (rule, ...allowed) {
     }
 
     return (req, res, next) => {
-        if (req.user.roles.indexOf(ROLES.GLOBAL_ROLES.ADMIN_ROLE) != -1){
+        if (req.user.roles.indexOf(ROLES.GLOBAL_ROLES.ADMIN_ROLE) !== -1){
             return next();
         }
-        if (typeof rule != 'function' && rule) {
+        if (typeof rule !== 'function' && rule) {
             allowed.push(rule);
             rule = null;
         }
 
-        if (allowed.indexOf(ROLES.GLOBAL_ROLES.ADMIN_ROLE) == -1) {
+        if (allowed.indexOf(ROLES.GLOBAL_ROLES.ADMIN_ROLE) === -1) {
             allowed.push(ROLES.GLOBAL_ROLES.ADMIN_ROLE);
         }
 

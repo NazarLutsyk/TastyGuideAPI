@@ -4,15 +4,20 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getEventMultilangs(req, res) {
         try {
-            let eventMultilangQuery = EventMultilang
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    eventMultilangQuery.populate(populateField);
+            let eventMultilangQuery;
+            if (req.query.aggregate) {
+                eventMultilangQuery = EventMultilang.aggregate(req.query.aggregate);
+            } else {
+                eventMultilangQuery = EventMultilang
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        eventMultilangQuery.populate(populateField);
+                    }
                 }
             }
             let eventMultilangs = await eventMultilangQuery.exec();

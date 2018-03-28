@@ -4,15 +4,20 @@ let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
 module.exports = {
     async getDepartments(req, res) {
         try {
-            let departmentQuery = Department
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    dayQuery.populate(departmentQuery);
+            let departmentQuery;
+            if (req.query.aggregate) {
+                departmentQuery = Department.aggregate(req.query.aggregate);
+            } else {
+                departmentQuery = Department
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        departmentQuery.populate(populateField);
+                    }
                 }
             }
             let departments = await departmentQuery.exec();

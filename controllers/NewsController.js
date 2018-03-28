@@ -6,15 +6,20 @@ upload = upload.array('images');
 module.exports = {
     async getNews(req, res) {
         try {
-            let newsQuery = News
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    newsQuery.populate(populateField);
+            let newsQuery;
+            if (req.query.aggregate) {
+                newsQuery = News.aggregate(req.query.aggregate);
+            } else {
+                newsQuery = News
+                    .find(req.query.query)
+                    .sort(req.query.sort)
+                    .select(req.query.fields)
+                    .skip(req.query.skip)
+                    .limit(req.query.limit);
+                if (req.query.populate) {
+                    for (let populateField of req.query.populate) {
+                        newsQuery.populate(populateField);
+                    }
                 }
             }
             let news = await newsQuery.exec();
