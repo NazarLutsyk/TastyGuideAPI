@@ -45,6 +45,10 @@ let PlaceSchema = new Schema({
             type: Number,
         },
     },
+    features:[
+      //todo some features
+    ],
+    //todo updatable rules
     topCategories:[String],
     images: [String],
     types: [{
@@ -65,9 +69,7 @@ let PlaceSchema = new Schema({
     }
 });
 
-PlaceSchema.statics.notUpdatable = function(){
-    return ['rating','reviews','allowed'];
-};
+PlaceSchema.statics.notUpdatable = ['rating','reviews','allowed'];
 
 PlaceSchema.statics.loadAsyncValues = async function (docs) {
     let Rating = require('./Rating');

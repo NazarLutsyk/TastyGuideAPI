@@ -1,4 +1,5 @@
 const ComplaintController = require(global.paths.CONTROLLERS + '/ComplaintController');
+let ROLES = require(global.paths.CONFIG + '/roles');
 const express = require('express');
 
 let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
@@ -11,6 +12,12 @@ router.route('/')
     .post(ComplaintController.createComplaint);
 router.route('/:id')
     .get(ComplaintController.getComplaintById)
-    .put(permission(Rule.updateComplaint),ComplaintController.updateComplaint)
-    .delete(permission(Rule.updateComplaint),ComplaintController.removeComplaint);
+    .put(
+        permission.rule(Rule.updateComplaint,ROLES.GLOBAL_ROLES.ADMIN_ROLE),
+        ComplaintController.updateComplaint
+    )
+    .delete(
+        permission.rule(Rule.updateComplaint,ROLES.GLOBAL_ROLES.ADMIN_ROLE),
+        ComplaintController.removeComplaint
+    );
 module.exports = router;

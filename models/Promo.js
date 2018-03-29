@@ -26,11 +26,16 @@ module.exports = mongoose.model('Promo', PromoSchema);
 
 PromoSchema.methods.supersave = async function () {
     let Place = require('./Place');
+    let Department = require('./Department');
 
     let place = await Place.findById(this.place);
+    let department = await Department.findById(this.author);
 
     if (!place && this.place) {
         throw new Error('Not found related model Place!');
+    }
+    if (!department && this.author) {
+        throw new Error('Not found related model Department!');
     }
 
     return await this.save();

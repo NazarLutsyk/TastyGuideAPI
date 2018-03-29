@@ -1,4 +1,5 @@
 const DayController = require(global.paths.CONTROLLERS + '/DayController');
+let ROLES = require(global.paths.CONFIG + '/roles');
 const express = require('express');
 
 let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
@@ -8,10 +9,19 @@ const router = express.Router();
 
 router.route('/')
     .get(DayController.getDays)
-    .post(permission(Rule.createDay),DayController.createDay);
+    .post(
+        permission.rule(Rule.createDay,ROLES.GLOBAL_ROLES.ADMIN_ROLE),
+        DayController.createDay
+    );
 router.route('/:id')
     .get(DayController.getDayById)
-    .put(permission(Rule.updateDay),DayController.updateDay)
-    .delete(permission(Rule.updateDay),DayController.removeDay);
+    .put(
+        permission.rule(Rule.updateDay,ROLES.GLOBAL_ROLES.ADMIN_ROLE),
+        DayController.updateDay
+    )
+    .delete(
+        permission.rule(Rule.updateDay,ROLES.GLOBAL_ROLES.ADMIN_ROLE),
+        DayController.removeDay
+    );
 
 module.exports = router;

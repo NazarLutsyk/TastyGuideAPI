@@ -1,38 +1,41 @@
-let ROLES = require(global.paths.CONFIG + '/roles');
-module.exports = function (rule, ...allowed) {
+let ROLES = require(global.paths.CONFIG + "/roles");
 
-    function isAllowed(roles) {
+function isAllowed(allowed, userRoles) {
+    for (let role of userRoles) {
+        if (allowed.indexOf(role) !== -1) {
+            return true;
+        }
+    }
+    return false;
+}
+
+exports.roles = function (...roles) {
+    return (req, res, next) => {
+        if (!roles) {
+            return next();
+        }
         for (let role of roles) {
-            if (allowed.indexOf(role) !== -1) {
-                return true;
+            if (typeof role !== "string") {
+                return res.sendStatus(400);
             }
         }
-        return false;
-    }
-
-    return (req, res, next) => {
-        if (req.user.roles.indexOf(ROLES.GLOBAL_ROLES.ADMIN_ROLE) !== -1){
+        if (req.user && isAllowed(roles, req.user.roles)) {
             return next();
         }
-        if (typeof rule !== 'function' && rule) {
-            allowed.push(rule);
-            rule = null;
-        }
+        return res.sendStatus(403);
+    };
+};
 
-        if (allowed.indexOf(ROLES.GLOBAL_ROLES.ADMIN_ROLE) === -1) {
-            allowed.push(ROLES.GLOBAL_ROLES.ADMIN_ROLE);
-        }
-
-        if (req.user && isAllowed(req.user.roles) && rule) {
-            return rule(req, res, next);
-        }
-        if (req.user && isAllowed(req.user.roles)) {
+exports.rule = function (rule, ...exclusionRoles) {
+    return function (req, res, next) {
+        if (exclusionRoles && isAllowed(exclusionRoles, req.user.roles)) {
             return next();
-        }
-        else if (rule) {
-            return rule(req, res, next);
         } else {
-            res.sendStatus(403);
+            if (typeof rule !== "function") {
+                return res.sendStatus(400);
+            } else {
+                return rule(req, res, next);
+            }
         }
     };
 };

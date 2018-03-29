@@ -9,7 +9,7 @@ module.exports = {
                 messageQuery = Message.aggregate(req.query.aggregate);
             } else {
                 let messageQuery = Message
-                    .find({$or:[{receiver:req.user._id},{sender:req.user._id}]})
+                    .find({$or: [{receiver: req.user._id}, {sender: req.user._id}]})
                     .find(req.query.query)
                     .sort(req.query.sort)
                     .select(req.query.fields)
@@ -31,7 +31,10 @@ module.exports = {
     async getMessageById(req, res) {
         let messageId = req.params.id;
         try {
-            let messageQuery = Message.findOne({_id: messageId})
+            let messageQuery = Message.findOne({
+                _id: messageId,
+                $or: [{receiver: req.user._id}, {sender: req.user._id}]
+            })
                 .select(req.query.fields);
             if (req.query.populate) {
                 for (let populateField of req.query.populate) {
@@ -47,7 +50,7 @@ module.exports = {
     async createMessage(req, res) {
         try {
             let err = keysValidator.diff(Message.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 req.body.sender = req.user._id;
@@ -66,7 +69,7 @@ module.exports = {
             if (message) {
                 await message.remove();
                 res.status(204).json(message);
-            }else {
+            } else {
                 res.sendStatus(404);
             }
         } catch (e) {

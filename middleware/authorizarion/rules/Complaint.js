@@ -7,9 +7,9 @@ module.exports = {
             let complaintId = req.params.id;
             let complaint = await Complaint.findById(complaintId);
             if (complaint && complaint.client.equals(user._id)) {
-                next();
+                return next();
             } else {
-                res.sendStatus(403);
+                return res.sendStatus(403);
             }
         } catch (e) {
             return res.status(400).send(e.toString());

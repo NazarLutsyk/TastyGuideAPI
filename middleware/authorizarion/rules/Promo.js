@@ -11,9 +11,9 @@ module.exports = {
                 place: placeId
             });
             if (allowed > 0) {
-                next();
+                return next();
             } else {
-                res.sendStatus(403);
+                return res.sendStatus(403);
             }
         } catch (e) {
             return res.status(400).send(e.toString());
@@ -32,9 +32,9 @@ module.exports = {
                 client: user._id
             });
             if (allowed > 0) {
-                next();
+                return next();
             } else {
-                res.sendStatus(403);
+                return res.sendStatus(403);
             }
         } catch (e) {
             return res.status(400).send(e.toString());

@@ -7,9 +7,9 @@ module.exports = {
             let ratingId = req.params.id;
             let rating = await Rating.findById(ratingId);
             if (rating && rating.client.equals(user._id)) {
-                next();
+                return next();
             } else {
-                res.sendStatus(403);
+                return res.sendStatus(403);
             }
         } catch (e) {
             return res.status(400).send(e.toString());

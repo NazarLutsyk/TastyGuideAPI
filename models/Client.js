@@ -52,6 +52,7 @@ let ClientSchema = new Schema({
 }, {
     timestamps: true,
 });
+ClientSchema.statics.notUpdatable = ['roles','avatar','facebookId','googleId'];
 ClientSchema.methods.encryptPassword = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(5), null);
 };

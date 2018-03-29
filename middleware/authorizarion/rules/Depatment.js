@@ -13,9 +13,9 @@ module.exports = {
                 roles: ROLES.PLACE_ROLES.BOSS_ROLE
             });
             if (allowed > 0) {
-                next();
+                return next();
             } else {
-                res.sendStatus(403);
+                return res.sendStatus(403);
             }
         } catch (e) {
             return res.status(400).send(e.toString());
@@ -35,9 +35,9 @@ module.exports = {
                 roles: ROLES.PLACE_ROLES.BOSS_ROLE
             });
             if (allowed > 0) {
-                next();
+                return next();
             } else {
-                res.sendStatus(403);
+                return res.sendStatus(403);
             }
         } catch (e) {
             return res.status(400).send(e.toString());
