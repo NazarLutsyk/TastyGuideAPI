@@ -11,11 +11,12 @@ setInterval(async function () {
         for (let place of notAllowedPlaces) {
             if (now.getDate() - place.createdAt.getDate() >= 3) {
                 await place.remove();
+                log(`remove place`);
             }
         }
     }
     catch (e) {
-        console.log(e);
+        log(e);
     }
 }, 1000*60*60*12);
 
@@ -28,7 +29,8 @@ setInterval(async function () {
         });
         for (let topPlace of topPlaces) {
             if (now >= topPlace.endDate) {
-                await TopPlace.findByIdAndUpdate(topPlace._id,{actual : false});
+                await TopPlace.findByIdAndUpdate(topPlace._id, {actual: false});
+                log(`update TopPlace`);
             }
         }
     }

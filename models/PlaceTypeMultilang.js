@@ -29,7 +29,7 @@ PlaceTypeMultilangSchema.methods.supersave = async function () {
     if (!lang && this.lang)  {
         throw new Error('Not found related model Lang!');
     }
-
+    log("save Multilang");
     return await this.save();
 };
 PlaceTypeMultilangSchema.methods.superupdate = async function (newDoc) {
@@ -45,6 +45,7 @@ PlaceTypeMultilangSchema.methods.superupdate = async function (newDoc) {
             throw new Error('Not found related model Lang!');
     }
     objectHelper.load(this, newDoc);
+    log("update Multilang");
     return await this.save();
 };
 

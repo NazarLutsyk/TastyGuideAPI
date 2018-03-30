@@ -4,7 +4,10 @@ let mkdirp = require('mkdirp');
 
 let logPath = path.join(__dirname,'../runtime','/logs');
 mkdirp(logPath, function (err) {
-    if (err) throw new Error(err)
+    if (err) {
+        throw new Error(err);
+    }
+    log(`Create dir ${logPath}`);
 });
 
 winston.configure({

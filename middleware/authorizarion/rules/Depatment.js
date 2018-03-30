@@ -4,6 +4,7 @@ let ROLES = require("../../../config/roles");
 module.exports = {
     async createDepartment(req, res, next) {
         try {
+            log('rule create Department');
             let user = req.user;
             let placeId = req.body.place;
 
@@ -26,6 +27,7 @@ module.exports = {
     },
     async updateDepartment(req, res, next) {
         try {
+            log('rule update Department');
             let allowed = 0;
             let user = req.user;
             let departmentId = req.params.id;

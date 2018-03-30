@@ -4,6 +4,7 @@ let ROLES = require("../../../config/roles");
 module.exports = {
     async updatePlace(req, res, next) {
         try {
+            log('rule update Place');
             let user = req.user;
             let placeId = req.params.id;
             let allowed = await Department.count({
@@ -24,6 +25,7 @@ module.exports = {
     },
     async deletePlace(req, res, next) {
         try {
+            log('rule delete Place');
             let user = req.user;
             let placeId = req.params.id;
             let allowed = await Department.count({

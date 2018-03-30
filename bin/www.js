@@ -2,20 +2,19 @@ const app = require("../app");
 const debug = require("debug")("drinker:server");
 const https = require("https");
 const fs = require("fs");
-let path = require('path');
+let path = require("path");
 
 const privateKey = fs.readFileSync(path.join(process.env.HOMEDRIVE, "demo", "myRootCA.key")).toString();
 const certificate = fs.readFileSync(path.join(process.env.HOMEDRIVE, "demo", "myRootCA.pem")).toString();
 
 let port = normalizePort(process.env.PORT || "3000");
-app.set('port', port);
+app.set("port", port);
 const server = https.createServer({
     key: privateKey,
     cert: certificate
 }, app);
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+server.listen(port, onListening);
+server.on("error", onError);
 
 function normalizePort(val) {
     const port = parseInt(val, 10);
@@ -29,7 +28,7 @@ function normalizePort(val) {
 }
 
 function onError(error) {
-    if (error.syscall !== 'listen') {
+    if (error.syscall !== "listen") {
         throw error;
     }
 
@@ -38,12 +37,12 @@ function onError(error) {
         : "Port " + port;
 
     switch (error.code) {
-        case 'EACCES':
-            console.error(bind + ' requires elevated privileges');
+        case "EACCES":
+            log(bind + " requires elevated privileges");
             process.exit(1);
             break;
-        case 'EADDRINUSE':
-            console.error(bind + ' is already in use');
+        case "EADDRINUSE":
+            log(bind + " is already in use");
             process.exit(1);
             break;
         default:
@@ -56,5 +55,5 @@ function onListening() {
     const bind = typeof addr === "string"
         ? "pipe " + addr
         : "port " + addr.port;
-    debug('Listening on ' + bind);
+    log("Process " + process.pid + " listening on " + bind);
 }

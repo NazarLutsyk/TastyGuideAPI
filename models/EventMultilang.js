@@ -31,8 +31,9 @@ EventMultilangSchema.methods.supersave = async function () {
         throw new Error('Not found related model Event!');
     }
     if (!lang) {
-        throw new Error('Not found related model Lang!');
+        throw new Error("Not found related model Lang!");
     }
+    log('save Multilang');
     return await this.save();
 };
 EventMultilangSchema.methods.superupdate = async function (newDoc) {
@@ -48,6 +49,7 @@ EventMultilangSchema.methods.superupdate = async function (newDoc) {
             throw new Error('Not found related model Lang!');
     }
     objectHelper.load(this, newDoc);
+    log('update Multilang');
     return await this.save();
 };
 

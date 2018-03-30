@@ -36,8 +36,14 @@ MessageSchema.methods.supersave = async function () {
     if (!sender || !receiver) {
         throw new Error('Not found related model Client!');
     }
+    log('save Message');
     return await this.save();
 };
 
 module.exports = mongoose.model('Message', MessageSchema);
 
+
+MessageSchema.pre("remove", async function (next) {
+    log('remove Message');
+    return next();
+});

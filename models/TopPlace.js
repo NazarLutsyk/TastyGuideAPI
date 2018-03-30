@@ -36,6 +36,7 @@ TopPlaceSchema.methods.supersave = async function () {
     if (!place && this.place) {
         throw new Error('Not found related model Place!');
     }
+    log("save TopPlace");
     return await this.save();
 };
 TopPlaceSchema.methods.superupdate = async function (newDoc) {
@@ -44,7 +45,13 @@ TopPlaceSchema.methods.superupdate = async function (newDoc) {
         throw new Error('Can`t update relations!');
     }
     objectHelper.load(this, newDoc);
+    log("update TopPlace");
     return await this.save();
 };
 
 module.exports = mongoose.model('TopPlace', TopPlaceSchema);
+
+TopPlaceSchema.pre("remove", async function (next) {
+    log('remove TopPlace');
+    return next();
+});

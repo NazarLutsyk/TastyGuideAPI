@@ -22,6 +22,7 @@ module.exports = function (pathToDir) {
 
             let resultFilename = id + "-" + Date.now() + extension;
             if ([".jpg", ".jpeg", ".png", ".svg", ".gif"].indexOf(extension) != -1) {
+                log(`save file ${resultFilename}`);
                 cb(null, resultFilename);
             } else {
                 cb(new Error("Bad extension"));

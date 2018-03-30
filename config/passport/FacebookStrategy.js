@@ -30,6 +30,7 @@ exports.Auth = new FacebookStrategy({
                 email: profile.email || '',
                 avatar : profile._json.picture.data.url
             });
+            log('create client');
             return cb(null, user);
         }
     } catch (e) {

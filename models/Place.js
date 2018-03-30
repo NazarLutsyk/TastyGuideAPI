@@ -78,6 +78,7 @@ PlaceSchema.statics.loadAsyncValues = async function (docs) {
     if (docs) {
         if (!Array.isArray(docs))
             docs = [docs];
+        log('load async values');
         for (let doc of docs) {
             let rating = await Rating.aggregate([
                 {$match: {place: doc._id}},
@@ -105,7 +106,7 @@ PlaceSchema.methods.supersave = async function () {
     if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== this.types.length)) {
         throw new Error('Not found related model PlaceType!');
     }
-
+    log('save Place');
     return await this.save();
 };
 
@@ -137,6 +138,7 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
         }
     }
     objectHelper.load(this, newDoc);
+    log('update Place');
     return await this.save();
 };
 
@@ -176,6 +178,7 @@ PlaceSchema.pre('remove', async function (next) {
                 fileHelper.deleteFiles(toDelete);
             }
         }
+        log('remove Place');
         return next();
     } catch (e) {
         return next(e);

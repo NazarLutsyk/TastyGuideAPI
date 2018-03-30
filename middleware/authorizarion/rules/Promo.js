@@ -4,6 +4,7 @@ let Promo = require("../../../models/Promo");
 module.exports = {
     async createPromo(req, res, next) {
         try {
+            log('rule create Promo');
             let user = req.user;
             let placeId = req.body.place;
             let allowed = await Department.count({
@@ -25,6 +26,7 @@ module.exports = {
     },
     async updatePromo(req, res, next) {
         try {
+            log('rule update Promo');
             let allowed = 0;
             let user = req.user;
             let promoId = req.params.id;

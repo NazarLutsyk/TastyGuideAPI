@@ -1,9 +1,9 @@
-let Lang = require('../models/Lang');
-let keysValidator = require('../validators/keysValidator');
-let objectHelper = require('../helpers/objectHelper');
+let Lang = require("../models/Lang");
+let keysValidator = require("../validators/keysValidator");
+let objectHelper = require("../helpers/objectHelper");
 
 module.exports = {
-    async getLangs(req, res,next) {
+    async getLangs(req, res, next) {
         try {
             let langQuery;
             if (req.query.aggregate) {
@@ -28,7 +28,7 @@ module.exports = {
             return next(e);
         }
     },
-    async getLangById(req, res,next) {
+    async getLangById(req, res, next) {
         let langId = req.params.id;
         try {
             let langQuery = Lang.findOne({_id: langId})
@@ -45,26 +45,26 @@ module.exports = {
             return next(e);
         }
     },
-    async createLang(req, res,next) {
+    async createLang(req, res, next) {
         try {
-            let lang = await Lang.create(req.body);
+            let lang = new Lang(req.body);
+            lang = await lang.supersave();
             res.status(201).json(lang);
         } catch (e) {
             e.status = 400;
             return next(e);
         }
     },
-    async updateLang(req, res,next) {
+    async updateLang(req, res, next) {
         let langId = req.params.id;
         try {
             let err = keysValidator.diff(Lang.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 let lang = await Lang.findById(langId);
                 if (lang) {
-                    objectHelper.load(lang, req.body);
-                    let updated = await lang.save();
+                    let updated = await lang.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
                     let e = new Error();
@@ -78,7 +78,7 @@ module.exports = {
             return next(e);
         }
     },
-    async removeLang(req, res,next) {
+    async removeLang(req, res, next) {
         let langId = req.params.id;
         try {
             let lang = await Lang.findById(langId);

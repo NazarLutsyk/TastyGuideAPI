@@ -4,6 +4,7 @@ let Multilang = require("../../../models/PlaceMultilang");
 module.exports = {
     async createPlaceMultilang(req, res, next) {
         try {
+            log('rule create PlaceMultilang');
             let user = req.user;
             let placeId = req.body.place;
 
@@ -26,6 +27,7 @@ module.exports = {
     },
     async updatePlaceMultilang(req, res, next) {
         try {
+            log('rule update PlaceMultilang');
             let allowed = 0;
             let user = req.user;
             let multilangId = req.params.id;

@@ -34,6 +34,7 @@ ComplaintSchema.methods.supersave = async function () {
     if (!place) {
         throw new Error('Not found related model Place!');
     }
+    log('save Complaint');
     return await this.save();
 };
 
@@ -44,9 +45,13 @@ ComplaintSchema.methods.superupdate = async function (newDoc) {
         throw new Error('Can`t update relations!');
     }
     objectHelper.load(this, newDoc);
+    log('update Complaint');
     return await this.save();
 };
 
 module.exports = mongoose.model('Complaint', ComplaintSchema);
 
-
+ComplaintSchema.pre("remove", async function (next) {
+    log('remove Complaint');
+    return next();
+});

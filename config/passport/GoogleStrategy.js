@@ -29,6 +29,7 @@ exports.Auth = new GoogleStrategy({
                 email: profile.emails[0].value || '',
                 avatar : profile._json.image.url
             });
+            log('create client');
             return cb(null, user);
         }
     } catch (e) {

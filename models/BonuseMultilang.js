@@ -37,6 +37,7 @@ BonuseMultilangSchema.methods.supersave = async function () {
     if (!lang && this.lang) {
         throw new Error("Not found related model Lang!");
     }
+    log('save Multilang');
     return await this.save();
 };
 BonuseMultilangSchema.methods.superupdate = async function (newDoc) {
@@ -51,8 +52,8 @@ BonuseMultilangSchema.methods.superupdate = async function (newDoc) {
         if (!lang)
             throw new Error("Not found related model Lang!");
     }
-
     objectHelper.load(this, newDoc);
+    log('update Multilang');
     return await this.save();
 };
 

@@ -7,15 +7,19 @@ module.exports = {
         }
         if (files.length > 0) {
             for (let file in files) {
-                fs.exists(files[file].toString(), function (exists) {
+                let fileName = files[file].toString();
+                fs.exists(fileName, function (exists) {
                     if (exists) {
-                        fs.unlink(files[file].toString(), function (err) {
+                        log(`File exists ${filename}`);
+                        fs.unlink(filename, function (err) {
                             if (err) {
                                 throw new Error(err);
                             }
+                            log(`Delete file ${filename}`);
                             return;
                         });
                     }
+                    log(`File doesn't exists ${filename}`);
                 });
             }
         } else {

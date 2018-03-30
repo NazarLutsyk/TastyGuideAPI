@@ -18,6 +18,7 @@ exports.LocalSignup = new LocalStrategy({
                 let client = new Client(req.body);
                 client.password = client.encryptPassword(client.password);
                 client = await client.save();
+                log('create client');
                 return done(null, client);
             }
         } catch (e) {

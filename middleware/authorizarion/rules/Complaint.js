@@ -2,6 +2,7 @@ let Complaint = require('../../../models/Complaint');
 module.exports = {
     async updateComplaint(req, res, next) {
         try {
+            log('rule update Complaint');
             let user = req.user;
             let complaintId = req.params.id;
             let complaint = await Complaint.findById(complaintId);

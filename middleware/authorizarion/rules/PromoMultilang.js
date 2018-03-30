@@ -5,6 +5,7 @@ let Place = require("../../../models/Place");
 module.exports = {
     async createPromoMultilang(req, res, next) {
         try {
+            log('rule create PromoMultilang');
             let allowed = 0;
             let user = req.user;
             let promoId = req.body.promo;
@@ -31,6 +32,7 @@ module.exports = {
     },
     async updatePromoMultilang(req, res, next) {
         try {
+            log('rule update PromoMultilang');
             let allowed = 0;
             let user = req.user;
             let multilangId = req.params.id;

@@ -2,6 +2,7 @@ let Message = require('../../../models/Message');
 module.exports = {
     async deleteMessage(req, res, next) {
         try {
+            log('rule delete Message');
             let user = req.user;
             let messageId = req.params.id;
             let message = await Message.findById(messageId);

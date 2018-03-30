@@ -44,6 +44,7 @@ RatingSchema.methods.supersave = async function () {
     if (!place) {
         throw new Error('Not found related model Place!');
     }
+    log("save Rating");
     return await this.save();
 };
 
@@ -53,7 +54,13 @@ RatingSchema.methods.superupdate = async function (newDoc) {
         throw new Error('Can`t update relations!');
     }
     objectHelper.load(this, newDoc);
+    log("update Rating");
     return await this.save();
 };
 
 module.exports = mongoose.model('Rating', RatingSchema);
+
+RatingSchema.pre("remove", async function (next) {
+    log('remove Rating');
+    return next();
+});

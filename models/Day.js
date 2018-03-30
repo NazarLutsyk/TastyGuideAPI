@@ -32,6 +32,7 @@ DaySchema.methods.supersave = async function () {
     if (!place && this.place) {
         throw new Error('Not found related model Place!');
     }
+    log('save Day');
     return await this.save();
 };
 DaySchema.methods.superupdate = async function (newDoc) {
@@ -40,8 +41,13 @@ DaySchema.methods.superupdate = async function (newDoc) {
         throw new Error('Can`t update relations!');
     }
     objectHelper.load(this, newDoc);
+    log('update Day');
     return await this.save();
 };
 
-
 module.exports = mongoose.model('Day', DaySchema);
+
+DaySchema.pre("remove", async function (next) {
+    log('remove Day');
+    return next();
+});

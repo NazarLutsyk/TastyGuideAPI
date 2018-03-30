@@ -14,3 +14,8 @@ let MultilangSchema = new Schema({
 });
 
 module.exports = mongoose.model('Multilang',MultilangSchema);
+
+MultilangSchema.pre("remove", async function (next) {
+    log('remove Multilang');
+    return next();
+});

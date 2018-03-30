@@ -76,6 +76,7 @@ ClientSchema.methods.superupdate = async function (newDoc) {
         }
     }
     objectHelper.load(this, newDoc);
+    log('update Client');
     return await this.save();
 };
 
@@ -86,6 +87,7 @@ let DrinkApplication = require("./DrinkApplication");
 let Rating = require("./Rating");
 let Department = require("./Department");
 let Message = require("./Message");
+let Promo = require("./Promo");
 ClientSchema.pre("remove", async function (next) {
     try {
         await Complaint.remove({client: this._id});
@@ -98,6 +100,15 @@ ClientSchema.pre("remove", async function (next) {
         await Message.remove(
             {receiver: this._id}
         );
+        await Promo.update(
+            {author: this._id},
+            {author: null},
+            {
+                multi: true,
+                runValidators: true,
+                context: 'query'
+            });
+        log('remove Client');
         return next();
     } catch (e) {
         return next(e);

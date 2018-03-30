@@ -10,6 +10,20 @@ let HashTagSchema = new Schema({
 }, {
     timestamps: true,
 });
+
+HashTagSchema.methods.supersave = async function () {
+    log('save HashTag');
+    return await this.save();
+};
+
+HashTagSchema.methods.superupdate = async function (newDoc) {
+    let objectHelper = require('../helpers/objectHelper');
+
+    objectHelper.load(this, newDoc);
+    log('update HashTag');
+    return await this.save();
+};
+
 module.exports = mongoose.model('HashTag', HashTagSchema);
 
 let Place = require('./Place');
@@ -23,6 +37,7 @@ HashTagSchema.pre('remove', async function (next) {
                 runValidators: true,
                 context: 'query'
             });
+        log('remove HashTag');
         return next();
     } catch (e) {
         return next(e);

@@ -11,6 +11,7 @@ function isAllowed(allowed, userRoles) {
 
 exports.roles = function (...roles) {
     return (req, res, next) => {
+        log('check roles');
         if (!roles) {
             return next();
         }
@@ -34,6 +35,7 @@ exports.roles = function (...roles) {
 exports.rule = function (rule, ...exclusionRoles) {
     return (req, res, next) => {
         try {
+            log('check rule');
             if (exclusionRoles && isAllowed(exclusionRoles, req.user.roles)) {
                 return next();
             } else {

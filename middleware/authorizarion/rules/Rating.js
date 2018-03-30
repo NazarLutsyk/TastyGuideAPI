@@ -3,6 +3,7 @@ let Rating = require('../../../models/Rating');
 module.exports = {
     async updateRating(req,res,next) {
         try {
+            log('rule update Rating');
             let user = req.user;
             let ratingId = req.params.id;
             let rating = await Rating.findById(ratingId);

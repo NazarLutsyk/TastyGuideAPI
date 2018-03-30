@@ -37,7 +37,7 @@ PromoSchema.methods.supersave = async function () {
     if (!department && this.author) {
         throw new Error('Not found related model Client!');
     }
-
+    log('save Promo');
     return await this.save();
 };
 
@@ -60,12 +60,12 @@ PromoSchema.methods.superupdate = async function (newDoc) {
         }
     }
     objectHelper.load(this, newDoc);
+    log('update Promo');
     return await this.save();
 };
 PromoSchema.pre('remove', async function (next) {
     let fileHelper = require('../helpers/fileHelper');
     let path = require('path');
-
     try {
         if (this.images.length > 0) {
             for (let i = 0; i < this.images.length; i++) {
@@ -74,6 +74,7 @@ PromoSchema.pre('remove', async function (next) {
                 fileHelper.deleteFiles(toDelete);
             }
         }
+        log('remove Promo');
         return next();
     } catch (e) {
         return next(e);

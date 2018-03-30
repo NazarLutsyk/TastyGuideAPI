@@ -1,6 +1,7 @@
 module.exports = {
     async updateClient(req, res, next) {
         try {
+            log('rule update Client');
             let user = req.user;
             let clientId = req.params.id;
             if (user._id.equals(clientId) && !req.body.roles) {

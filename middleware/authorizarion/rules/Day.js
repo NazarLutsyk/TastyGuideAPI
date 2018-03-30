@@ -4,6 +4,7 @@ let Day = require("../../../models/Day");
 module.exports = {
     async createDay(req, res, next) {
         try {
+            log('rule create Day');
             let user = req.user;
             let placeId = req.body.place;
 
@@ -26,6 +27,7 @@ module.exports = {
     },
     async updateDay(req, res, next) {
         try {
+            log('rule update Day');
             let allowed = 0;
             let user = req.user;
             let dayId = req.params.id;

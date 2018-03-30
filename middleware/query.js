@@ -18,6 +18,7 @@ module.exports = {
                 req.query.populate = populate ? QueryHelper.toPopulate(populate) : null;
                 req.query.skip = skip ? +skip : 0;
                 req.query.limit = limit ? +limit : null;
+                log('query ',req.query);
                 return next();
             } catch (e) {
                 e.status = 400;

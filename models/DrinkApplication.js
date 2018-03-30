@@ -52,6 +52,7 @@ DrinkApplicationSchema.methods.supersave = async function () {
     if (!place) {
         throw new Error('Not found related model Place!');
     }
+    log('save DrinkApp');
     return await this.save();
 };
 
@@ -68,10 +69,15 @@ DrinkApplicationSchema.methods.superupdate = async function (newDoc) {
             throw new Error('Not found related model Place!');
         }
     }
-
     objectHelper.load(this, newDoc);
+    log('update DrinkApp');
     return await this.save()
 };
 
 module.exports = mongoose.model('DrinkApplication', DrinkApplicationSchema);
 
+
+DrinkApplicationSchema.pre("remove", async function (next) {
+    log('remove DrinkApp');
+    return next();
+});

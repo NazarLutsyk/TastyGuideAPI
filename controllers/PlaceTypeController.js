@@ -51,7 +51,8 @@ module.exports = {
             if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
-                let placeType = await PlaceType.create(req.body);
+                let placeType = new PlaceType(req.body);
+                placeType = await placeType.supersave();
                 res.status(201).json(placeType);
             }
         } catch (e) {
@@ -68,8 +69,7 @@ module.exports = {
             } else {
                 let placeType = await PlaceType.findById(placeTypeId);
                 if (placeType) {
-                    objectHelper.load(placeType, req.body);
-                    let updated = await placeType.save();
+                    let updated = await placeType.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
                     let e = new Error();
