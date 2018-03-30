@@ -1,5 +1,5 @@
 let mongoose = require('mongoose');
-let ROLES = require(global.paths.CONFIG + '/roles');
+let ROLES = require('../config/roles');
 
 let Schema = mongoose.Schema;
 
@@ -40,7 +40,7 @@ DepartmentSchema.methods.supersave = async function () {
 };
 
 DepartmentSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let objectHelper = require('../helpers/objectHelper');
     if (newDoc.place || newDoc.client) {
         throw new Error('Can`t update relations!');
     }

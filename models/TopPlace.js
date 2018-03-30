@@ -39,7 +39,7 @@ TopPlaceSchema.methods.supersave = async function () {
     return await this.save();
 };
 TopPlaceSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let objectHelper = require('../helpers/objectHelper');
     if (newDoc.place) {
         throw new Error('Can`t update relations!');
     }

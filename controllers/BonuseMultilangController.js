@@ -1,8 +1,8 @@
-let BonuseMultilang = require(global.paths.MODELS + '/BonuseMultilang');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let BonuseMultilang = require('../models/BonuseMultilang');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
-    async getBonuseMultilangs(req, res) {
+    async getBonuseMultilangs(req, res,next) {
         try {
             let bonuseMultilangQuery;
             if (req.query.aggregate) {
@@ -23,10 +23,11 @@ module.exports = {
             let bonuseMultilang = await bonuseMultilangQuery.exec();
             res.json(bonuseMultilang);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getBonuseMultilangById(req, res) {
+    async getBonuseMultilangById(req, res,next) {
         let bonuseMultilangId = req.params.id;
         try {
             let bonuseMultilangQuery = BonuseMultilang.findOne({_id: bonuseMultilangId})
@@ -39,10 +40,11 @@ module.exports = {
             let bonuseMultilang = await bonuseMultilangQuery.exec();
             res.json(bonuseMultilang);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createBonuseMultilang(req, res) {
+    async createBonuseMultilang(req, res,next) {
         try {
             let err = keysValidator.diff(BonuseMultilang.schema.tree, req.body);
             if (err) {
@@ -53,10 +55,11 @@ module.exports = {
                 res.status(201).json(bonuseMultilang);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateBonuseMultilang(req, res) {
+    async updateBonuseMultilang(req, res,next) {
         let bonuseMultilangId = req.params.id;
         try {
             let err = keysValidator.diff(BonuseMultilang.schema.tree, req.body);
@@ -68,25 +71,33 @@ module.exports = {
                     let updated = await bonuseMultilang.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
-                    res.sendStatus(404);
+                    let e = new Error();
+                    e.status = 404;
+                    e.message = 'Not found';
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeImage(req, res) {
+    async removeImage(req, res,next) {
         let bonuseMultilangId = req.params.id;
         try {
             let bonuseMultilang = await BonuseMultilang.findById(bonuseMultilangId);
-            if(bonuseMultilang) {
+            if (bonuseMultilang) {
                 bonuseMultilang = await bonuseMultilang.remove();
                 res.status(204).json(bonuseMultilang);
-            }else {
-                res.sendStatus(404);
+            } else {
+                let e = new Error();
+                e.status = 404;
+                e.message = 'Not found';
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

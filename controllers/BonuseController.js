@@ -1,10 +1,10 @@
-let Bonuse = require(global.paths.MODELS + '/Bonuse');
+let Bonuse = require('../models/Bonuse');
 let path = require('path');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC,'upload','promo'));
+let keysValidator = require('../validators/keysValidator');
+let upload = require('../middleware/multer')(path.join(__dirname,'../public','upload', 'promo'));
 upload = upload.array('images');
 module.exports = {
-    async getBonuses(req, res) {
+    async getBonuses(req, res,next) {
         try {
             let bonuseQuery;
             if (req.query.aggregate) {
@@ -25,10 +25,11 @@ module.exports = {
             let bonuses = await bonuseQuery.exec();
             res.json(bonuses);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getBonuseById(req, res) {
+    async getBonuseById(req, res,next) {
         let bonuseId = req.params.id;
         try {
             let bonuseQuery = Bonuse.findOne({_id: bonuseId})
@@ -41,10 +42,11 @@ module.exports = {
             let bonuse = await bonuseQuery.exec();
             res.json(bonuse);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createBonuse(req, res) {
+    async createBonuse(req, res,next) {
         try {
             let err = keysValidator.diff(Bonuse.schema.tree, req.body);
             if (err) {
@@ -54,9 +56,10 @@ module.exports = {
                 if (bonuse) {
                     upload(req, res, async function (err) {
                         if (err) {
-                            return res.status(400).send(err.toString());
+                            err.status = 400;
+                            return next(err);
                         } else {
-                            if(!bonuse.images)
+                            if (!bonuse.images)
                                 bonuse.images = [];
                             for (let file in req.files) {
                                 let image = req.files[file].filename;
@@ -67,17 +70,19 @@ module.exports = {
                                 bonuse = await bonuse.supersave();
                                 res.status(201).json(bonuse);
                             } catch (e) {
-                                res.status(400).send(e.toString());
+                                e.status = 400;
+                                return next(e);
                             }
                         }
                     });
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateBonuse(req, res) {
+    async updateBonuse(req, res,next) {
         let bonuseId = req.params.id;
         try {
             let err = keysValidator.diff(Bonuse.schema.tree, req.body);
@@ -88,9 +93,10 @@ module.exports = {
                 if (bonuse) {
                     upload(req, res, async function (err) {
                         if (err) {
-                            return res.status(400).send(err.toString());
+                            err.status = 400;
+                            return next(err);
                         } else {
-                            if(!req.body.images)
+                            if (!req.body.images)
                                 req.body.images = [];
                             for (let file in req.files) {
                                 let image = req.files[file].filename;
@@ -100,19 +106,24 @@ module.exports = {
                                 let updated = await news.superupdate(req.body);
                                 res.status(201).json(updated);
                             } catch (e) {
-                                res.status(400).send(e.toString());
+                                e.status = 400;
+                                return next(e);
                             }
                         }
                     });
                 } else {
-                    res.sendStatus(404);
+                    let e = new Error();
+                    e.message = 'Not found';
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeBonuse(req, res) {
+    async removeBonuse(req, res,next) {
         let bonuseId = req.params.id;
         try {
             let bonuse = await Event.findById(bonuseId);
@@ -120,10 +131,14 @@ module.exports = {
                 bonuse = await bonuse.remove();
                 res.status(204).json(bonuse);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.status = 404;
+                e.message = 'Not found';
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
 };

@@ -1,8 +1,8 @@
-let DrinkApplication = require(global.paths.MODELS + '/DrinkApplication');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let DrinkApplication = require('../models/DrinkApplication');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
-    async getDrinkApplications(req, res) {
+    async getDrinkApplications(req, res,next) {
         try {
             let drinkApplicationsQuery;
             if (req.query.aggregate) {
@@ -23,10 +23,11 @@ module.exports = {
             let drinkApplications = await drinkApplicationsQuery.exec();
             res.json(drinkApplications);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getDrinkApplicationById(req, res) {
+    async getDrinkApplicationById(req, res,next) {
         let drinkApplicationId = req.params.id;
         try {
             let drinkApplicationQuery = DrinkApplication.findOne({_id: drinkApplicationId})
@@ -39,13 +40,14 @@ module.exports = {
             let drinkApplication = await drinkApplicationQuery.exec();
             res.json(drinkApplication);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createDrinkApplication(req, res) {
+    async createDrinkApplication(req, res,next) {
         try {
             let err = keysValidator.diff(DrinkApplication.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 req.body.organizer = req.user._id;
@@ -54,40 +56,49 @@ module.exports = {
                 res.status(201).json(drinkApp);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateDrinkApplication(req, res) {
+    async updateDrinkApplication(req, res,next) {
         let drinkApplicationId = req.params.id;
         try {
             let err = keysValidator.diff(DrinkApplication.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let drinkApp = await DrinkApplication.findById(drinkApplicationId);
                 if (drinkApp && req.body) {
                     let updated = await drinkApp.superupdate(req.body);
                     res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
+                } else {
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeDrinkApplication(req, res) {
+    async removeDrinkApplication(req, res,next) {
         let drinkApplicationId = req.params.id;
         try {
             let drinkApplication = await DrinkApplication.findById(drinkApplicationId);
             if (drinkApplication) {
                 drinkApplication = await drinkApplication.remove();
                 res.status(204).json(drinkApplication);
-            }else {
-                res.sendStatus(404);
+            } else {
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

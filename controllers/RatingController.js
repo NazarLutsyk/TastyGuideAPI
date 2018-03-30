@@ -1,8 +1,8 @@
-let Rating = require(global.paths.MODELS + '/Rating');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let Rating = require('../models/Rating');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
-    async getRatings(req, res) {
+    async getRatings(req, res, next) {
         try {
             let ratingQuery;
             if (req.query.aggregate) {
@@ -23,10 +23,11 @@ module.exports = {
             let ratings = await ratingQuery.exec();
             res.json(ratings);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getRatingById(req, res) {
+    async getRatingById(req, res, next) {
         let ratingId = req.params.id;
         try {
             let ratingQuery = Rating.findOne({_id: ratingId})
@@ -39,10 +40,11 @@ module.exports = {
             let rating = await ratingQuery.exec();
             res.json(rating);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createRating(req, res) {
+    async createRating(req, res, next) {
         try {
             let err = keysValidator.diff(Rating.schema.tree, req.body);
             if (err) {
@@ -54,10 +56,11 @@ module.exports = {
                 res.status(201).json(rating);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateRating(req, res) {
+    async updateRating(req, res, next) {
         let ratingId = req.params.id;
         try {
             let err = keysValidator.diff(Rating.schema.tree, req.body);
@@ -69,14 +72,18 @@ module.exports = {
                     let updated = await rating.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
-                    res.sendStatus(404);
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeRating(req, res) {
+    async removeRating(req, res, next) {
         let ratingId = req.params.id;
         try {
             let rating = await Rating.findById(ratingId);
@@ -84,10 +91,14 @@ module.exports = {
                 rating = await rating.remove();
                 res.status(204).json(rating);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

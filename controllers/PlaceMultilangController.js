@@ -1,8 +1,8 @@
-let PlaceMultilang = require(global.paths.MODELS + '/PlaceMultilang');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let PlaceMultilang = require('../models/PlaceMultilang');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
-    async getPlaceMultilangs(req, res) {
+    async getPlaceMultilangs(req, res, next) {
         try {
             let placeMultilangQuery;
             if (req.query.aggregate) {
@@ -23,10 +23,11 @@ module.exports = {
             let placeMultilangs = await placeMultilangQuery.exec();
             res.json(placeMultilangs);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getPlaceMultilangById(req, res) {
+    async getPlaceMultilangById(req, res, next) {
         let placeMultilangId = req.params.id;
         try {
             let placeMultilangQuery = PlaceMultilang.findOne({_id: placeMultilangId})
@@ -39,10 +40,11 @@ module.exports = {
             let placeMultilang = await placeMultilangQuery.exec();
             res.json(placeMultilang);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createPlaceMultilang(req, res) {
+    async createPlaceMultilang(req, res, next) {
         try {
             let err = keysValidator.diff(PlaceMultilang.schema.tree, req.body);
             if (err) {
@@ -53,10 +55,11 @@ module.exports = {
                 res.status(201).json(placeMultilang);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updatePlaceMultilang(req, res) {
+    async updatePlaceMultilang(req, res, next) {
         let placeMultilangId = req.params.id;
         try {
             let err = keysValidator.diff(PlaceMultilang.schema.tree, req.body);
@@ -68,14 +71,18 @@ module.exports = {
                     let updated = await placeMultilang.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
-                    res.sendStatus(404);
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removePlaceMultilang(req, res) {
+    async removePlaceMultilang(req, res, next) {
         let placeMultilangId = req.params.id;
         try {
             let placeMultilang = await PlaceMultilang.findById(placeMultilangId);
@@ -83,10 +90,14 @@ module.exports = {
                 placeMultilang = await placeMultilang.remove();
                 res.status(204).json(placeMultilang);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

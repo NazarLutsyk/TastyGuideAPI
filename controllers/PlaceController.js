@@ -1,13 +1,13 @@
-let path = require('path');
-let Place = require(global.paths.MODELS + '/Place');
-let Department = require(global.paths.MODELS + '/Department');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let ROLES = require(global.paths.CONFIG + '/roles');
-let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC, 'upload', 'place'));
-upload = upload.array('images');
+let path = require("path");
+let Place = require("../models/Place");
+let Department = require("../models/Department");
+let keysValidator = require("../validators/keysValidator");
+let ROLES = require("../config/roles");
+let upload = require("../middleware/multer")(path.join(__dirname, "../public", "upload", "place"));
+upload = upload.array("images");
 
 module.exports = {
-    async getPlaces(req, res) {
+    async getPlaces(req, res, next) {
         try {
             let placeQuery;
             if (req.query.aggregate) {
@@ -29,10 +29,11 @@ module.exports = {
             await Place.loadAsyncValues(places);
             res.json(places);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getPlaceById(req, res) {
+    async getPlaceById(req, res, next) {
         let placeId = req.params.id;
         try {
             let PlaceQuery = Place.findOne({_id: placeId})
@@ -48,14 +49,15 @@ module.exports = {
             await Place.loadAsyncValues(place);
             res.json(place);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createPlace(req, res) {
+    async createPlace(req, res, next) {
         try {
             let err = keysValidator.diff(Place.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 let place = new Place(req.body);
                 if (place) {
@@ -79,22 +81,24 @@ module.exports = {
                                 await Place.loadAsyncValues(place);
                                 res.status(201).json(place);
                             } catch (e) {
-                                res.status(400).send(e.toString());
+                                e.status = 400;
+                                return next(e);
                             }
                         }
                     });
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updatePlace(req, res) {
+    async updatePlace(req, res, next) {
         let placeId = req.params.id;
         try {
             let err = keysValidator.diff(Place.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 let place = await Place.findById(placeId);
                 if (place) {
@@ -118,14 +122,17 @@ module.exports = {
                         }
                     });
                 } else {
-                    res.sendStatus(404);
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            return next(e);
         }
     },
-    async removePlace(req, res) {
+    async removePlace(req, res, next) {
         let placeId = req.params.id;
         try {
             let removedPlace = await Place.findById(placeId);
@@ -133,10 +140,14 @@ module.exports = {
                 removedPlace = await removedPlace.remove();
                 res.sendStatus(204);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
 };

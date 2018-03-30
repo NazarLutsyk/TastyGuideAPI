@@ -1,10 +1,10 @@
-let News = require(global.paths.MODELS + '/News');
+let News = require('../models/News');
 let path = require('path');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC,'upload','promo'));
+let keysValidator = require('../validators/keysValidator');
+let upload = require('../middleware/multer')(path.join(__dirname,'../public', 'upload', 'promo'));
 upload = upload.array('images');
 module.exports = {
-    async getNews(req, res) {
+    async getNews(req, res, next) {
         try {
             let newsQuery;
             if (req.query.aggregate) {
@@ -25,10 +25,11 @@ module.exports = {
             let news = await newsQuery.exec();
             res.json(news);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getNewsById(req, res) {
+    async getNewsById(req, res, next) {
         let newsId = req.params.id;
         try {
             let newsQuery = News.findOne({_id: newsId})
@@ -41,13 +42,14 @@ module.exports = {
             let news = await newsQuery.exec();
             res.json(news);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createNews(req, res) {
+    async createNews(req, res, next) {
         try {
             let err = keysValidator.diff(News.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let news = new News(req.body);
@@ -56,7 +58,7 @@ module.exports = {
                         if (err) {
                             return res.status(400).send(err.toString());
                         } else {
-                            if(!news.images)
+                            if (!news.images)
                                 news.images = [];
                             for (let file in req.files) {
                                 let image = req.files[file].filename;
@@ -67,21 +69,23 @@ module.exports = {
                                 news = await news.supersave();
                                 res.status(201).json(news);
                             } catch (e) {
-                                res.status(400).send(e.toString());
+                                e.status = 400;
+                                return next(e);
                             }
                         }
                     });
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateNews(req, res) {
+    async updateNews(req, res, next) {
         let newsId = req.params.id;
         try {
             let err = keysValidator.diff(News.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let news = await News.findById(newsId);
@@ -90,7 +94,7 @@ module.exports = {
                         if (err) {
                             return res.status(400).send(err.toString());
                         } else {
-                            if(!req.body.images)
+                            if (!req.body.images)
                                 req.body.images = [];
                             for (let file in req.files) {
                                 let image = req.files[file].filename;
@@ -100,19 +104,24 @@ module.exports = {
                                 let updated = await news.superupdate(req.body);
                                 res.status(201).json(updated);
                             } catch (e) {
-                                res.status(400).send(e.toString());
+                                e.status = 400;
+                                return next(e);
                             }
                         }
                     });
-                }else {
-                    res.sendStatus(404);
+                } else {
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeNews(req, res) {
+    async removeNews(req, res, next) {
         let newsId = req.params.id;
         try {
             let news = await News.findById(newsId);
@@ -120,10 +129,14 @@ module.exports = {
                 news = await news.remove();
                 res.status(204).json(news);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
 };

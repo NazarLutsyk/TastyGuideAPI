@@ -1,4 +1,4 @@
-let QueryHelper = require(global.paths.HELPERS + '/queryHelper');
+let QueryHelper = require('../helpers/queryHelper');
 
 module.exports = {
     parseQuery(req, res, next) {
@@ -20,6 +20,7 @@ module.exports = {
                 req.query.limit = limit ? +limit : null;
                 return next();
             } catch (e) {
+                e.status = 400;
                 return next(e);
             }
         }

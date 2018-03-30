@@ -1,15 +1,19 @@
 let passport = require('passport');
 module.exports = {
     signUp(req, res, next) {
-        passport.authenticate('local.signup', function (err, user, info) {
+        passport.authenticate('local.signup', function (err, user) {
             if (err) {
-                return res.status(400).send(err);
+                err.status = 400;
+                return next(err);
             }
             if (!user) {
-                return res.sendStatus(400);
+                let e = new Error();
+                e.status = 400;
+                return next(e);
             }
             req.logIn(user, function (err) {
                 if (err) {
+                    err.status = 400;
                     return next(err);
                 }
                 return res.status(200).json({
@@ -19,15 +23,19 @@ module.exports = {
         })(req, res, next);
     },
     signIn(req, res, next) {
-        passport.authenticate('local.signin', function (err, user, info) {
+        passport.authenticate('local.signin', function (err, user) {
             if (err) {
-                return res.status(400).send(err);
+                err.status = 400;
+                return next(err);
             }
             if (!user) {
-                return res.sendStatus(400);
+                let e = new Error();
+                e.status = 400;
+                return next(e);
             }
             req.logIn(user, function (err) {
                 if (err) {
+                    err.status = 400;
                     return next(err);
                 }
                 return res.status(200).json({
@@ -36,26 +44,29 @@ module.exports = {
             });
         })(req, res, next);
     },
-    facebookAuth(req, res) {
+    facebookAuth(req, res, next) {
         if (req.user) {
             return res.status(200).json({
                 user: req.user
             });
         }else {
-            return res.sendStatus(400);
+            let e = new Error();
+            e.status = 400;
+            return next(e);
         }
     },
-    googleAuth(req, res) {
-        console.log('controller');
+    googleAuth(req, res, next) {
         if (req.user) {
             return res.status(200).json({
                 user: req.user
             });
         }else {
-            return res.sendStatus(400);
+            let e = new Error();
+            e.status = 400;
+            return next(e);
         }
     },
-    logout(req, res, next) {
+    logout(req, res) {
         req.logout();
         res.sendStatus(200);
     }

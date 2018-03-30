@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-let query = require(global.paths.MIDDLEWARE + '/query');
+let query = require('../middleware/query');
 router.use(query.parseQuery);
 
 router.use('/places', require('./place'));

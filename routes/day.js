@@ -1,9 +1,9 @@
-const DayController = require(global.paths.CONTROLLERS + '/DayController');
-let ROLES = require(global.paths.CONFIG + '/roles');
+const DayController = require('../controllers/DayController');
+let ROLES = require('../config/roles');
 const express = require('express');
 
-let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
-let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Day');
+let permission = require('../middleware/authorizarion/index');
+let Rule = require('../middleware/authorizarion/rules/Day');
 
 const router = express.Router();
 

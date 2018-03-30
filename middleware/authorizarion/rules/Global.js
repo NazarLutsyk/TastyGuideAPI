@@ -1,15 +1,19 @@
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+let objectHelper = require('../../../helpers/objectHelper');
 
 exports.updatable = function (notAllowed) {
     return async function (req, res, next) {
         try {
             if (req.body && objectHelper.someKeyContains(req.body, notAllowed)) {
-                res.sendStatus(400);
+                let error = new Error();
+                error.message = 'Forbidden';
+                error.status = 403;
+                return next(error);
             } else {
                 next();
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

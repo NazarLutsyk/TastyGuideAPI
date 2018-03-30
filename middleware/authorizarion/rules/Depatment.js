@@ -1,6 +1,6 @@
-let Place = require(global.paths.MODELS + '/Place');
-let Department = require(global.paths.MODELS + '/Department');
-let ROLES = require(global.paths.CONFIG + '/roles');
+let Place = require("../../../models/Place");
+let Department = require("../../../models/Department");
+let ROLES = require("../../../config/roles");
 module.exports = {
     async createDepartment(req, res, next) {
         try {
@@ -15,7 +15,10 @@ module.exports = {
             if (allowed > 0) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.message = "Forbidden";
+                error.status = 403;
+                return next(error);
             }
         } catch (e) {
             return res.status(400).send(e.toString());
@@ -23,24 +26,30 @@ module.exports = {
     },
     async updateDepartment(req, res, next) {
         try {
+            let allowed = 0;
             let user = req.user;
-            let departmentId = req.body.id;
+            let departmentId = req.params.id;
 
             let department = await Department.findById(departmentId);
-            let place = await Place.findOne({_id: department.place});
-
-            let allowed = await Department.count({
-                place: place._id,
-                client: user._id,
-                roles: ROLES.PLACE_ROLES.BOSS_ROLE
-            });
+            if (department) {
+                let place = await Place.findOne({_id: department.place});
+                allowed = await Department.count({
+                    place: place._id,
+                    client: user._id,
+                    roles: ROLES.PLACE_ROLES.BOSS_ROLE
+                });
+            }
             if (allowed > 0) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.message = "Forbidden";
+                error.status = 403;
+                return next(error);
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

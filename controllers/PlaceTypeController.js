@@ -1,9 +1,9 @@
-let PlaceType = require(global.paths.MODELS + '/PlaceType');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+let PlaceType = require('../models/PlaceType');
+let keysValidator = require('../validators/keysValidator');
+let objectHelper = require('../helpers/objectHelper');
 
 module.exports = {
-    async getPlaceTypes(req, res) {
+    async getPlaceTypes(req, res, next) {
         try {
             let placeTypeQuery;
             if (req.query.aggregate) {
@@ -24,10 +24,11 @@ module.exports = {
             let placeTypes = await placeTypeQuery.exec();
             res.json(placeTypes);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getPlaceTypeById(req, res) {
+    async getPlaceTypeById(req, res, next) {
         let placeTypeId = req.params.id;
         try {
             let placeTypeQuery = PlaceType.findOne({_id: placeTypeId})
@@ -40,27 +41,29 @@ module.exports = {
             let placeType = await placeTypeQuery.exec();
             res.json(placeType);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createPlaceType(req, res) {
+    async createPlaceType(req, res, next) {
         try {
             let err = keysValidator.diff(PlaceType.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let placeType = await PlaceType.create(req.body);
                 res.status(201).json(placeType);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updatePlaceType(req, res) {
+    async updatePlaceType(req, res, next) {
         let placeTypeId = req.params.id;
         try {
             let err = keysValidator.diff(PlaceType.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let placeType = await PlaceType.findById(placeTypeId);
@@ -68,15 +71,19 @@ module.exports = {
                     objectHelper.load(placeType, req.body);
                     let updated = await placeType.save();
                     res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
+                } else {
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removePlaceType(req, res) {
+    async removePlaceType(req, res, next) {
         let placeTypeId = req.params.id;
         try {
             let placeType = await PlaceType.findById(placeTypeId);
@@ -84,10 +91,14 @@ module.exports = {
                 placeType = await placeType.remove();
                 res.status(204).json(placeType);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
 };

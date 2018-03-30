@@ -18,6 +18,7 @@ let PlaceTypeMultilangSchema = new Schema({
 
 PlaceTypeMultilangSchema.methods.supersave = async function () {
     let PlaceType = require('./PlaceType');
+    let Lang = require('./Lang');
 
     let placeType = await PlaceType.findById(this.placeType);
     let lang = await Lang.findById(this.lang);
@@ -32,7 +33,7 @@ PlaceTypeMultilangSchema.methods.supersave = async function () {
     return await this.save();
 };
 PlaceTypeMultilangSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let objectHelper = require('../helpers/objectHelper');
     let Lang = require('./Lang');
 
     if (newDoc.placeType) {

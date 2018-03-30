@@ -1,5 +1,5 @@
 let mongoose = require('mongoose');
-let path = require('path');
+
 
 let Schema = mongoose.Schema;
 
@@ -69,7 +69,9 @@ let PlaceSchema = new Schema({
     }
 });
 
-PlaceSchema.statics.notUpdatable = ['rating','reviews','allowed'];
+PlaceSchema.statics.notUpdatable = function (){
+    return ['rating','reviews','allowed'];
+};
 
 PlaceSchema.statics.loadAsyncValues = async function (docs) {
     let Rating = require('./Rating');
@@ -109,10 +111,11 @@ PlaceSchema.methods.supersave = async function () {
 
 PlaceSchema.methods.superupdate = async function (newDoc) {
 
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
-    let fileHelper = require(global.paths.HELPERS + '/fileHelper');
+    let objectHelper = require('../helpers/objectHelper');
+    let fileHelper = require('../helpers/fileHelper');
     let PlaceType = require('./PlaceType');
     let HashTag = require('./HashTag');
+    let path = require('path');
 
     let placeTypeExists = await PlaceType.count({_id: newDoc.types});
     let hashTagExists = await HashTag.count({_id: newDoc.hashTags});
@@ -128,7 +131,7 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
         for (let i = 0; i < this.images.length; i++) {
             let oldImage = this.images[i];
             if (newDoc.images.indexOf(oldImage) === -1) {
-                let toDelete = global.paths.PUBLIC + "/upload/place/" + oldImage;
+                let toDelete = path.join(__dirname,"../public","upload","place", oldImage);
                 fileHelper.deleteFiles(toDelete);
             }
         }
@@ -149,6 +152,7 @@ let Promo = require('./Promo');
 let HashTag = require('./HashTag');
 let Multilang = require('./PlaceMultilang');
 let Client = require('./Client');
+let path = require('path');
 PlaceSchema.pre('remove', async function (next) {
     try {
         let complaints = await Complaint.remove({place: this._id});
@@ -159,7 +163,7 @@ PlaceSchema.pre('remove', async function (next) {
         let days = await Day.remove({place: this._id});
         let promos = await Promo.remove({place: this._id});
         let multilangs = await Multilang.remove({place: this._id});
-        let fileHelper = require(global.paths.HELPERS + '/fileHelper');
+        let fileHelper = require('../helpers/fileHelper');
 
         await Client.update(
             {favoritePlaces: this._id},
@@ -168,7 +172,7 @@ PlaceSchema.pre('remove', async function (next) {
         if (this.images.length > 0) {
             for (let i = 0; i < this.images.length; i++) {
                 let image = this.images[i];
-                let toDelete = global.paths.PUBLIC + "/upload/place/" + image;
+                let toDelete = path.join(__dirname,"../public","upload","place", image);
                 fileHelper.deleteFiles(toDelete);
             }
         }

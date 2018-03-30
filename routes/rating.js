@@ -1,9 +1,9 @@
-const RatingController = require(global.paths.CONTROLLERS + '/RatingController');
+const RatingController = require('../controllers/RatingController');
 const express = require('express');
-let ROLES = require(global.paths.CONFIG + '/roles');
+let ROLES = require('../config/roles');
 
-let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
-let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Rating');
+let permission = require('../middleware/authorizarion/index');
+let Rule = require('../middleware/authorizarion/rules/Rating');
 
 const router = express.Router();
 

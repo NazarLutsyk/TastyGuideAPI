@@ -48,7 +48,7 @@ RatingSchema.methods.supersave = async function () {
 };
 
 RatingSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let objectHelper = require('../helpers/objectHelper');
     if (newDoc.place || newDoc.client) {
         throw new Error('Can`t update relations!');
     }

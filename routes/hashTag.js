@@ -1,8 +1,8 @@
-const HashTagController = require(global.paths.CONTROLLERS + '/HashTagController');
-let ROLES = require(global.paths.CONFIG + '/roles');
+const HashTagController = require('../controllers/HashTagController');
+let ROLES = require('../config/roles');
 const express = require('express');
 
-let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
+let permission = require('../middleware/authorizarion/index');
 
 const router = express.Router();
 

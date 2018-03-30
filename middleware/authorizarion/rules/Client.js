@@ -1,4 +1,3 @@
-let Client = require(global.paths.MODELS + '/Client');
 module.exports = {
     async updateClient(req, res, next) {
         try {
@@ -7,10 +6,14 @@ module.exports = {
             if (user._id.equals(clientId) && !req.body.roles) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.message = 'Forbidden';
+                error.status = 403;
+                return next(error);
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

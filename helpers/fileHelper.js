@@ -11,8 +11,6 @@ module.exports = {
                     if (exists) {
                         fs.unlink(files[file].toString(), function (err) {
                             if (err) {
-                                console.log('From file helper');
-                                console.log(err);
                                 throw new Error(err);
                             }
                             return;

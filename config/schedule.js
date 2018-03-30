@@ -1,5 +1,5 @@
-let TopPlace = require(global.paths.MODELS + '/TopPlace');
-let Place = require(global.paths.MODELS + '/Place');
+let TopPlace = require('../models/TopPlace');
+let Place = require('../models/Place');
 
 //deletes places in query that are older than 3 days
 setInterval(async function () {

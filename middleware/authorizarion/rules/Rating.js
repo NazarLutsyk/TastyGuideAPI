@@ -1,5 +1,5 @@
-let Client = require(global.paths.MODELS + '/Client');
-let Rating = require(global.paths.MODELS + '/Rating');
+
+let Rating = require('../../../models/Rating');
 module.exports = {
     async updateRating(req,res,next) {
         try {
@@ -9,10 +9,14 @@ module.exports = {
             if (rating && rating.client.equals(user._id)) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.status = 403;
+                error.message = 'Forbidden';
+                return next(error);
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

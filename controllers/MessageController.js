@@ -1,8 +1,8 @@
-let Message = require(global.paths.MODELS + '/Message');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let Message = require('../models/Message');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
-    async getMessages(req, res) {
+    async getMessages(req, res, next) {
         try {
             let messageQuery;
             messageQuery = Message
@@ -21,10 +21,11 @@ module.exports = {
             let news = await messageQuery.exec();
             res.json(news);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getMessageById(req, res) {
+    async getMessageById(req, res, next) {
         let messageId = req.params.id;
         try {
             let messageQuery = Message.findOne({
@@ -40,10 +41,11 @@ module.exports = {
             let messages = await messageQuery.exec();
             res.json(messages);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createMessage(req, res) {
+    async createMessage(req, res, next) {
         try {
             let err = keysValidator.diff(Message.schema.tree, req.body);
             if (err) {
@@ -55,10 +57,11 @@ module.exports = {
                 res.status(201).json(message);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeMessage(req, res) {
+    async removeMessage(req, res, next) {
         let messageId = req.params.id;
         try {
             let message = await Message.findById(messageId);
@@ -66,10 +69,14 @@ module.exports = {
                 await message.remove();
                 res.status(204).json(message);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

@@ -5,7 +5,7 @@ module.exports = {
         second = Object.keys(second);
 
         for (let key of second) {
-            if (first.indexOf(key) == -1) {
+            if (first.indexOf(key) === -1) {
                 error.push(key);
             }
         }

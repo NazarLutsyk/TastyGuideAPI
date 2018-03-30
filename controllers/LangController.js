@@ -1,9 +1,9 @@
-let Lang = require(global.paths.MODELS + '/Lang');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+let Lang = require('../models/Lang');
+let keysValidator = require('../validators/keysValidator');
+let objectHelper = require('../helpers/objectHelper');
 
 module.exports = {
-    async getLangs(req, res) {
+    async getLangs(req, res,next) {
         try {
             let langQuery;
             if (req.query.aggregate) {
@@ -24,10 +24,11 @@ module.exports = {
             let langs = await langQuery.exec();
             res.json(langs);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getLangById(req, res) {
+    async getLangById(req, res,next) {
         let langId = req.params.id;
         try {
             let langQuery = Lang.findOne({_id: langId})
@@ -40,18 +41,20 @@ module.exports = {
             let lang = await langQuery.exec();
             res.json(lang);
         } catch (e) {
-            res.status(404).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createLang(req, res) {
+    async createLang(req, res,next) {
         try {
             let lang = await Lang.create(req.body);
             res.status(201).json(lang);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateLang(req, res) {
+    async updateLang(req, res,next) {
         let langId = req.params.id;
         try {
             let err = keysValidator.diff(Lang.schema.tree, req.body);
@@ -63,15 +66,19 @@ module.exports = {
                     objectHelper.load(lang, req.body);
                     let updated = await lang.save();
                     res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
+                } else {
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeLang(req, res) {
+    async removeLang(req, res,next) {
         let langId = req.params.id;
         try {
             let lang = await Lang.findById(langId);
@@ -79,10 +86,14 @@ module.exports = {
                 lang = await lang.remove();
                 res.status(204).json(lang);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

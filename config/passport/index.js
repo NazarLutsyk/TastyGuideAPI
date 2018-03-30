@@ -2,7 +2,7 @@ let passport = require('passport');
 let LocalStrategy = require('./LocalStrategy');
 let FacebookStrategy = require('./FacebookStrategy');
 let GoogleStrategy = require('./GoogleStrategy');
-let Client = require(global.paths.MODELS + '/Client');
+let Client = require('../../models/Client');
 
 passport.serializeUser(function (user, done) {
     done(null, user.id);

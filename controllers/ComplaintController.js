@@ -1,8 +1,8 @@
-let Complaint = require(global.paths.MODELS + '/Complaint');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let Complaint = require('../models/Complaint');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
-    async getComplaints(req, res) {
+    async getComplaints(req, res,next) {
         try {
             let complaintQuery;
             if (req.query.aggregate) {
@@ -23,10 +23,11 @@ module.exports = {
             let complaints = await complaintQuery.exec();
             res.json(complaints);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getComplaintById(req, res) {
+    async getComplaintById(req, res,next) {
         let complaintId = req.params.id;
         try {
             let complaintQuery = Complaint.findOne({_id: complaintId})
@@ -39,10 +40,11 @@ module.exports = {
             let complaint = await complaintQuery.exec();
             res.json(complaint);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createComplaint(req, res) {
+    async createComplaint(req, res,next) {
         try {
             let err = keysValidator.diff(Complaint.schema.tree, req.body);
             if (err) {
@@ -54,10 +56,11 @@ module.exports = {
                 res.status(201).json(complaint);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateComplaint(req, res) {
+    async updateComplaint(req, res,next) {
         let complaintId = req.params.id;
         try {
             let err = keysValidator.diff(Complaint.schema.tree, req.body);
@@ -69,14 +72,18 @@ module.exports = {
                     let updated = await complaint.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
-                    res.sendStatus(404);
+                    let e = new Error();
+                    e.status = 404;
+                    e.message = 'Not found';
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeComplaint(req, res) {
+    async removeComplaint(req, res,next) {
         let complaintId = req.params.id;
         try {
             let complaint = await Complaint.findById(complaintId);
@@ -84,10 +91,14 @@ module.exports = {
                 complaint = await complaint.remove();
                 res.status(204).json(complaint);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = 'Not found';
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

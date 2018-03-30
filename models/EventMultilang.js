@@ -22,6 +22,7 @@ let EventMultilangSchema = new Schema({
 
 EventMultilangSchema.methods.supersave = async function () {
     let Event = require('./Event');
+    let Lang = require('./Lang');
 
     let promo = await Event.findById(this.promo);
     let lang = await Lang.findById(this.lang);
@@ -35,7 +36,7 @@ EventMultilangSchema.methods.supersave = async function () {
     return await this.save();
 };
 EventMultilangSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let objectHelper = require('../helpers/objectHelper');
     let Lang = require('./Lang');
 
     if (newDoc.promo) {

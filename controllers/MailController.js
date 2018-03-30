@@ -1,5 +1,5 @@
 let nodemailer = require('nodemailer');
-let MAIL = require(global.paths.CONFIG + '/mail');
+let MAIL = require('../config/mail');
 
 //todo normal message format
 module.exports = {
@@ -18,6 +18,7 @@ module.exports = {
             text: 'I hope this message gets through!',
         }, (error, info) => {
             if (error) {
+                error.status = 400;
                 return next(error);
             }
             res.json(info);

@@ -1,7 +1,7 @@
-const EventController = require(global.paths.CONTROLLERS + '/EventController');
-let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
-let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Promo');
-let ROLES = require(global.paths.CONFIG + '/roles');
+const EventController = require('../controllers/EventController');
+let permission = require('../middleware/authorizarion/index');
+let Rule = require('../middleware/authorizarion/rules/Promo');
+let ROLES = require('../config/roles');
 const express = require('express');
 
 const router = express.Router();

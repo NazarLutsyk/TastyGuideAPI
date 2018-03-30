@@ -1,6 +1,6 @@
-let Department = require(global.paths.MODELS + '/Department');
-let Place = require(global.paths.MODELS + '/Place');
-let Day = require(global.paths.MODELS + '/Day');
+let Department = require("../../../models/Department");
+let Place = require("../../../models/Place");
+let Day = require("../../../models/Day");
 module.exports = {
     async createDay(req, res, next) {
         try {
@@ -14,31 +14,41 @@ module.exports = {
             if (allowed > 0) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.status = 403;
+                error.message = "Forbidden";
+                return next(error);
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
     async updateDay(req, res, next) {
         try {
+            let allowed = 0;
             let user = req.user;
-            let dayId = req.body.id;
+            let dayId = req.params.id;
 
             let day = await Day.findById(dayId);
-            let place = await Place.findOne({_id: day.place});
-
-            let allowed = await Department.count({
-                place: place._id,
-                client: user._id
-            });
+            if (day) {
+                let place = await Place.findOne({_id: day.place});
+                allowed = await Department.count({
+                    place: place._id,
+                    client: user._id
+                });
+            }
             if (allowed > 0) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.message = "Forbidden";
+                error.status = 403;
+                return next(error);
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

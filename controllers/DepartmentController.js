@@ -1,8 +1,8 @@
-let Department = require(global.paths.MODELS + '/Department');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let Department = require('../models/Department');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
-    async getDepartments(req, res) {
+    async getDepartments(req, res,next) {
         try {
             let departmentQuery;
             if (req.query.aggregate) {
@@ -23,10 +23,11 @@ module.exports = {
             let departments = await departmentQuery.exec();
             res.json(departments);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getDepartmentById(req, res) {
+    async getDepartmentById(req, res,next) {
         let departmentId = req.params.id;
         try {
             let departmentQuery = Department.findOne({_id: departmentId})
@@ -39,13 +40,14 @@ module.exports = {
             let department = await departmentQuery.exec();
             res.json(department);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createDepartment(req, res) {
+    async createDepartment(req, res,next) {
         try {
             let err = keysValidator.diff(Department.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let department = new Department(req.body);
@@ -53,40 +55,49 @@ module.exports = {
                 res.status(201).json(department);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateDepartment(req, res) {
+    async updateDepartment(req, res,next) {
         let departmentId = req.params.id;
         try {
             let err = keysValidator.diff(Department.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let department = await Department.findById(departmentId);
                 if (department) {
                     let updated = await department.superupdate(req.body);
                     res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
+                } else {
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeDepartment(req, res) {
+    async removeDepartment(req, res,next) {
         let departmentId = req.params.id;
         try {
             let department = await Department.findById(departmentId);
             if (department) {
                 department = await department.remove();
                 res.status(204).json(department);
-            }else {
-                res.sendStatus(404);
+            } else {
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
 };

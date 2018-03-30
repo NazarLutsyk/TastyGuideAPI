@@ -1,7 +1,7 @@
-let mongoose = require('mongoose');
-let bcrypt = require('bcrypt-nodejs');
-let path = require('path');
-let ROLES = require('../config/roles');
+let mongoose = require("mongoose");
+let bcrypt = require("bcrypt-nodejs");
+
+let ROLES = require("../config/roles");
 let Schema = mongoose.Schema;
 
 let ClientSchema = new Schema({
@@ -22,7 +22,7 @@ let ClientSchema = new Schema({
             validator: function () {
                 return this.password.length >= 4;
             },
-            message: 'Password min length eq 4'
+            message: "Password min length eq 4"
         }
     },
     facebookId: String,
@@ -47,65 +47,56 @@ let ClientSchema = new Schema({
     },
     favoritePlaces: [{
         type: Schema.Types.ObjectId,
-        ref: 'Place'
+        ref: "Place"
     }],
 }, {
     timestamps: true,
 });
-ClientSchema.statics.notUpdatable = ['roles','avatar','facebookId','googleId'];
+ClientSchema.statics.notUpdatable = function(){
+    return ["roles", "avatar", "facebookId", "googleId"];
+};
+
 ClientSchema.methods.encryptPassword = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(5), null);
 };
 ClientSchema.methods.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
-ClientSchema.statics.notUpdatable = function(){
-    return ['avatar','roles'];
+ClientSchema.statics.notUpdatable = function () {
+    return ["avatar", "roles"];
 };
 ClientSchema.methods.superupdate = async function (newDoc) {
-    let Place = require('./Place');
+    let Place = require("./Place");
+    let objectHelper = require('../helpers/objectHelper');
 
-    if (newDoc.hasOwnProperty('favoritePlaces')) {
+    if (newDoc.hasOwnProperty("favoritePlaces")) {
         let count = await Place.count({_id: newDoc.favoritePlaces});
         if (count !== newDoc.favoritePlaces.length) {
-            throw new Error('Not found related model Place!');
+            throw new Error("Not found related model Place!");
         }
     }
     objectHelper.load(this, newDoc);
     return await this.save();
 };
 
-module.exports = mongoose.model('Client', ClientSchema);
+module.exports = mongoose.model("Client", ClientSchema);
 
-let Complaint = require('./Complaint');
-let DrinkApplication = require('./DrinkApplication');
-let Place = require('./Place');
-let Rating = require('./Rating');
-let Department = require('./Department');
-let Message = require('./Message');
-ClientSchema.pre('remove', async function (next) {
+let Complaint = require("./Complaint");
+let DrinkApplication = require("./DrinkApplication");
+let Rating = require("./Rating");
+let Department = require("./Department");
+let Message = require("./Message");
+ClientSchema.pre("remove", async function (next) {
     try {
         await Complaint.remove({client: this._id});
         await DrinkApplication.remove({organizer: this._id});
         await Rating.remove({client: this._id});
         await Department.remove({client: this._id});
-        await Message.update(
-            {sender: this._id},
-            {sender: null},
-            {
-                multi: true,
-                runValidators: true,
-                context: 'query'
-            }
+        await Message.remove(
+            {sender: this._id}
         );
-        await Message.update(
-            {receiver: this._id},
-            {receiver: null},
-            {
-                multi: true,
-                runValidators: true,
-                context: 'query'
-            }
+        await Message.remove(
+            {receiver: this._id}
         );
         return next();
     } catch (e) {

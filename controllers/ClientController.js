@@ -1,8 +1,8 @@
-let Client = require(global.paths.MODELS + '/Client');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let Client = require('../models/Client');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
-    async getClients(req, res) {
+    async getClients(req, res,next) {
         try {
             let clientQuery;
             if (req.query.aggregate) {
@@ -23,10 +23,11 @@ module.exports = {
             let clients = await clientQuery.exec();
             res.json(clients);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getClientById(req, res) {
+    async getClientById(req, res,next) {
         let clientId = req.params.id;
         try {
             let clientQuery = Client.findOne({_id: clientId})
@@ -39,10 +40,11 @@ module.exports = {
             let client = await clientQuery.exec();
             res.json(client);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateClient(req, res) {
+    async updateClient(req, res,next) {
         let clientId = req.params.id;
         try {
             let err = keysValidator.diff(Client.schema.tree, req.body);
@@ -54,25 +56,33 @@ module.exports = {
                     let updated = await client.superupdate(req.body);
                     res.status(201).json(updated);
                 } else {
-                    res.sendStatus(404);
+                    let e = new Error();
+                    e.message = 'Not found';
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeClient(req, res) {
+    async removeClient(req, res,next) {
         let clientId = req.params.id;
         try {
             let removedClient = await Client.findById(clientId);
             if (removedClient) {
                 removedClient = await removedClient.remove();
                 res.status(204).json(removedClient);
-            }else {
-                res.sendStatus(404);
+            } else {
+                let e = new Error();
+                e.message = 'Not found';
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
 };

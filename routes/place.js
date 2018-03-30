@@ -1,9 +1,9 @@
-const PlaceController = require(global.paths.CONTROLLERS + '/PlaceController');
-let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
-let ROLES = require(global.paths.CONFIG + '/roles');
-let PlaceRule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Place');
-let GlobalRule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Global');
-let Place = require(global.paths.MODELS + '/Place');
+const PlaceController = require('../controllers/PlaceController');
+let permission = require('../middleware/authorizarion/index');
+let ROLES = require('../config/roles');
+let PlaceRule = require('../middleware/authorizarion/rules/Place');
+let GlobalRule = require('../middleware/authorizarion/rules/Global');
+let Place = require('../models/Place');
 const express = require('express');
 
 const router = express.Router();
@@ -11,14 +11,13 @@ const router = express.Router();
 router.route('/')
     .get(PlaceController.getPlaces)
     .post(
-        permission.rule(GlobalRule.updatable(Place.notUpdatable),ROLES.GLOBAL_ROLES.ADMIN_ROLE),
-        permission.rule(PlaceRule.updatable,ROLES.GLOBAL_ROLES.ADMIN_ROLE),
+        permission.rule(GlobalRule.updatable(Place.notUpdatable()),ROLES.GLOBAL_ROLES.ADMIN_ROLE),
         PlaceController.createPlace
     );
 router.route('/:id')
     .get(PlaceController.getPlaceById)
     .put(
-        permission.rule(GlobalRule.updatable(Place.notUpdatable),ROLES.GLOBAL_ROLES.ADMIN_ROLE),
+        permission.rule(GlobalRule.updatable(Place.notUpdatable()),ROLES.GLOBAL_ROLES.ADMIN_ROLE),
         permission.rule(PlaceRule.updatePlace,ROLES.GLOBAL_ROLES.ADMIN_ROLE),
         PlaceController.updatePlace
     )

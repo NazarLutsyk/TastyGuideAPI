@@ -1,9 +1,9 @@
-const DrinkApplicationController = require(global.paths.CONTROLLERS + '/DrinkApplicationController');
-let ROLES = require(global.paths.CONFIG + '/roles');
+const DrinkApplicationController = require('../controllers/DrinkApplicationController');
+let ROLES = require('../config/roles');
 const express = require('express');
 
-let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
-let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/DrinkApplication');
+let permission = require('../middleware/authorizarion/index');
+let Rule = require('../middleware/authorizarion/rules/DrinkApplication');
 
 const router = express.Router();
 

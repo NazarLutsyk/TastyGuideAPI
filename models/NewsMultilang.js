@@ -22,6 +22,7 @@ let NewsMultilangSchema = new Schema({
 
 NewsMultilangSchema.methods.supersave = async function () {
     let News = require('./News');
+    let Lang = require('./Lang');
 
     let promo = await News.findById(this.promo);
     let lang = await Lang.findById(this.lang);
@@ -36,7 +37,7 @@ NewsMultilangSchema.methods.supersave = async function () {
     return await this.save();
 };
 NewsMultilangSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let objectHelper = require('../helpers/objectHelper');
     let Lang = require('./Lang');
 
     if (newDoc.promo) {

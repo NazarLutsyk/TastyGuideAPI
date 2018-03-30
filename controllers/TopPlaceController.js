@@ -1,8 +1,8 @@
-let TopPlace = require(global.paths.MODELS + '/TopPlace');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let TopPlace = require('../models/TopPlace');
+let keysValidator = require('../validators/keysValidator');
 
 module.exports = {
-    async getTopPlaces(req, res) {
+    async getTopPlaces(req, res, next) {
         try {
             let topPlaceQuery;
             if (req.query.aggregate) {
@@ -19,13 +19,15 @@ module.exports = {
                         topPlaceQuery.populate(populateField);
                     }
                 }
-            } topPlaces = await topPlaceQuery.exec();
+            }
+            let topPlaces = await topPlaceQuery.exec();
             res.json(topPlaces);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getTopPlaceById(req, res) {
+    async getTopPlaceById(req, res, next) {
         let topPlaceId = req.params.id;
         try {
             let topPlaceQuery = TopPlace.findOne({_id: topPlaceId})
@@ -38,13 +40,14 @@ module.exports = {
             let topPlace = await topPlaceQuery.exec();
             res.json(topPlace);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createTopPlace(req, res) {
+    async createTopPlace(req, res, next) {
         try {
             let err = keysValidator.diff(TopPlace.schema.tree, req.body);
-            if (err){
+            if (err) {
                 throw new Error('Unknown fields ' + err);
             } else {
                 let topPlace = new TopPlace(req.body);
@@ -52,11 +55,11 @@ module.exports = {
                 res.status(201).json(topPlace);
             }
         } catch (e) {
-            console.log(e);
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateTopPlace(req, res) {
+    async updateTopPlace(req, res, next) {
         let topPlaceId = req.params.id;
         try {
             let err = keysValidator.diff(TopPlace.schema.tree, req.body);
@@ -67,26 +70,34 @@ module.exports = {
                 if (topPlace) {
                     let updated = await topPlace.superupdate(req.body);
                     res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
+                } else {
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeTopPlace(req, res) {
+    async removeTopPlace(req, res, next) {
         let topPlaceId = req.params.id;
         try {
             let topPlace = await TopPlace.findById(topPlaceId);
             if (topPlace) {
                 topPlace = await topPlace.remove();
                 res.status(204).json(topPlace);
-            }else {
-                res.sendStatus(404);
+            } else {
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

@@ -56,7 +56,7 @@ DrinkApplicationSchema.methods.supersave = async function () {
 };
 
 DrinkApplicationSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let objectHelper = require('../helpers/objectHelper');
     let Place = require('./Place');
 
     if (newDoc.organizer) {

@@ -1,6 +1,6 @@
-let Department = require(global.paths.MODELS + '/Department');
-let Place = require(global.paths.MODELS + '/Place');
-let ROLES = require(global.paths.CONFIG + '/roles');
+let Department = require("../../../models/Department");
+
+let ROLES = require("../../../config/roles");
 module.exports = {
     async updatePlace(req, res, next) {
         try {
@@ -13,10 +13,13 @@ module.exports = {
             if (allowed > 0) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.status = 403;
+                return next(error);
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
     async deletePlace(req, res, next) {
@@ -31,7 +34,10 @@ module.exports = {
             if (allowed > 0) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.status = 403;
+                error.message = "Forbidden";
+                return next(error);
             }
         } catch (e) {
             return res.status(400).send(e.toString());

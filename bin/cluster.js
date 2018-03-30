@@ -6,7 +6,7 @@ if(cluster.isMaster){
     for (let i = 0; i < cpus; i++) {
         cluster.fork();
     }
-    cluster.on('exit',function (worker, code, signal) {
+    cluster.on('exit',function (worker, code) {
         if(code !== 0 && !worker.exitedAfterDisconnect){
             cluster.fork();
         }

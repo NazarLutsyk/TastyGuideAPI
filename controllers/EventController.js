@@ -1,10 +1,10 @@
-let Event = require(global.paths.MODELS + '/Event');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
+let Event = require('../models/Event');
+let keysValidator = require('../validators/keysValidator');
 let path = require('path');
-let upload = require(global.paths.MIDDLEWARE + '/multer')(path.join(global.paths.PUBLIC,'upload','promo'));
+let upload = require('../middleware/multer')(path.join(__dirname,'../public', 'upload', 'promo'));
 upload = upload.array('images');
 module.exports = {
-    async getEvents(req, res) {
+    async getEvents(req, res,next) {
         try {
             let eventQuery;
             if (req.query.aggregate) {
@@ -25,10 +25,11 @@ module.exports = {
             let events = await eventQuery.exec();
             res.json(events);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getEventById(req, res) {
+    async getEventById(req, res,next) {
         let eventId = req.params.id;
         try {
             let eventQuery = Event.findOne({_id: eventId})
@@ -41,10 +42,11 @@ module.exports = {
             let event = await eventQuery.exec();
             res.json(event);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createEvent(req, res) {
+    async createEvent(req, res,next) {
         try {
             let err = keysValidator.diff(Event.schema.tree, req.body);
             if (err) {
@@ -56,7 +58,7 @@ module.exports = {
                         if (err) {
                             return res.status(400).send(err.toString());
                         } else {
-                            if(!event.images)
+                            if (!event.images)
                                 event.images = [];
                             for (let file in req.files) {
                                 let image = req.files[file].filename;
@@ -67,19 +69,24 @@ module.exports = {
                                 event = await event.supersave();
                                 res.status(201).json(event);
                             } catch (e) {
-                                res.status(400).send(e.toString());
+                                e.status = 400;
+                                return next(e);
                             }
                         }
                     });
-                }else {
-                    res.sendStatus(404);
+                } else {
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateEvent(req, res) {
+    async updateEvent(req, res,next) {
         let eventId = req.params.id;
         try {
             let err = keysValidator.diff(Event.schema.tree, req.body);
@@ -92,7 +99,7 @@ module.exports = {
                         if (err) {
                             return res.status(400).send(err.toString());
                         } else {
-                            if(!req.body.images)
+                            if (!req.body.images)
                                 req.body.images = [];
                             for (let file in req.files) {
                                 let image = req.files[file].filename;
@@ -102,19 +109,24 @@ module.exports = {
                                 let updated = await event.superupdate(req.body);
                                 res.status(201).json(updated);
                             } catch (e) {
-                                res.status(400).send(e.toString());
+                                e.status = 400;
+                                return next(e);
                             }
                         }
                     });
                 } else {
-                    res.sendStatus(404);
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeEvent(req, res) {
+    async removeEvent(req, res,next) {
         let eventId = req.params.id;
         try {
             let event = await Event.findById(eventId);
@@ -122,10 +134,14 @@ module.exports = {
                 event = await event.remove();
                 res.status(204).json(event);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
 

@@ -38,7 +38,7 @@ ComplaintSchema.methods.supersave = async function () {
 };
 
 ComplaintSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+    let objectHelper = require('../helpers/objectHelper');
 
     if (newDoc.place || newDoc.client) {
         throw new Error('Can`t update relations!');

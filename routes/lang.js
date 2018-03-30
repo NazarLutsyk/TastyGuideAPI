@@ -1,7 +1,7 @@
-const LangController = require(global.paths.CONTROLLERS + '/LangController');
+const LangController = require('../controllers/LangController');
 const express = require('express');
-let ROLES = require(global.paths.CONFIG + '/roles');
-let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
+let ROLES = require('../config/roles');
+let permission = require('../middleware/authorizarion/index');
 
 const router = express.Router();
 

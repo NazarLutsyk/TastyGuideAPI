@@ -1,4 +1,4 @@
-let ROLES = require(global.paths.CONFIG + "/roles");
+
 
 function isAllowed(allowed, userRoles) {
     for (let role of userRoles) {
@@ -16,26 +16,38 @@ exports.roles = function (...roles) {
         }
         for (let role of roles) {
             if (typeof role !== "string") {
-                return res.sendStatus(400);
+                let error = new Error();
+                error.status = 400;
+                return next(error);
             }
         }
         if (req.user && isAllowed(roles, req.user.roles)) {
             return next();
         }
-        return res.sendStatus(403);
+        let error = new Error();
+        error.message = 'Forbidden';
+        error.status = 403;
+        return next(error);
     };
 };
 
 exports.rule = function (rule, ...exclusionRoles) {
-    return function (req, res, next) {
-        if (exclusionRoles && isAllowed(exclusionRoles, req.user.roles)) {
-            return next();
-        } else {
-            if (typeof rule !== "function") {
-                return res.sendStatus(400);
+    return (req, res, next) => {
+        try {
+            if (exclusionRoles && isAllowed(exclusionRoles, req.user.roles)) {
+                return next();
             } else {
-                return rule(req, res, next);
+                if (typeof rule !== "function") {
+                    let error = new Error();
+                    error.status = 400;
+                    return next(error);
+                } else {
+                    return rule(req, res, next);
+                }
             }
+        } catch (e) {
+            e.status = 400;
+            return next(e);
         }
     };
 };

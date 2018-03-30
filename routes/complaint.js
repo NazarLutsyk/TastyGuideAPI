@@ -1,9 +1,9 @@
-const ComplaintController = require(global.paths.CONTROLLERS + '/ComplaintController');
-let ROLES = require(global.paths.CONFIG + '/roles');
+const ComplaintController = require('../controllers/ComplaintController');
+let ROLES = require('../config/roles');
 const express = require('express');
 
-let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
-let Rule = require(global.paths.MIDDLEWARE + '/authorizarion/rules/Complaint');
+let permission = require('../middleware/authorizarion/index');
+let Rule = require('../middleware/authorizarion/rules/Complaint');
 
 const router = express.Router();
 

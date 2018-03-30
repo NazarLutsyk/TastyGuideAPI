@@ -9,7 +9,6 @@ let MongoStorage = require('connect-mongo')(session);
 let passport = require('passport');
 let helmet = require('helmet');
 let cors = require('cors');
-require('./config/path');
 require('./config/winston');
 require('./config/passport/index');
 require('./config/schedule');
@@ -55,10 +54,13 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-app.use(function (err, req, res, next) {
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-    res.sendStatus(err.status || 500);
+app.use(function (err, req, res) {
+    res.status(err.status || 500);
+    res.json({
+        message: err.message,
+        status: err.status,
+        trace: err.trace
+    });
 });
 
 module.exports = app;

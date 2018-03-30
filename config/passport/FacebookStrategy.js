@@ -1,6 +1,6 @@
 let FacebookStrategy = require('passport-facebook').Strategy;
-let Client = require(global.paths.MODELS + '/Client');
-let SOCIAL = require(global.paths.CONFIG + '/social');
+let Client = require('../../models/Client');
+let SOCIAL = require('../social');
 
 exports.Auth = new FacebookStrategy({
     clientID: SOCIAL.FACEBOOK.CLIENT_ID,

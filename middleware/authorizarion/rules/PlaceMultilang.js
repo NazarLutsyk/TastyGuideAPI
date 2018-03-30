@@ -1,6 +1,6 @@
-let Department = require(global.paths.MODELS + '/Department');
-let Place = require(global.paths.MODELS + '/Place');
-let Multilang = require(global.paths.MODELS + '/PlaceMultilang');
+let Department = require("../../../models/Department");
+let Place = require("../../../models/Place");
+let Multilang = require("../../../models/PlaceMultilang");
 module.exports = {
     async createPlaceMultilang(req, res, next) {
         try {
@@ -14,28 +14,37 @@ module.exports = {
             if (allowed > 0) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.status = 403;
+                error.message = "Forbidden";
+                return next(error);
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
     async updatePlaceMultilang(req, res, next) {
         try {
+            let allowed = 0;
             let user = req.user;
-            let multilangId = req.body.id;
+            let multilangId = req.params.id;
 
             let multilang = await Multilang.findById(multilangId);
-            let place = await Place.findOne({_id: multilang.place});
-
-            let allowed = await Department.count({
-                client: user._id,
-                place: place._id
-            });
+            if (multilang) {
+                let place = await Place.findOne({_id: multilang.place});
+                allowed = await Department.count({
+                    client: user._id,
+                    place: place._id
+                });
+            }
             if (allowed > 0) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.status = 403;
+                error.message = "Forbidden";
+                return next(error);
             }
         } catch (e) {
             return res.status(400).send(e.toString());

@@ -1,9 +1,9 @@
-let HashTag = require(global.paths.MODELS + '/HashTag');
-let keysValidator = require(global.paths.VALIDATORS + '/keysValidator');
-let objectHelper = require(global.paths.HELPERS + '/objectHelper');
+let HashTag = require('../models/HashTag');
+let keysValidator = require('../validators/keysValidator');
+let objectHelper = require('../helpers/objectHelper');
 
 module.exports = {
-    async getHashTags(req, res) {
+    async getHashTags(req, res,next) {
         try {
             let hashTagQuery;
             if (req.query.aggregate) {
@@ -24,10 +24,11 @@ module.exports = {
             let hashTags = await hashTagQuery.exec();
             res.json(hashTags);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async getHashTagById(req, res) {
+    async getHashTagById(req, res,next) {
         let hashTagId = req.params.id;
         try {
             let hashTagQuery = HashTag.findOne({_id: hashTagId})
@@ -40,10 +41,11 @@ module.exports = {
             let hashTag = await hashTagQuery.exec();
             res.json(hashTag);
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async createHashTag(req, res) {
+    async createHashTag(req, res,next) {
         try {
             let err = keysValidator.diff(HashTag.schema.tree, req.body);
             if (err) {
@@ -53,10 +55,11 @@ module.exports = {
                 res.status(201).json(hashTag);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async updateHashTag(req, res) {
+    async updateHashTag(req, res,next) {
         let hashTagId = req.params.id;
         try {
             let err = keysValidator.diff(HashTag.schema.tree, req.body);
@@ -68,15 +71,19 @@ module.exports = {
                     objectHelper.load(lang, req.body);
                     let updated = await hashTag.save();
                     res.status(201).json(updated);
-                }else {
-                    res.sendStatus(404);
+                } else {
+                    let e = new Error();
+                    e.message = "Not found";
+                    e.status = 404;
+                    return next(e);
                 }
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
-    async removeHashTag(req, res) {
+    async removeHashTag(req, res,next) {
         let hashTagId = req.params.id;
         try {
             let hashTag = await HashTag.findById(hashTagId);
@@ -84,10 +91,14 @@ module.exports = {
                 hashTag = await hashTag.remove();
                 res.status(204).json(hashTag);
             } else {
-                res.sendStatus(404);
+                let e = new Error();
+                e.message = "Not found";
+                e.status = 404;
+                return next(e);
             }
         } catch (e) {
-            res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     },
 };

@@ -1,6 +1,6 @@
-let DrinkApplication = require(global.paths.MODELS + '/DrinkApplication');
+let DrinkApplication = require('../../../models/DrinkApplication');
 module.exports = {
-    async updateDrinkApplication(req,res,next) {
+    async updateDrinkApplication(req, res, next) {
         try {
             let user = req.user;
             let drinkAppId = req.params.id;
@@ -8,10 +8,14 @@ module.exports = {
             if (drinkApp && drinkApp.organizer.equals(user._id)) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.message = 'Forbidden';
+                error.status = 403;
+                return next(error);
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

@@ -1,5 +1,4 @@
-let Client = require(global.paths.MODELS + '/Client');
-let Complaint = require(global.paths.MODELS + '/Complaint');
+let Complaint = require('../../../models/Complaint');
 module.exports = {
     async updateComplaint(req, res, next) {
         try {
@@ -9,10 +8,14 @@ module.exports = {
             if (complaint && complaint.client.equals(user._id)) {
                 return next();
             } else {
-                return res.sendStatus(403);
+                let error = new Error();
+                error.message = 'Forbidden';
+                error.status = 403;
+                return next(error);
             }
         } catch (e) {
-            return res.status(400).send(e.toString());
+            e.status = 400;
+            return next(e);
         }
     }
 };

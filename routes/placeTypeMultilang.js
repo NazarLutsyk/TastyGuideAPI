@@ -1,7 +1,7 @@
-const PlaceTypeMultilangController = require(global.paths.CONTROLLERS+ '/PlaceTypeMultilangController');
+const PlaceTypeMultilangController = require('../controllers/PlaceTypeMultilangController');
 const express = require('express');
-let permission = require(global.paths.MIDDLEWARE + '/authorizarion/index');
-let ROLES = require(global.paths.CONFIG + '/roles');
+let permission = require('../middleware/authorizarion/index');
+let ROLES = require('../config/roles');
 
 const router = express.Router();
 
