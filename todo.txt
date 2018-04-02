@@ -32,7 +32,7 @@
 //todo change global config
 //todo register facebook&google&gmail accounts
 //todo features in place(wifi...)
-//todo normal errors
+//+normal errors
 //+Можливість додавання Топ-категорій типу “Найкращий заклад для весілля, корпоративу, дня народження”
 //+statistic reviews/aggregations
 //+disallow update secured fields

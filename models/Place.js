@@ -122,10 +122,10 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
     let hashTagExists = await HashTag.count({_id: newDoc.hashTags});
 
 
-    if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== this.hashTags.length)) {
+    if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== newDoc.hashTags.length)) {
         throw new Error('Not found related model HashTag!');
     }
-    if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== this.types.length)) {
+    if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== newDoc.types.length)) {
         throw new Error('Not found related model PlaceType!');
     }
     if (newDoc.images) {
