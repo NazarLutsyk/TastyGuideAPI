@@ -8,7 +8,6 @@ if(cluster.isMaster){
     }
     cluster.on('exit',function (worker, code) {
         if(code !== 0 && !worker.exitedAfterDisconnect){
-            log(`worker ${worker.id} exited, respawning...`);
             cluster.fork();
         }
     });

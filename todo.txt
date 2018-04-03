@@ -31,7 +31,7 @@
 //+logger
 //todo change global config
 //todo register facebook&google&gmail accounts
-//todo features in place(wifi...)
+//+features in place(wifi...)
 //+normal errors
 //+Можливість додавання Топ-категорій типу “Найкращий заклад для весілля, корпоративу, дня народження”
 //+statistic reviews/aggregations

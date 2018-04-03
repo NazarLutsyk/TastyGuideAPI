@@ -1,4 +1,4 @@
-let mongoose = require('mongoose');
+let mongoose = require("mongoose");
 
 
 let Schema = mongoose.Schema;
@@ -19,7 +19,7 @@ let PlaceSchema = new Schema({
             validator: function (averagePrice) {
                 return averagePrice >= 0;
             },
-            message: 'Min avaragePrive eq 0'
+            message: "Min avaragePrive eq 0"
         }
     },
     reviews: {
@@ -45,19 +45,33 @@ let PlaceSchema = new Schema({
             type: Number,
         },
     },
-    features:[
-      //todo some features
-    ],
-    //todo updatable rules
-    topCategories:[String],
+    features: {
+        wifi: {
+            type: Boolean,
+            default: false
+        },
+        parking: {
+            type: Boolean,
+            default: false
+        },
+        vipRoom: {
+            type: Boolean,
+            default: false
+        },
+        karaoke: {
+            type: Boolean,
+            default: false
+        }
+    },
+    topCategories: [String],
     images: [String],
     types: [{
         type: Schema.Types.ObjectId,
-        ref: 'PlaceType',
+        ref: "PlaceType",
     }],
     hashTags: [{
         type: Schema.Types.ObjectId,
-        ref: 'HashTag'
+        ref: "HashTag"
     }],
 }, {
     timestamps: true,
@@ -69,20 +83,20 @@ let PlaceSchema = new Schema({
     }
 });
 
-PlaceSchema.statics.notUpdatable = function (){
-    return ['rating','reviews','allowed'];
+PlaceSchema.statics.notUpdatable = function () {
+    return ["rating", "reviews", "allowed", "topCategories"];
 };
 
 PlaceSchema.statics.loadAsyncValues = async function (docs) {
-    let Rating = require('./Rating');
+    let Rating = require("./Rating");
     if (docs) {
         if (!Array.isArray(docs))
             docs = [docs];
-        log('load async values');
+        log("load async values");
         for (let doc of docs) {
             let rating = await Rating.aggregate([
                 {$match: {place: doc._id}},
-                {$group: {_id: doc._id, avg: {$avg: '$value'}}}
+                {$group: {_id: doc._id, avg: {$avg: "$value"}}}
             ]);
             if (rating && rating.length > 0)
                 doc.rating = rating[0].avg;
@@ -94,68 +108,72 @@ PlaceSchema.statics.loadAsyncValues = async function (docs) {
 
 
 PlaceSchema.methods.supersave = async function () {
-    let PlaceType = require('./PlaceType');
-    let HashTag = require('./HashTag');
+    let PlaceType = require("./PlaceType");
+    let HashTag = require("./HashTag");
 
     let placeTypeExists = await PlaceType.count({_id: this.types});
     let hashTagExists = await HashTag.count({_id: this.hashTags});
 
     if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== this.hashTags.length)) {
-        throw new Error('Not found related model HashTag!');
+        throw new Error("Not found related model HashTag!");
     }
     if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== this.types.length)) {
-        throw new Error('Not found related model PlaceType!');
+        throw new Error("Not found related model PlaceType!");
     }
-    log('save Place');
+    log("save Place");
     return await this.save();
 };
 
 PlaceSchema.methods.superupdate = async function (newDoc) {
 
-    let objectHelper = require('../helpers/objectHelper');
-    let fileHelper = require('../helpers/fileHelper');
-    let PlaceType = require('./PlaceType');
-    let HashTag = require('./HashTag');
-    let path = require('path');
+    let objectHelper = require("../helpers/objectHelper");
+    let fileHelper = require("../helpers/fileHelper");
+    let PlaceType = require("./PlaceType");
+    let HashTag = require("./HashTag");
+    let path = require("path");
 
     let placeTypeExists = await PlaceType.count({_id: newDoc.types});
     let hashTagExists = await HashTag.count({_id: newDoc.hashTags});
 
 
-    if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== newDoc.hashTags.length)) {
-        throw new Error('Not found related model HashTag!');
+    if (newDoc.hashTags && newDoc.hashTags.length > 0) {
+        if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== newDoc.hashTags.length)) {
+            throw new Error("Not found related model HashTag!");
+        }
     }
-    if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== newDoc.types.length)) {
-        throw new Error('Not found related model PlaceType!');
+    if (newDoc.types && newDoc.types.length > 0) {
+        if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== newDoc.types.length)) {
+            throw new Error("Not found related model PlaceType!");
+        }
     }
     if (newDoc.images) {
         for (let i = 0; i < this.images.length; i++) {
             let oldImage = this.images[i];
             if (newDoc.images.indexOf(oldImage) === -1) {
-                let toDelete = path.join(__dirname,"../public","upload","place", oldImage);
+                let toDelete = path.join(__dirname, "../public", "upload", "place", oldImage);
                 fileHelper.deleteFiles(toDelete);
             }
         }
     }
     objectHelper.load(this, newDoc);
-    log('update Place');
+    log("update Place");
     return await this.save();
 };
 
-module.exports = mongoose.model('Place', PlaceSchema);
+module.exports = mongoose.model("Place", PlaceSchema);
 
-let Complaint = require('./Complaint');
-let DrinkApplication = require('./DrinkApplication');
-let Rating = require('./Rating');
-let Department = require('./Department');
-let TopPlace = require('./TopPlace');
-let Day = require('./Day');
-let Promo = require('./Promo');
-let HashTag = require('./HashTag');
-let Multilang = require('./PlaceMultilang');
-let Client = require('./Client');
-let path = require('path');
-PlaceSchema.pre('remove', async function (next) {
+let Complaint = require("./Complaint");
+let DrinkApplication = require("./DrinkApplication");
+let Rating = require("./Rating");
+let Department = require("./Department");
+let TopPlace = require("./TopPlace");
+let Day = require("./Day");
+let Promo = require("./Promo");
+let HashTag = require("./HashTag");
+let Multilang = require("./PlaceMultilang");
+let Client = require("./Client");
+let path = require("path");
+PlaceSchema.pre("remove", async function (next) {
     try {
         let complaints = await Complaint.remove({place: this._id});
         let drinkApplications = await DrinkApplication.remove({place: this._id});
@@ -165,20 +183,20 @@ PlaceSchema.pre('remove', async function (next) {
         let days = await Day.remove({place: this._id});
         let promos = await Promo.remove({place: this._id});
         let multilangs = await Multilang.remove({place: this._id});
-        let fileHelper = require('../helpers/fileHelper');
+        let fileHelper = require("../helpers/fileHelper");
 
         await Client.update(
             {favoritePlaces: this._id},
             {$pull: {favoritePlaces: this._id}},
-            {multi: true, runValidators: true, context: 'query'});
+            {multi: true, runValidators: true, context: "query"});
         if (this.images.length > 0) {
             for (let i = 0; i < this.images.length; i++) {
                 let image = this.images[i];
-                let toDelete = path.join(__dirname,"../public","upload","place", image);
+                let toDelete = path.join(__dirname, "../public", "upload", "place", image);
                 fileHelper.deleteFiles(toDelete);
             }
         }
-        log('remove Place');
+        log("remove Place");
         return next();
     } catch (e) {
         return next(e);

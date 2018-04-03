@@ -104,7 +104,8 @@ module.exports = {
                 if (place) {
                     upload(req, res, async function (err) {
                         if (err) {
-                            return res.status(400).send(err.toString());
+                            e.status = 400;
+                            return next(err);
                         } else {
                             if (!req.body.images)
                                 req.body.images = [];
@@ -117,7 +118,8 @@ module.exports = {
                                 await Place.loadAsyncValues(updated);
                                 res.status(201).json(updated);
                             } catch (e) {
-                                res.status(400).send(e.toString());
+                                e.status = 400;
+                                return next(e);
                             }
                         }
                     });
