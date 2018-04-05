@@ -4,24 +4,7 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getEventMultilangs(req, res,next) {
         try {
-            let eventMultilangQuery;
-            if (req.query.aggregate) {
-                eventMultilangQuery = EventMultilang.aggregate(req.query.aggregate);
-            } else {
-                eventMultilangQuery = EventMultilang
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        eventMultilangQuery.populate(populateField);
-                    }
-                }
-            }
-            let eventMultilangs = await eventMultilangQuery.exec();
-            res.json(eventMultilangs);
+            res.json(await EventMultilang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -30,15 +13,8 @@ module.exports = {
     async getEventMultilangById(req, res,next) {
         let eventMultilangId = req.params.id;
         try {
-            let eventMultilangQuery = EventMultilang.findOne({_id: eventMultilangId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    eventMultilangQuery.populate(populateField);
-                }
-            }
-            let eventMultilang = await eventMultilangQuery.exec();
-            res.json(eventMultilang);
+            req.query.target.query._id = eventMultilangId;
+            res.json(await EventMultilang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

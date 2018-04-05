@@ -6,24 +6,7 @@ upload = upload.array('images');
 module.exports = {
     async getBonuses(req, res,next) {
         try {
-            let bonuseQuery;
-            if (req.query.aggregate) {
-                bonuseQuery = Bonuse.aggregate(req.query.aggregate);
-            } else {
-                bonuseQuery = Bonuse
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        bonuseQuery.populate(populateField);
-                    }
-                }
-            }
-            let bonuses = await bonuseQuery.exec();
-            res.json(bonuses);
+            res.json(await Bonuse.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -32,15 +15,8 @@ module.exports = {
     async getBonuseById(req, res,next) {
         let bonuseId = req.params.id;
         try {
-            let bonuseQuery = Bonuse.findOne({_id: bonuseId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    bonuseQuery.populate(populateField);
-                }
-            }
-            let bonuse = await bonuseQuery.exec();
-            res.json(bonuse);
+            req.query.target.query._id = bonuseId;
+            res.json(await Bonuse.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

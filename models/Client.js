@@ -52,10 +52,55 @@ let ClientSchema = new Schema({
 }, {
     timestamps: true,
 });
-ClientSchema.statics.notUpdatable = function(){
+ClientSchema.statics.notUpdatable = function () {
     return ["roles", "avatar", "facebookId", "googleId"];
 };
-
+ClientSchema.statics.superfind = async function (params) {
+    let {universalFind} = require("../helpers/mongoQueryHelper");
+    let {target, fetch} = params;
+    let res = [];
+    let listOfMainModels = await universalFind(this, target);
+    if (fetch && listOfMainModels && !target.aggregate) {
+        for (let mainModel of listOfMainModels) {
+            let mainModelToResponse = mainModel.toObject();
+            if (mainModel._id) {
+                for (let fetchModel of fetch) {
+                    let fetchModelName = Object.keys(fetchModel)[0];
+                    if (fetchModelName.toLowerCase() === "complaint") {
+                        fetchModel[fetchModelName].query.client = mainModel._id.toString();
+                        mainModelToResponse.complaints = await universalFind(require("./Complaint"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "drinkapplication") {
+                        fetchModel[fetchModelName].query.client = mainModel._id.toString();
+                        mainModelToResponse.drinkApplications = await universalFind(require("./DrinkApplication"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "rating") {
+                        fetchModel[fetchModelName].query.client = mainModel._id.toString();
+                        mainModelToResponse.ratings = await universalFind(require("./Rating"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "department") {
+                        fetchModel[fetchModelName].query.client = mainModel._id.toString();
+                        mainModelToResponse.departments = await universalFind(require("./Department"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "promo") {
+                        fetchModel[fetchModelName].query.author = mainModel._id.toString();
+                        mainModelToResponse.promos = await universalFind(require("./Promo"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "sendedmessages" && fetchModel[fetchModelName].query.sender === mainModel._id.toString()) {
+                        mainModelToResponse.sendedMessages = await universalFind(require("./Message"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "receivedmessages" && fetchModel[fetchModelName].query.receiver === mainModel._id.toString()) {
+                        mainModelToResponse.receivedMessages = await universalFind(require("./Message"), fetchModel[fetchModelName]);
+                    }
+                }
+            }
+            res.push(mainModelToResponse);
+        }
+    } else if (target.aggregate) {
+        res.push(...listOfMainModels);
+    }
+    return res;
+};
 ClientSchema.methods.encryptPassword = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(5), null);
 };
@@ -67,7 +112,7 @@ ClientSchema.statics.notUpdatable = function () {
 };
 ClientSchema.methods.superupdate = async function (newDoc) {
     let Place = require("./Place");
-    let objectHelper = require('../helpers/objectHelper');
+    let objectHelper = require("../helpers/objectHelper");
 
     if (newDoc.hasOwnProperty("favoritePlaces")) {
         let count = await Place.count({_id: newDoc.favoritePlaces});
@@ -76,7 +121,7 @@ ClientSchema.methods.superupdate = async function (newDoc) {
         }
     }
     objectHelper.load(this, newDoc);
-    log('update Client');
+    log("update Client");
     return await this.save();
 };
 
@@ -106,9 +151,9 @@ ClientSchema.pre("remove", async function (next) {
             {
                 multi: true,
                 runValidators: true,
-                context: 'query'
+                context: "query"
             });
-        log('remove Client');
+        log("remove Client");
         return next();
     } catch (e) {
         return next(e);

@@ -4,24 +4,7 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getPlaceTypeMultilangs(req, res, next) {
         try {
-            let placeTypeMultilangQuery;
-            if (req.query.aggregate) {
-                placeTypeMultilangQuery = PlaceTypeMultilang.aggregate(req.query.aggregate);
-            } else {
-                placeTypeMultilangQuery = PlaceTypeMultilang
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        placeTypeMultilangQuery.populate(populateField);
-                    }
-                }
-            }
-            let placeTypeMultilangs = await placeTypeMultilangQuery.exec();
-            res.json(placeTypeMultilangs);
+            res.json(await PlaceTypeMultilang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -30,15 +13,8 @@ module.exports = {
     async getPlaceTypeMultilangById(req, res, next) {
         let placeTypeMultilangId = req.params.id;
         try {
-            let placeTypeMultilangQuery = PlaceTypeMultilang.findOne({_id: placeTypeMultilangId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    placeTypeMultilangQuery.populate(populateField);
-                }
-            }
-            let placeTypeMultilang = await placeTypeMultilangQuery.exec();
-            res.json(placeTypeMultilang);
+            req.query.target.query._id = placeTypeMultilangId;
+            res.json(await PlaceTypeMultilang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

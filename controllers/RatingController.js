@@ -4,24 +4,7 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getRatings(req, res, next) {
         try {
-            let ratingQuery;
-            if (req.query.aggregate) {
-                ratingQuery = Rating.aggregate(req.query.aggregate);
-            } else {
-                ratingQuery = Rating
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        ratingQuery.populate(populateField);
-                    }
-                }
-            }
-            let ratings = await ratingQuery.exec();
-            res.json(ratings);
+            res.json(await Rating.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -30,15 +13,8 @@ module.exports = {
     async getRatingById(req, res, next) {
         let ratingId = req.params.id;
         try {
-            let ratingQuery = Rating.findOne({_id: ratingId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    ratingQuery.populate(populateField);
-                }
-            }
-            let rating = await ratingQuery.exec();
-            res.json(rating);
+            req.query.target.query._id = ratingId;
+            res.json(await Rating.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

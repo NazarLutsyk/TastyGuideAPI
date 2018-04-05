@@ -86,7 +86,67 @@ let PlaceSchema = new Schema({
 PlaceSchema.statics.notUpdatable = function () {
     return ["rating", "reviews", "allowed", "topCategories"];
 };
-
+PlaceSchema.statics.superfind = async function (params) {
+    let {universalFind} = require("../helpers/mongoQueryHelper");
+    let {target, fetch} = params;
+    let res = [];
+    let listOfMainModels = await universalFind(this, target);
+    await this.loadAsyncValues(listOfMainModels);
+    if (fetch && listOfMainModels && !target.aggregate) {
+        for (let mainModel of listOfMainModels) {
+            let mainModelToResponse = mainModel.toObject();
+            if (mainModel._id) {
+                for (let fetchModel of fetch) {
+                    let fetchModelName = Object.keys(fetchModel)[0];
+                    if (fetchModelName.toLowerCase() === "complaint") {
+                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
+                        mainModelToResponse.complaints = await universalFind(require("./Complaint"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "drinkapplication") {
+                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
+                        mainModelToResponse.drinkApplications = await universalFind(require("./DrinkApplication"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "rating") {
+                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
+                        mainModelToResponse.ratings = await universalFind(require("./Rating"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "department") {
+                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
+                        mainModelToResponse.departments = await universalFind(require("./Department"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "hashtag") {
+                        fetchModel[fetchModelName].query._id = mainModel.hashTags;
+                        mainModelToResponse.hashTags = await universalFind(require("./HashTag"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "topplace") {
+                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
+                        mainModelToResponse.tops = await universalFind(require("./TopPlace"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "placetype") {
+                        fetchModel[fetchModelName].query._id = mainModel.types;
+                        mainModelToResponse.types = (await universalFind(require("./PlaceType"), fetchModel[fetchModelName]))[0];
+                    }
+                    if (fetchModelName.toLowerCase() === "placemultilang") {
+                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
+                        mainModelToResponse.multilang = await universalFind(require("./PlaceMultilang"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "day") {
+                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
+                        mainModelToResponse.days = await universalFind(require("./Day"), fetchModel[fetchModelName]);
+                    }
+                    if (fetchModelName.toLowerCase() === "promo") {
+                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
+                        mainModelToResponse.promos = await universalFind(require("./Promo"), fetchModel[fetchModelName]);
+                    }
+                }
+            }
+            res.push(mainModelToResponse);
+        }
+    }else if(target.aggregate){
+        res.push(...listOfMainModels);
+    }
+    return res;
+};
 PlaceSchema.statics.loadAsyncValues = async function (docs) {
     let Rating = require("./Rating");
     if (docs) {

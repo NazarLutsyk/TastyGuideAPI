@@ -1,30 +1,23 @@
 module.exports = {
-    toSelect(str) {
-        let fields = str.split(',');
-        let res = {};
-        for (let field of fields) {
-            if (field.startsWith('-')) {
-                res[field.substr(1)] = 0;
-            } else {
-                res[field] = 1;
-            }
+    normalizeQuery(oldQuery) {
+        let query = {
+            aggregate: null,
+            query: {},
+            sort: null,
+            select: null,
+            skip: 0,
+            limit: null,
+            populate: null
+        };
+        if (oldQuery) {
+            query.aggregate = oldQuery.aggregate ? oldQuery.aggregate : null;
+            query.query = oldQuery.query ? oldQuery.query : {};
+            query.sort = oldQuery.sort ? oldQuery.sort : null;
+            query.select = oldQuery.select ? oldQuery.select : null;
+            query.skip = oldQuery.skip ? oldQuery.skip : 0;
+            query.limit = oldQuery.limit ? oldQuery.limit : null;
+            query.populate = oldQuery.populate ? oldQuery.populate : null;
         }
-        return res;
-    },
-    toSort(str) {
-        let fields = str.split(',');
-        let res = {};
-        for (let field of fields) {
-            if (field.startsWith('-')) {
-                res[field.substr(1)] = -1;
-            } else {
-                res[field] = 1;
-            }
-        }
-        return res;
-    },
-    toPopulate(str) {
-        let fields = str.split(',');
-        return fields;
-    },
+        return query;
+    }
 };

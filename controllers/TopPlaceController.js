@@ -4,24 +4,7 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getTopPlaces(req, res, next) {
         try {
-            let topPlaceQuery;
-            if (req.query.aggregate) {
-                topPlaceQuery = TopPlace.aggregate(req.query.aggregate);
-            } else {
-                topPlaceQuery = TopPlace
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        topPlaceQuery.populate(populateField);
-                    }
-                }
-            }
-            let topPlaces = await topPlaceQuery.exec();
-            res.json(topPlaces);
+            res.json(await TopPlace.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -30,15 +13,8 @@ module.exports = {
     async getTopPlaceById(req, res, next) {
         let topPlaceId = req.params.id;
         try {
-            let topPlaceQuery = TopPlace.findOne({_id: topPlaceId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    topPlaceQuery.populate(populateField);
-                }
-            }
-            let topPlace = await topPlaceQuery.exec();
-            res.json(topPlace);
+            req.query.target.query._id = topPlaceId;
+            res.json(await TopPlace.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

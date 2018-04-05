@@ -14,7 +14,7 @@ module.exports = {
             if (allowed > 0) {
                 return next();
             } else {
-                let error = new Error();
+                let error = new Error("Forbidden");
                 error.status = 403;
                 return next(error);
             }

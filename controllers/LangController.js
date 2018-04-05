@@ -5,24 +5,7 @@ let objectHelper = require("../helpers/objectHelper");
 module.exports = {
     async getLangs(req, res, next) {
         try {
-            let langQuery;
-            if (req.query.aggregate) {
-                langQuery = Lang.aggregate(req.query.aggregate);
-            } else {
-                langQuery = Lang
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        langQuery.populate(populateField);
-                    }
-                }
-            }
-            let langs = await langQuery.exec();
-            res.json(langs);
+            res.json(await Complaint.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -31,15 +14,8 @@ module.exports = {
     async getLangById(req, res, next) {
         let langId = req.params.id;
         try {
-            let langQuery = Lang.findOne({_id: langId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    langQuery.populate(populateField);
-                }
-            }
-            let lang = await langQuery.exec();
-            res.json(lang);
+            req.query.target.query._id = langId;
+            res.json(await Lang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

@@ -6,24 +6,7 @@ upload = upload.array('images');
 module.exports = {
     async getNews(req, res, next) {
         try {
-            let newsQuery;
-            if (req.query.aggregate) {
-                newsQuery = News.aggregate(req.query.aggregate);
-            } else {
-                newsQuery = News
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        newsQuery.populate(populateField);
-                    }
-                }
-            }
-            let news = await newsQuery.exec();
-            res.json(news);
+            res.json(await News.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -32,15 +15,8 @@ module.exports = {
     async getNewsById(req, res, next) {
         let newsId = req.params.id;
         try {
-            let newsQuery = News.findOne({_id: newsId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    newsQuery.populate(populateField);
-                }
-            }
-            let news = await newsQuery.exec();
-            res.json(news);
+            req.query.target.query._id = newsId;
+            res.json(await News.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

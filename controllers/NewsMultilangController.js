@@ -4,24 +4,7 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getNewsMultilangs(req, res,next) {
         try {
-            let newsMultilangQuery;
-            if (req.query.aggregate) {
-                newsMultilangQuery = NewsMultilang.aggregate(req.query.aggregate);
-            } else {
-                newsMultilangQuery = NewsMultilang
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        newsMultilangQuery.populate(populateField);
-                    }
-                }
-            }
-            let newsMultilangs = await newsMultilangQuery.exec();
-            res.json(newsMultilangs);
+            res.json(await NewsMultilang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -30,15 +13,8 @@ module.exports = {
     async getNewsMultilangById(req, res,next) {
         let newsMultilangId = req.params.id;
         try {
-            let newsMultilangQuery = NewsMultilang.findOne({_id: newsMultilangId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    newsMultilangQuery.populate(populateField);
-                }
-            }
-            let newsMultilang = await newsMultilangQuery.exec();
-            res.json(newsMultilang);
+            req.query.target.query._id = newsMultilangId;
+            res.json(await NewsMultilang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

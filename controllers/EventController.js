@@ -6,24 +6,7 @@ upload = upload.array('images');
 module.exports = {
     async getEvents(req, res,next) {
         try {
-            let eventQuery;
-            if (req.query.aggregate) {
-                eventQuery = Event.aggregate(req.query.aggregate);
-            } else {
-                eventQuery = Event
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        eventQuery.populate(populateField);
-                    }
-                }
-            }
-            let events = await eventQuery.exec();
-            res.json(events);
+            res.json(await Event.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -32,15 +15,8 @@ module.exports = {
     async getEventById(req, res,next) {
         let eventId = req.params.id;
         try {
-            let eventQuery = Event.findOne({_id: eventId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    eventQuery.populate(populateField);
-                }
-            }
-            let event = await eventQuery.exec();
-            res.json(event);
+            req.query.target.query._id = eventId;
+            res.json(await Event.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

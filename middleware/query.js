@@ -1,24 +1,29 @@
-let QueryHelper = require('../helpers/queryHelper');
+let QueryHelper = require("../helpers/queryHelper");
 
 module.exports = {
     parseQuery(req, res, next) {
-        if (req.method.toLowerCase() === 'get') {
+        if (req.method.toLowerCase() === "get") {
             try {
-                let fields = req.query.fields;
-                let sort = req.query.sort;
-                let query = req.query.query;
-                let skip = req.query.skip;
-                let limit = req.query.limit;
-                let populate = req.query.populate;
-                let aggregate = req.query.aggregate;
-                req.query.fields = fields ? QueryHelper.toSelect(fields) : null;
-                req.query.sort = sort ? QueryHelper.toSort(sort) : null;
-                req.query.query = query ? JSON.parse(query) : null;
-                req.query.aggregate = aggregate ? JSON.parse(aggregate) : null;
-                req.query.populate = populate ? QueryHelper.toPopulate(populate) : null;
-                req.query.skip = skip ? +skip : 0;
-                req.query.limit = limit ? +limit : null;
-                log('query ',req.query);
+                let target = req.query.target;
+                let fetch = req.query.fetch;
+
+                target = target ? JSON.parse(target) : null;
+                fetch = fetch ? JSON.parse(fetch) : null;
+                let resTarget = {};
+                let resFetch = [];
+
+                resTarget = QueryHelper.normalizeQuery(target);
+                if (fetch && fetch.length > 0) {
+                    for (let fetchModel of fetch) {
+                        let fetchModelName = Object.keys(fetchModel)[0];
+                        let normalized = QueryHelper.normalizeQuery(fetchModel[fetchModelName]);
+                        normalized.aggregate = null;
+                        resFetch.push({[fetchModelName]: normalized});
+                    }
+                }
+                req.query.target = resTarget;
+                req.query.fetch = resFetch;
+                log("query ", req.query);
                 return next();
             } catch (e) {
                 e.status = 400;

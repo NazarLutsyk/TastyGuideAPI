@@ -5,24 +5,7 @@ let objectHelper = require('../helpers/objectHelper');
 module.exports = {
     async getPlaceTypes(req, res, next) {
         try {
-            let placeTypeQuery;
-            if (req.query.aggregate) {
-                placeTypeQuery = PlaceType.aggregate(req.query.aggregate);
-            } else {
-                placeTypeQuery = PlaceType
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        placeTypeQuery.populate(populateField);
-                    }
-                }
-            }
-            let placeTypes = await placeTypeQuery.exec();
-            res.json(placeTypes);
+            res.json(await PlaceType.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -31,15 +14,8 @@ module.exports = {
     async getPlaceTypeById(req, res, next) {
         let placeTypeId = req.params.id;
         try {
-            let placeTypeQuery = PlaceType.findOne({_id: placeTypeId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    placeTypeQuery.populate(populateField);
-                }
-            }
-            let placeType = await placeTypeQuery.exec();
-            res.json(placeType);
+            req.query.target.query._id = placeTypeId;
+            res.json(await PlaceType.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

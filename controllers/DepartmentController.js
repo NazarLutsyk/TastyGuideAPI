@@ -4,24 +4,7 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getDepartments(req, res,next) {
         try {
-            let departmentQuery;
-            if (req.query.aggregate) {
-                departmentQuery = Department.aggregate(req.query.aggregate);
-            } else {
-                departmentQuery = Department
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        departmentQuery.populate(populateField);
-                    }
-                }
-            }
-            let departments = await departmentQuery.exec();
-            res.json(departments);
+            res.json(await Department.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -30,15 +13,8 @@ module.exports = {
     async getDepartmentById(req, res,next) {
         let departmentId = req.params.id;
         try {
-            let departmentQuery = Department.findOne({_id: departmentId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    departmentQuery.populate(populateField);
-                }
-            }
-            let department = await departmentQuery.exec();
-            res.json(department);
+            req.query.target.query._id = departmentId;
+            res.json(await Department.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

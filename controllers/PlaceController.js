@@ -9,25 +9,7 @@ upload = upload.array("images");
 module.exports = {
     async getPlaces(req, res, next) {
         try {
-            let placeQuery;
-            if (req.query.aggregate) {
-                placeQuery = Place.aggregate(req.query.aggregate);
-            } else {
-                placeQuery = Place
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        placeQuery.populate(populateField);
-                    }
-                }
-            }
-            let places = await placeQuery.exec();
-            await Place.loadAsyncValues(places);
-            res.json(places);
+            res.json(await Place.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -36,18 +18,8 @@ module.exports = {
     async getPlaceById(req, res, next) {
         let placeId = req.params.id;
         try {
-            let PlaceQuery = Place.findOne({_id: placeId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    PlaceQuery.populate(populateField);
-                }
-            }
-            let place = await PlaceQuery.exec();
-            place.reviews++;
-            place = await place.save();
-            await Place.loadAsyncValues(place);
-            res.json(place);
+            req.query.target.query._id = placeId;
+            res.json(await Place.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

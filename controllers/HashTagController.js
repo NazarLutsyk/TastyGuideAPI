@@ -5,24 +5,7 @@ let objectHelper = require('../helpers/objectHelper');
 module.exports = {
     async getHashTags(req, res,next) {
         try {
-            let hashTagQuery;
-            if (req.query.aggregate) {
-                hashTagQuery = HashTag.aggregate(req.query.aggregate);
-            } else {
-                hashTagQuery = HashTag
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        hashTagQuery.populate(populateField);
-                    }
-                }
-            }
-            let hashTags = await hashTagQuery.exec();
-            res.json(hashTags);
+            res.json(await HashTag.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -31,15 +14,8 @@ module.exports = {
     async getHashTagById(req, res,next) {
         let hashTagId = req.params.id;
         try {
-            let hashTagQuery = HashTag.findOne({_id: hashTagId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    hashTagQuery.populate(populateField);
-                }
-            }
-            let hashTag = await hashTagQuery.exec();
-            res.json(hashTag);
+            req.query.target.query._id = hashTagId;
+            res.json(await HashTag.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

@@ -1,54 +1,30 @@
-let Complaint = require('../models/Complaint');
-let keysValidator = require('../validators/keysValidator');
+let Complaint = require("../models/Complaint");
+let keysValidator = require("../validators/keysValidator");
 
 module.exports = {
-    async getComplaints(req, res,next) {
+    async getComplaints(req, res, next) {
         try {
-            let complaintQuery;
-            if (req.query.aggregate) {
-                complaintQuery = Complaint.aggregate(req.query.aggregate);
-            } else {
-                complaintQuery = Complaint
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        complaintQuery.populate(populateField);
-                    }
-                }
-            }
-            let complaints = await complaintQuery.exec();
-            res.json(complaints);
+            res.json(await Complaint.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
         }
     },
-    async getComplaintById(req, res,next) {
+    async getComplaintById(req, res, next) {
         let complaintId = req.params.id;
         try {
-            let complaintQuery = Complaint.findOne({_id: complaintId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    complaintQuery.populate(populateField);
-                }
-            }
-            let complaint = await complaintQuery.exec();
-            res.json(complaint);
+            req.query.target.query._id = complaintId;
+            res.json(await Complaint.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
         }
     },
-    async createComplaint(req, res,next) {
+    async createComplaint(req, res, next) {
         try {
             let err = keysValidator.diff(Complaint.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 req.body.client = req.user._id;
                 let complaint = new Complaint(req.body);
@@ -60,12 +36,12 @@ module.exports = {
             return next(e);
         }
     },
-    async updateComplaint(req, res,next) {
+    async updateComplaint(req, res, next) {
         let complaintId = req.params.id;
         try {
             let err = keysValidator.diff(Complaint.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 let complaint = await Complaint.findById(complaintId);
                 if (complaint) {
@@ -74,7 +50,7 @@ module.exports = {
                 } else {
                     let e = new Error();
                     e.status = 404;
-                    e.message = 'Not found';
+                    e.message = "Not found";
                     return next(e);
                 }
             }
@@ -83,7 +59,7 @@ module.exports = {
             return next(e);
         }
     },
-    async removeComplaint(req, res,next) {
+    async removeComplaint(req, res, next) {
         let complaintId = req.params.id;
         try {
             let complaint = await Complaint.findById(complaintId);
@@ -92,7 +68,7 @@ module.exports = {
                 res.status(204).json(complaint);
             } else {
                 let e = new Error();
-                e.message = 'Not found';
+                e.message = "Not found";
                 e.status = 404;
                 return next(e);
             }

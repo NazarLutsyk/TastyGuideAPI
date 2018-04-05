@@ -4,24 +4,7 @@ let keysValidator = require("../validators/keysValidator");
 module.exports = {
     async getDays(req, res, next) {
         try {
-            let dayQuery;
-            if (req.query.aggregate) {
-                dayQuery = Day.aggregate(req.query.aggregate);
-            } else {
-                dayQuery = Day
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        dayQuery.populate(populateField);
-                    }
-                }
-            }
-            let days = await dayQuery.exec();
-            res.json(days);
+            res.json(await Day.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -30,15 +13,8 @@ module.exports = {
     async getDayById(req, res, next) {
         let dayId = req.params.id;
         try {
-            let dayQuery = Day.findOne({_id: dayId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    dayQuery.populate(populateField);
-                }
-            }
-            let day = await dayQuery.exec();
-            res.json(day);
+            req.query.target.query._id = dayId;
+            res.json(await Day.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

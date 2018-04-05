@@ -1,25 +1,11 @@
-let Message = require('../models/Message');
-let keysValidator = require('../validators/keysValidator');
+let Message = require("../models/Message");
+let keysValidator = require("../validators/keysValidator");
 
 module.exports = {
     async getMessages(req, res, next) {
         try {
-            let messageQuery;
-            messageQuery = Message
-                .find({$or: [{receiver: req.user._id}, {sender: req.user._id}]})
-                .find(req.query.query)
-                .sort(req.query.sort)
-                .select(req.query.fields)
-                .aggregate(req.query.aggregate)
-                .skip(req.query.skip)
-                .limit(req.query.limit);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    messageQuery.populate(populateField);
-                }
-            }
-            let news = await messageQuery.exec();
-            res.json(news);
+            req.query.target.query.$or = [{receiver: req.user._id}, {sender: req.user._id}];
+            res.json(await Message.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -49,7 +35,7 @@ module.exports = {
         try {
             let err = keysValidator.diff(Message.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 req.body.sender = req.user._id;
                 let message = new Message(req.body);

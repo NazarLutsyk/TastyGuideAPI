@@ -4,24 +4,7 @@ let keysValidator = require('../validators/keysValidator');
 module.exports = {
     async getBonuseMultilangs(req, res,next) {
         try {
-            let bonuseMultilangQuery;
-            if (req.query.aggregate) {
-                bonuseMultilangQuery = BonuseMultilang.aggregate(req.query.aggregate);
-            } else {
-                bonuseMultilangQuery = BonuseMultilang
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        bonuseMultilangQuery.populate(populateField);
-                    }
-                }
-            }
-            let bonuseMultilang = await bonuseMultilangQuery.exec();
-            res.json(bonuseMultilang);
+            res.json(await BonuseMultilang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
@@ -30,15 +13,8 @@ module.exports = {
     async getBonuseMultilangById(req, res,next) {
         let bonuseMultilangId = req.params.id;
         try {
-            let bonuseMultilangQuery = BonuseMultilang.findOne({_id: bonuseMultilangId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    bonuseMultilangQuery.populate(populateField);
-                }
-            }
-            let bonuseMultilang = await bonuseMultilangQuery.exec();
-            res.json(bonuseMultilang);
+            req.query.target.query._id = bonuseMultilangId;
+            res.json(await BonuseMultilang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

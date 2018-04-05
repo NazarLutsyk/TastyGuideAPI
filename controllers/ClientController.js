@@ -1,55 +1,49 @@
-let Client = require('../models/Client');
-let keysValidator = require('../validators/keysValidator');
+let Client = require("../models/Client");
+let keysValidator = require("../validators/keysValidator");
 
 module.exports = {
-    async getClients(req, res,next) {
+    async getClients(req, res, next) {
         try {
-            let clientQuery;
-            if (req.query.aggregate) {
-                clientQuery = Client.aggregate(req.query.aggregate);
-            } else {
-                clientQuery = Client
-                    .find(req.query.query)
-                    .sort(req.query.sort)
-                    .select(req.query.fields)
-                    .skip(req.query.skip)
-                    .limit(req.query.limit);
-                if (req.query.populate) {
-                    for (let populateField of req.query.populate) {
-                        clientQuery.populate(populateField);
-                    }
+            for (let fetchModel of req.query.fetch) {
+                let fetchModelName = Object.keys(fetchModel)[0];
+                if (fetchModelName === "SendedMessages") {
+                    fetchModel[fetchModelName].query.sender = req.user._id.toString();
+                }
+                if (fetchModelName === "ReceivedMessages") {
+                    fetchModel[fetchModelName].query.receiver = req.user._id.toString();
                 }
             }
-            let clients = await clientQuery.exec();
-            res.json(clients);
+            res.json(await Client.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
         }
     },
-    async getClientById(req, res,next) {
+    async getClientById(req, res, next) {
         let clientId = req.params.id;
         try {
-            let clientQuery = Client.findOne({_id: clientId})
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    clientQuery.populate(populateField);
+            req.query.target.query._id = clientId;
+            for (let fetchModel of req.query.fetch) {
+                let fetchModelName = Object.keys(fetchModel)[0];
+                if (fetchModelName === "SendedMessages") {
+                    fetchModel[fetchModelName].query.sender = req.user._id.toString();
+                }
+                if (fetchModelName === "ReceivedMessages") {
+                    fetchModel[fetchModelName].query.receiver = req.user._id.toString();
                 }
             }
-            let client = await clientQuery.exec();
-            res.json(client);
+            res.json(await Client.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
         }
     },
-    async updateClient(req, res,next) {
+    async updateClient(req, res, next) {
         let clientId = req.params.id;
         try {
             let err = keysValidator.diff(Client.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 let client = await Client.findById(clientId);
                 if (client) {
@@ -57,7 +51,7 @@ module.exports = {
                     res.status(201).json(updated);
                 } else {
                     let e = new Error();
-                    e.message = 'Not found';
+                    e.message = "Not found";
                     e.status = 404;
                     return next(e);
                 }
@@ -67,7 +61,7 @@ module.exports = {
             return next(e);
         }
     },
-    async removeClient(req, res,next) {
+    async removeClient(req, res, next) {
         let clientId = req.params.id;
         try {
             let removedClient = await Client.findById(clientId);
@@ -76,7 +70,7 @@ module.exports = {
                 res.status(204).json(removedClient);
             } else {
                 let e = new Error();
-                e.message = 'Not found';
+                e.message = "Not found";
                 e.status = 404;
                 return next(e);
             }
