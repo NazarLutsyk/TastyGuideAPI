@@ -10,7 +10,6 @@ let Bonuse = require("./models/Bonuse");
 let Event = require("./models/Event");
 let PlaceType = require("./models/PlaceType");
 let Lang = require("./models/Lang");
-let Day = require("./models/Day");
 let TopPlace = require("./models/TopPlace");
 let HashTag = require("./models/HashTag");
 let Place = require("./models/Place");
@@ -38,10 +37,6 @@ let hashTag1;
 let hashTag2;
 let hashTag3;
 let hashTag4;
-let day1;
-let day2;
-let day3;
-let day4;
 let news1;
 let news2;
 let bonuse1;
@@ -158,6 +153,28 @@ async function createModels() {
             lng: 774
         },
         images: ["/public/upload/default.jpg"],
+        days: {
+            0: {
+                start: "09:00",
+                end: "18:00"
+            },
+            1: {
+                start: "09:00",
+                end: "18:00"
+            },
+            2: {
+                start: "09:00",
+                end: "18:00"
+            },
+            3: {
+                start: "09:00",
+                end: "18:00"
+            },
+            4: {
+                start: "09:00",
+                end: "18:00"
+            },
+        },
         types: [placeType1],
         hashTags: [hashTag1, hashTag2]
     });
@@ -172,6 +189,20 @@ async function createModels() {
             lng: 774
         },
         images: ["/public/upload/default.jpg"],
+        days: {
+            5: {
+                start: "23:00",
+                end: "07:00"
+            },
+            6: {
+                start: "23:00",
+                end: "07:00"
+            },
+            7: {
+                start: "23:00",
+                end: "07:00"
+            }
+        },
         types: [placeType2],
         hashTags: [hashTag3, hashTag4]
     });
@@ -201,26 +232,6 @@ async function createModels() {
         endDate: Date(),
         price: 9999,
         actual: false,
-        place: place2
-    });
-    day1 = await Day.create({
-        startTime: Date(),
-        endTime: Date(),
-        place: place1
-    });
-    day2 = await Day.create({
-        startTime: Date(),
-        endTime: Date(),
-        place: place1
-    });
-    day3 = await Day.create({
-        startTime: Date(),
-        endTime: Date(),
-        place: place2
-    });
-    day4 = await Day.create({
-        startTime: Date(),
-        endTime: Date(),
         place: place2
     });
     placeM1 = await PlaceMultilang.create({
@@ -348,36 +359,36 @@ async function createModels() {
         place: place2
     });
     news1 = await News.create({
-        author: department1,
+        author: client1,
         place: place1,
         images: ["/public/upload/default.jpg"]
     });
     news2 = await News.create({
-        author: department2,
+        author: client2,
         place: place2,
         images: ["/public/upload/default.jpg"]
     });
     bonuse1 = await Bonuse.create({
         startDate: Date(),
         endDate: Date(),
-        author: department1,
+        author: client1,
         place: place1,
         images: ["/public/upload/default.jpg"]
     });
     bonuse2 = await Bonuse.create({
         startDate: Date(),
         endDate: Date(),
-        author: department2,
+        author: client1,
         place: place2,
         images: ["/public/upload/default.jpg"]
     });
     event1 = await Event.create({
-        author: department1,
+        author: client1,
         place: place1,
         images: ["/public/upload/default.jpg"]
     });
     event2 = await Event.create({
-        author: department2,
+        author: client2,
         place: place2,
         images: ["/public/upload/default.jpg"]
     });

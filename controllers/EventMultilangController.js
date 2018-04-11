@@ -14,7 +14,8 @@ module.exports = {
         let eventMultilangId = req.params.id;
         try {
             req.query.target.query._id = eventMultilangId;
-            res.json(await EventMultilang.superfind(req.query));
+            let eventMultilang = await EventMultilang.superfind(req.query);
+            res.json(eventMultilang[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

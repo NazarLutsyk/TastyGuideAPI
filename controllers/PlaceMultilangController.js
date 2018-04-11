@@ -14,7 +14,8 @@ module.exports = {
         let placeMultilangId = req.params.id;
         try {
             req.query.target.query._id = placeMultilangId;
-            res.json(await PlaceMultilang.superfind(req.query));
+            let placeMultilang = await PlaceMultilang.superfind(req.query);
+            res.json(placeMultilang[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

@@ -19,7 +19,14 @@ module.exports = {
         let placeId = req.params.id;
         try {
             req.query.target.query._id = placeId;
-            res.json(await Place.superfind(req.query));
+            let place = await Place.superfind(req.query);
+            place = place[0];
+            if (place) {
+                let toUpdate = await Place.findById(placeId);
+                toUpdate.reviews++;
+                await toUpdate.supersave();
+            }
+            res.json(place);
         } catch (e) {
             e.status = 400;
             return next(e);

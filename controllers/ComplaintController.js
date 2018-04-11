@@ -14,7 +14,8 @@ module.exports = {
         let complaintId = req.params.id;
         try {
             req.query.target.query._id = complaintId;
-            res.json(await Complaint.superfind(req.query));
+            let complaint = await Complaint.superfind(req.query);
+            res.json(complaint[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

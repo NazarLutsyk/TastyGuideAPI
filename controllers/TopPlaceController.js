@@ -14,7 +14,8 @@ module.exports = {
         let topPlaceId = req.params.id;
         try {
             req.query.target.query._id = topPlaceId;
-            res.json(await TopPlace.superfind(req.query));
+            let topPlace = await TopPlace.superfind(req.query);
+            res.json(topPlace[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

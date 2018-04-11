@@ -14,7 +14,8 @@ module.exports = {
         let ratingId = req.params.id;
         try {
             req.query.target.query._id = ratingId;
-            res.json(await Rating.superfind(req.query));
+            let rating = await Rating.superfind(req.query);
+            res.json(rating[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

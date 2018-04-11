@@ -15,7 +15,8 @@ module.exports = {
         let langId = req.params.id;
         try {
             req.query.target.query._id = langId;
-            res.json(await Lang.superfind(req.query));
+            let lang = await Lang.superfind(req.query);
+            res.json(lang[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

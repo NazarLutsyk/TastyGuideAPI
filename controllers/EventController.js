@@ -16,7 +16,8 @@ module.exports = {
         let eventId = req.params.id;
         try {
             req.query.target.query._id = eventId;
-            res.json(await Event.superfind(req.query));
+            let event = await Event.superfind(req.query);
+            res.json(event[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

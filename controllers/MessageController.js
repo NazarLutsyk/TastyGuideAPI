@@ -14,18 +14,10 @@ module.exports = {
     async getMessageById(req, res, next) {
         let messageId = req.params.id;
         try {
-            let messageQuery = Message.findOne({
-                _id: messageId,
-                $or: [{receiver: req.user._id}, {sender: req.user._id}]
-            })
-                .select(req.query.fields);
-            if (req.query.populate) {
-                for (let populateField of req.query.populate) {
-                    messageQuery.populate(populateField);
-                }
-            }
-            let messages = await messageQuery.exec();
-            res.json(messages);
+            req.query.target.query._id = messageId;
+            req.query.target.query.$or = [{receiver: req.user._id}, {sender: req.user._id}];
+            let message = await Message.superfind(req.query);
+            res.json(message[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

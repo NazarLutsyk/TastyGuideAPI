@@ -32,7 +32,8 @@ module.exports = {
                     fetchModel[fetchModelName].query.receiver = req.user._id.toString();
                 }
             }
-            res.json(await Client.superfind(req.query));
+            let client = await Client.superfind(req.query);
+            res.json(client[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

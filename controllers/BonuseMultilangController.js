@@ -14,7 +14,8 @@ module.exports = {
         let bonuseMultilangId = req.params.id;
         try {
             req.query.target.query._id = bonuseMultilangId;
-            res.json(await BonuseMultilang.superfind(req.query));
+            let bonuseMultilang = await BonuseMultilang.superfind(req.query);
+            res.json(bonuseMultilang[0]);
         } catch (e) {
             e.status = 400;
             return next(e);

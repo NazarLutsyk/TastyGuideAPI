@@ -65,6 +65,64 @@ let PlaceSchema = new Schema({
     },
     topCategories: [String],
     images: [String],
+    days: {
+        1: {
+            start: {
+                type: String,
+            },
+            end: {
+                type: String,
+            }
+        },
+        2: {
+            start: {
+                type: String,
+            },
+            end: {
+                type: String,
+            }
+        },
+        3: {
+            start: {
+                type: String,
+            },
+            end: {
+                type: String,
+            }
+        },
+        4: {
+            start: {
+                type: String,
+            },
+            end: {
+                type: String,
+            }
+        },
+        5: {
+            start: {
+                type: String,
+            },
+            end: {
+                type: String,
+            }
+        },
+        6: {
+            start: {
+                type: String,
+            },
+            end: {
+                type: String,
+            }
+        },
+        7: {
+            start: {
+                type: String,
+            },
+            end: {
+                type: String,
+            }
+        },
+    },
     types: [{
         type: Schema.Types.ObjectId,
         ref: "PlaceType",
@@ -124,15 +182,11 @@ PlaceSchema.statics.superfind = async function (params) {
                     }
                     if (fetchModelName.toLowerCase() === "placetype") {
                         fetchModel[fetchModelName].query._id = mainModel.types;
-                        mainModelToResponse.types = (await universalFind(require("./PlaceType"), fetchModel[fetchModelName]))[0];
+                        mainModelToResponse.types = await universalFind(require("./PlaceType"), fetchModel[fetchModelName]);
                     }
                     if (fetchModelName.toLowerCase() === "placemultilang") {
                         fetchModel[fetchModelName].query.place = mainModel._id.toString();
                         mainModelToResponse.multilang = await universalFind(require("./PlaceMultilang"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "day") {
-                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
-                        mainModelToResponse.days = await universalFind(require("./Day"), fetchModel[fetchModelName]);
                     }
                     if (fetchModelName.toLowerCase() === "promo") {
                         fetchModel[fetchModelName].query.place = mainModel._id.toString();
@@ -142,7 +196,7 @@ PlaceSchema.statics.superfind = async function (params) {
             }
             res.push(mainModelToResponse);
         }
-    }else if(target.aggregate){
+    } else if (target.aggregate) {
         res.push(...listOfMainModels);
     }
     return res;
@@ -227,7 +281,6 @@ let DrinkApplication = require("./DrinkApplication");
 let Rating = require("./Rating");
 let Department = require("./Department");
 let TopPlace = require("./TopPlace");
-let Day = require("./Day");
 let Promo = require("./Promo");
 let HashTag = require("./HashTag");
 let Multilang = require("./PlaceMultilang");
@@ -240,7 +293,6 @@ PlaceSchema.pre("remove", async function (next) {
         let ratings = await Rating.remove({place: this._id});
         let departments = await Department.remove({place: this._id});
         let topPlaces = await TopPlace.remove({place: this._id});
-        let days = await Day.remove({place: this._id});
         let promos = await Promo.remove({place: this._id});
         let multilangs = await Multilang.remove({place: this._id});
         let fileHelper = require("../helpers/fileHelper");

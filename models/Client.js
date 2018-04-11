@@ -86,6 +86,10 @@ ClientSchema.statics.superfind = async function (params) {
                         fetchModel[fetchModelName].query.author = mainModel._id.toString();
                         mainModelToResponse.promos = await universalFind(require("./Promo"), fetchModel[fetchModelName]);
                     }
+                    if (fetchModelName.toLowerCase() === "favoriteplace") {
+                        fetchModel[fetchModelName].query._id = mainModel.favoritePlaces;
+                        mainModelToResponse.favoritePlaces = await universalFind(require("./Place"), fetchModel[fetchModelName]);
+                    }
                     if (fetchModelName.toLowerCase() === "sendedmessages" && fetchModel[fetchModelName].query.sender === mainModel._id.toString()) {
                         mainModelToResponse.sendedMessages = await universalFind(require("./Message"), fetchModel[fetchModelName]);
                     }

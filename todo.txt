@@ -34,7 +34,7 @@
 //+Можливість додавання Топ-категорій типу “Найкращий заклад для весілля, корпоративу, дня народження”
 //+statistic reviews/aggregations
 //+disallow update secured fields
-//todo services and change url
+//services and change url
 //todo change global config
 //todo register facebook&google&gmail accounts
 //todo ionic facebook

@@ -14,7 +14,6 @@ router.use("/departments", require("./department"));
 router.use("/ratings", require("./rating"));
 router.use("/drinkApplications", require("./drinkApplication"));
 router.use("/complaints", require("./complaint"));
-router.use("/days", require("./day"));
 router.use("/news", require("./news"));
 router.use("/bonuses", require("./bonuse"));
 router.use("/events", require("./event"));
