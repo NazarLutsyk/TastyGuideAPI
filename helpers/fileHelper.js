@@ -10,16 +10,16 @@ module.exports = {
                 let fileName = files[file].toString();
                 fs.exists(fileName, function (exists) {
                     if (exists) {
-                        log(`File exists ${filename}`);
-                        fs.unlink(filename, function (err) {
+                        log(`File exists ${fileName}`);
+                        fs.unlink(fileName, function (err) {
                             if (err) {
                                 throw new Error(err);
                             }
-                            log(`Delete file ${filename}`);
+                            log(`Delete file ${fileName}`);
                             return;
                         });
                     }
-                    log(`File doesn't exists ${filename}`);
+                    log(`File doesn't exists ${fileName}`);
                 });
             }
         } else {

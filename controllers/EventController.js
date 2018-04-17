@@ -1,10 +1,10 @@
-let Event = require('../models/Event');
-let keysValidator = require('../validators/keysValidator');
-let path = require('path');
-let upload = require('../middleware/multer')(path.join(__dirname,'../public', 'upload', 'promo'));
-upload = upload.array('images');
+let Event = require("../models/Event");
+let keysValidator = require("../validators/keysValidator");
+let path = require("path");
+let upload = require("../middleware/multer")(path.join(__dirname, "../public", "upload", "promo"));
+upload = upload.single("image");
 module.exports = {
-    async getEvents(req, res,next) {
+    async getEvents(req, res, next) {
         try {
             res.json(await Event.superfind(req.query));
         } catch (e) {
@@ -12,7 +12,7 @@ module.exports = {
             return next(e);
         }
     },
-    async getEventById(req, res,next) {
+    async getEventById(req, res, next) {
         let eventId = req.params.id;
         try {
             req.query.target.query._id = eventId;
@@ -23,11 +23,11 @@ module.exports = {
             return next(e);
         }
     },
-    async createEvent(req, res,next) {
+    async createEvent(req, res, next) {
         try {
             let err = keysValidator.diff(Event.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 let event = new Event(req.body);
                 if (event) {
@@ -35,12 +35,7 @@ module.exports = {
                         if (err) {
                             return res.status(400).send(err.toString());
                         } else {
-                            if (!event.images)
-                                event.images = [];
-                            for (let file in req.files) {
-                                let image = req.files[file].filename;
-                                event.images.push(image);
-                            }
+                            event.image = req.file ? req.file.filename : "";
                             try {
                                 event.author = req.user._id;
                                 event = await event.supersave();
@@ -63,32 +58,27 @@ module.exports = {
             return next(e);
         }
     },
-    async updateEvent(req, res,next) {
+    async updateEvent(req, res, next) {
         let eventId = req.params.id;
         try {
             let err = keysValidator.diff(Event.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 let event = await Event.findById(eventId);
                 if (event) {
                     upload(req, res, async function (err) {
                         if (err) {
                             return res.status(400).send(err.toString());
-                        } else {
-                            if (!req.body.images)
-                                req.body.images = [];
-                            for (let file in req.files) {
-                                let image = req.files[file].filename;
-                                req.body.images.push(image);
-                            }
-                            try {
-                                let updated = await event.superupdate(req.body);
-                                res.status(201).json(updated);
-                            } catch (e) {
-                                e.status = 400;
-                                return next(e);
-                            }
+                        } else if(req.file){
+                            req.body.image = req.file.filename;
+                        }
+                        try {
+                            let updated = await event.superupdate(req.body);
+                            res.status(201).json(updated);
+                        } catch (e) {
+                            e.status = 400;
+                            return next(e);
                         }
                     });
                 } else {
@@ -103,7 +93,7 @@ module.exports = {
             return next(e);
         }
     },
-    async removeEvent(req, res,next) {
+    async removeEvent(req, res, next) {
         let eventId = req.params.id;
         try {
             let event = await Event.findById(eventId);

@@ -1,8 +1,8 @@
-let News = require('../models/News');
-let path = require('path');
-let keysValidator = require('../validators/keysValidator');
-let upload = require('../middleware/multer')(path.join(__dirname,'../public', 'upload', 'promo'));
-upload = upload.array('images');
+let News = require("../models/News");
+let path = require("path");
+let keysValidator = require("../validators/keysValidator");
+let upload = require("../middleware/multer")(path.join(__dirname, "../public", "upload", "promo"));
+upload = upload.single("image");
 module.exports = {
     async getNews(req, res, next) {
         try {
@@ -27,7 +27,7 @@ module.exports = {
         try {
             let err = keysValidator.diff(News.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 let news = new News(req.body);
                 if (news) {
@@ -35,12 +35,7 @@ module.exports = {
                         if (err) {
                             return res.status(400).send(err.toString());
                         } else {
-                            if (!news.images)
-                                news.images = [];
-                            for (let file in req.files) {
-                                let image = req.files[file].filename;
-                                news.images.push(image);
-                            }
+                            news.image = req.file ? req.file.filename : "";
                             try {
                                 news.author = req.user._id;
                                 news = await news.supersave();
@@ -63,7 +58,7 @@ module.exports = {
         try {
             let err = keysValidator.diff(News.schema.tree, req.body);
             if (err) {
-                throw new Error('Unknown fields ' + err);
+                throw new Error("Unknown fields " + err);
             } else {
                 let news = await News.findById(newsId);
                 if (news) {
@@ -71,11 +66,10 @@ module.exports = {
                         if (err) {
                             return res.status(400).send(err.toString());
                         } else {
-                            if (!req.body.images)
-                                req.body.images = [];
-                            for (let file in req.files) {
-                                let image = req.files[file].filename;
-                                req.body.images.push(image);
+                            if (err) {
+                                return res.status(400).send(err.toString());
+                            } else if(req.file){
+                                req.body.image = req.file.filename;
                             }
                             try {
                                 let updated = await news.superupdate(req.body);

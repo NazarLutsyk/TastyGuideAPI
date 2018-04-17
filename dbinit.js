@@ -361,36 +361,36 @@ async function createModels() {
     news1 = await News.create({
         author: client1,
         place: place1,
-        images: ["/public/upload/default.jpg"]
+        image: 'default.jpg'
     });
     news2 = await News.create({
         author: client2,
         place: place2,
-        images: ["/public/upload/default.jpg"]
+        image: 'default.jpg'
     });
     bonuse1 = await Bonuse.create({
         startDate: Date(),
         endDate: Date(),
         author: client1,
         place: place1,
-        images: ["/public/upload/default.jpg"]
+        image: 'default.jpg'
     });
     bonuse2 = await Bonuse.create({
         startDate: Date(),
         endDate: Date(),
         author: client1,
         place: place2,
-        images: ["/public/upload/default.jpg"]
+        image: 'default.jpg'
     });
     event1 = await Event.create({
         author: client1,
         place: place1,
-        images: ["/public/upload/default.jpg"]
+        image: 'default.jpg'
     });
     event2 = await Event.create({
         author: client2,
         place: place2,
-        images: ["/public/upload/default.jpg"]
+        image: 'default.jpg'
     });
     eventM1 = await EventMultilang.create({
         header: "header",
