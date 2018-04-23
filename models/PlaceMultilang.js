@@ -11,6 +11,7 @@ let PlaceMultilangSchema = new Schema({
         type: String,
         required: true
     },
+    address: String,
     place: {
         type: Schema.Types.ObjectId,
         ref: 'Place',

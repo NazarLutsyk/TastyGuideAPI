@@ -123,7 +123,6 @@ let PlaceSchema = new Schema({
             }
         },
     },
-    address: String,
     types: [{
         type: Schema.Types.ObjectId,
         ref: "PlaceType",
