@@ -93,22 +93,22 @@ async function createModels() {
     placeType1 = await PlaceType.create({});
     placeType2 = await PlaceType.create({});
     placeTypeM1 = await PlaceTypeMultilang.create({
-        name: "placeType",
+        name: "ресторан",
         placeType: placeType1,
         lang: lang1
     });
     placeTypeM2 = await PlaceTypeMultilang.create({
-        name: "placeType",
+        name: "resturant",
         placeType: placeType1,
         lang: lang2
     });
     placeTypeM3 = await PlaceTypeMultilang.create({
-        name: "placeType",
+        name: "бар",
         placeType: placeType2,
         lang: lang1
     });
     placeTypeM4 = await PlaceTypeMultilang.create({
-        name: "placeType",
+        name: "bar",
         placeType: placeType2,
         lang: lang2
     });
@@ -122,7 +122,7 @@ async function createModels() {
         city: "Jopsk",
         phone: "355875545722",
         email: "someemail@mail.com",
-        avatar: "/public/upload/default.jpg"
+        avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNLzZszQbQf6jkknIGI8A3rj-0BoEngyi9156njfrCjPED9_b2vw"
     });
     client2 = await Client.create({
         name: "Tasik",
@@ -130,7 +130,7 @@ async function createModels() {
         city: "Jopsk",
         phone: "355875545722",
         email: "someemail@mail.com",
-        avatar: "/public/upload/default.jpg"
+        avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNLzZszQbQf6jkknIGI8A3rj-0BoEngyi9156njfrCjPED9_b2vw"
     });
     message1 = await Message.create({
         value: "Idi suka nahui!",
@@ -149,10 +149,10 @@ async function createModels() {
         reviews: 300,
         allowed: true,
         location: {
-            ltg: 442,
+            lat: 442,
             lng: 774
         },
-        images: ["/public/upload/default.jpg"],
+        images: ["/upload/place/default.jpg"],
         days: {
             0: {
                 start: "09:00",
@@ -174,6 +174,18 @@ async function createModels() {
                 start: "09:00",
                 end: "18:00"
             },
+            5: {
+                start: "09:00",
+                end: "18:00"
+            },
+            6: {
+                start: "09:00",
+                end: "18:00"
+            },
+            7: {
+                start: "09:00",
+                end: "18:00"
+            }
         },
         types: [placeType1],
         hashTags: [hashTag1, hashTag2]
@@ -181,15 +193,35 @@ async function createModels() {
     place2 = await Place.create({
         phone: "355875545722",
         email: "someemail@mail.com",
-        averagePrice: 7000,
-        reviews: 300,
+        averagePrice: 200,
+        reviews: 321,
         allowed: true,
         location: {
-            ltg: 442,
+            lat: 442,
             lng: 774
         },
-        images: ["/public/upload/default.jpg"],
+        images: ["/upload/place/default.jpg"],
         days: {
+            0: {
+                start: "09:00",
+                end: "18:00"
+            },
+            1: {
+                start: "09:00",
+                end: "18:00"
+            },
+            2: {
+                start: "09:00",
+                end: "18:00"
+            },
+            3: {
+                start: "09:00",
+                end: "18:00"
+            },
+            4: {
+                start: "09:00",
+                end: "18:00"
+            },
             5: {
                 start: "23:00",
                 end: "07:00"
@@ -235,27 +267,31 @@ async function createModels() {
         place: place2
     });
     placeM1 = await PlaceMultilang.create({
-        name: "place name",
-        description: "descr",
+        name: "ржавый башмак",
+        description: "самый ржавый башмак на всем белом свете",
+        address: "Львів Пимоненка 19",
         place: place1,
         lang: lang1
     });
     placeM2 = await PlaceMultilang.create({
-        name: "place name",
-        description: "descr",
+        name: "row foot",
+        description: "the most row foot all over the world",
         place: place1,
+        address: "Lviv Pymonenka 19",
         lang: lang2
     });
     placeM3 = await PlaceMultilang.create({
-        name: "place name",
-        description: "descr",
+        name: "скрипучий стул",
+        description: "стул скрипит, значит на нем сидят...жопа болит",
         place: place2,
+        address: "Львів Городоцька 16",
         lang: lang1
     });
     placeM4 = await PlaceMultilang.create({
-        name: "place name",
-        description: "descr",
+        name: "screaming chair",
+        description: "some screaming chair for your ass",
         place: place2,
+        address: "Lviv Gorodotska 16",
         lang: lang2
     });
     department1 = await Department.create({
@@ -338,63 +374,63 @@ async function createModels() {
         place: place1
     });
     rating2 = await Rating.create({
-        value: 5,
+        value: 2,
         comment: "Duze faino",
-        price: 200,
+        price: 150,
         client: client1,
         place: place1
     });
     rating3 = await Rating.create({
-        value: 5,
+        value: 4,
         comment: "Duze faino",
         price: 200,
         client: client2,
         place: place2
     });
     rating4 = await Rating.create({
-        value: 5,
+        value: 3,
         comment: "Duze faino",
-        price: 200,
+        price: 300,
         client: client2,
         place: place2
     });
     news1 = await News.create({
         author: client1,
         place: place1,
-        image: 'default.jpg'
+        image: "/upload/promo/default.jpg"
     });
     news2 = await News.create({
         author: client2,
         place: place2,
-        image: 'default.jpg'
+        image: "/upload/promo/default.jpg"
     });
     bonuse1 = await Bonuse.create({
         startDate: Date(),
         endDate: Date(),
         author: client1,
         place: place1,
-        image: 'default.jpg'
+        image: "/upload/promo/default.jpg"
     });
     bonuse2 = await Bonuse.create({
         startDate: Date(),
         endDate: Date(),
         author: client1,
         place: place2,
-        image: 'default.jpg'
+        image: "/upload/promo/default.jpg"
     });
     event1 = await Event.create({
         author: client1,
         place: place1,
-        image: 'default.jpg'
+        image: "/upload/promo/default.jpg"
     });
     event2 = await Event.create({
         author: client2,
         place: place2,
-        image: 'default.jpg'
+        image: "/upload/promo/default.jpg"
     });
     eventM1 = await EventMultilang.create({
-        header: "header",
-        description: "descr",
+        header: "жесткий бухлет",
+        description: "собираемся бухнуть все разом",
         promo: event1,
         lang: lang1,
     });
@@ -405,8 +441,8 @@ async function createModels() {
         lang: lang2
     });
     eventM3 = await EventMultilang.create({
-        header: "header",
-        description: "descr",
+        header: "свинг вечеруха",
+        description: "свингуем до упаду",
         promo: event2,
         lang: lang1
     });
@@ -417,9 +453,9 @@ async function createModels() {
         lang: lang2
     });
     bonuseM1 = await BonuseMultilang.create({
-        header: "header",
-        description: "descr",
-        conditions: "conditions",
+        header: "получи звиздюлей",
+        description: "получи звиздюлей всего за 1000 грн/час",
+        conditions: "прийди главное",
         promo: bonuse1,
         lang: lang1
     });
@@ -431,8 +467,8 @@ async function createModels() {
         lang: lang2
     });
     bonuseM3 = await BonuseMultilang.create({
-        header: "header",
-        description: "descr",
+        header: "укради все что не ровно лежит",
+        description: "ну ті и из названия понял что к чему",
         conditions: "conditions",
         promo: bonuse2,
         lang: lang1
@@ -445,8 +481,8 @@ async function createModels() {
         lang: lang2
     });
     newsM1 = await NewsMultilang.create({
-        header: "header",
-        description: "descr",
+        header: "рада обосралась",
+        description: "рада как всегда обосралась",
         promo: news1,
         lang: lang1
     });
@@ -457,8 +493,8 @@ async function createModels() {
         lang: lang2
     });
     newsM3 = await NewsMultilang.create({
-        header: "header",
-        description: "descr",
+        header: "рада обосралась снова",
+        description: "рада снова как всегда обосралась",
         promo: news2,
         lang: lang1
     });

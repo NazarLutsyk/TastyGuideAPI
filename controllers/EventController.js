@@ -35,7 +35,7 @@ module.exports = {
                         if (err) {
                             return res.status(400).send(err.toString());
                         } else {
-                            event.image = req.file ? req.file.filename : "";
+                            event.image = req.file ? "/upload/promo/" + req.file.filename : "";
                             try {
                                 event.author = req.user._id;
                                 event = await event.supersave();
@@ -71,7 +71,7 @@ module.exports = {
                         if (err) {
                             return res.status(400).send(err.toString());
                         } else if(req.file){
-                            req.body.image = req.file.filename;
+                            req.body.image = "/upload/promo/" + req.file.filename;
                         }
                         try {
                             let updated = await event.superupdate(req.body);

@@ -47,7 +47,7 @@ module.exports = {
                             if (!place.images)
                                 place.images = [];
                             for (let file in req.files) {
-                                let image = req.files[file].filename;
+                                let image = "/upload/place/" + req.files[file].filename;
                                 place.images.push(image);
                             }
                             try {
@@ -89,7 +89,7 @@ module.exports = {
                             if (!req.body.images)
                                 req.body.images = [];
                             for (let file in req.files) {
-                                let image = req.files[file].filename;
+                                let image = "/upload/place/" + req.files[file].filename;
                                 req.body.images.push(image);
                             }
                             try {

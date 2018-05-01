@@ -36,7 +36,7 @@ module.exports = {
                             err.status = 400;
                             return next(err);
                         } else {
-                            bonuse.image = req.file ? req.file.filename : "";
+                            bonuse.image = req.file ? "/upload/promo/" + req.file.filename : "";
                             try {
                                 bonuse.author = req.user._id;
                                 bonuse = await bonuse.supersave();
@@ -70,8 +70,8 @@ module.exports = {
                         } else {
                             if (err) {
                                 return res.status(400).send(err.toString());
-                            } else if(req.file){
-                                req.body.image = req.file.filename;
+                            } else if (req.file) {
+                                req.body.image = "/upload/promo/" + req.file.filename;
                             }
                             try {
                                 let updated = await news.superupdate(req.body);

@@ -51,7 +51,10 @@ module.exports = Promo.discriminator('Bonuse', BonuseSchema);
 let Multilang = require('./BonuseMultilang');
 BonuseSchema.pre('remove', async function (next) {
     try {
-        await Multilang.remove({promo: this._id});
+        let multilangs = await Multilang.find({promo: this._id});
+        for (const multilang of multilangs) {
+            await multilang.remove();
+        }
         return next();
     } catch (e) {
         return next(e);

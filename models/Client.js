@@ -139,16 +139,30 @@ let Message = require("./Message");
 let Promo = require("./Promo");
 ClientSchema.pre("remove", async function (next) {
     try {
-        await Complaint.remove({client: this._id});
-        await DrinkApplication.remove({organizer: this._id});
-        await Rating.remove({client: this._id});
-        await Department.remove({client: this._id});
-        await Message.remove(
-            {sender: this._id}
-        );
-        await Message.remove(
-            {receiver: this._id}
-        );
+        let complaints = await Complaint.find({client: this._id});
+        let drinkApps = await DrinkApplication.find({organizer: this._id});
+        let ratings = await Rating.find({client: this._id});
+        let departments = await Department.find({client: this._id});
+        let sended = await Message.find({sender: this._id});
+        let received = await Message.find({receiver: this._id});
+        for (const complaint of complaints) {
+            await complaint.remove();
+        }
+        for (const drinkApp of drinkApps) {
+            await drinkApp.remove();
+        }
+        for (const rating of ratings) {
+            await rating.remove();
+        }
+        for (const department of departments) {
+            await department.remove();
+        }
+        for (const message of sended) {
+            await message.remove();
+        }
+        for (const message of received) {
+            await message.remove();
+        }
         await Promo.update(
             {author: this._id},
             {author: null},

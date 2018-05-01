@@ -53,11 +53,14 @@ let Place = require("./Place");
 let PlaceTypeMultilang = require("./PlaceTypeMultilang");
 PlaceTypeSchema.pre("remove", async function (next) {
     try {
+        let placeTypeMultilangs = await PlaceTypeMultilang.find({placeType: this._id});
+        for (const placeTypeMultilang of placeTypeMultilangs) {
+            await placeTypeMultilang.remove();
+        }
         await Place.update(
             {types: this._id},
             {$pull: {types: this._id}},
             {multi: true, runValidators: true, context: "query"});
-        await PlaceTypeMultilang.remove({placeType: this._id});
         log("remove PlaceType");
         return next();
     } catch (e) {

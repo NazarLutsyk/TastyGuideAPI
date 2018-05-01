@@ -46,7 +46,7 @@ PromoSchema.methods.superupdate = async function (newDoc) {
         throw new Error("Can`t update relations!");
     }
     if ((newDoc.image !== this.image) && this.image) {
-        let toDelete = path.join(__dirname, "../public", "upload", "promo", this.image);
+        let toDelete = path.join(__dirname, "../public", this.image);
         fileHelper.deleteFiles(toDelete);
     }
     objectHelper.load(this, newDoc);
@@ -56,9 +56,10 @@ PromoSchema.methods.superupdate = async function (newDoc) {
 PromoSchema.pre("remove", async function (next) {
     let fileHelper = require("../helpers/fileHelper");
     let path = require("path");
+    console.log("remove promo");
     try {
         if (this.image) {
-            let toDelete = path.join(__dirname, "../public", "upload", "promo", this.image);
+            let toDelete = path.join(__dirname, "../public", this.image);
             fileHelper.deleteFiles(toDelete);
         }
         log("remove Promo");

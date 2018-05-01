@@ -1,10 +1,9 @@
-let mongoose = require('mongoose');
+let mongoose = require("mongoose");
 let Schema = mongoose.Schema;
-let Promo = require('./Promo');
+let Promo = require("./Promo");
 
-let EventSchema = new Schema({
-}, {
-    discriminatorKey: 'kind'
+let EventSchema = new Schema({}, {
+    discriminatorKey: "kind"
 });
 
 EventSchema.statics.superfind = async function (params) {
@@ -39,12 +38,15 @@ EventSchema.statics.superfind = async function (params) {
     }
     return res;
 };
-module.exports = Promo.discriminator('Event', EventSchema);
+module.exports = Promo.discriminator("Event", EventSchema);
 
-let Multilang = require('./EventMultilang');
-EventSchema.pre('remove', async function (next) {
+let Multilang = require("./EventMultilang");
+EventSchema.pre("remove", async function (next) {
     try {
-        await Multilang.remove({promo: this._id});
+        let multilangs = await Multilang.find({promo: this._id});
+        for (const multilang of multilangs) {
+            await multilang.remove();
+        }
         return next();
     } catch (e) {
         return next(e);

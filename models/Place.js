@@ -265,7 +265,7 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
         for (let i = 0; i < this.images.length; i++) {
             let oldImage = this.images[i];
             if (newDoc.images.indexOf(oldImage) === -1) {
-                let toDelete = path.join(__dirname, "../public", "upload", "place", oldImage);
+                let toDelete = path.join(__dirname, "../public", oldImage);
                 fileHelper.deleteFiles(toDelete);
             }
         }
@@ -288,16 +288,38 @@ let Multilang = require("./PlaceMultilang");
 let Client = require("./Client");
 let path = require("path");
 PlaceSchema.pre("remove", async function (next) {
+    console.log("remove place");
     try {
-        let complaints = await Complaint.remove({place: this._id});
-        let drinkApplications = await DrinkApplication.remove({place: this._id});
-        let ratings = await Rating.remove({place: this._id});
-        let departments = await Department.remove({place: this._id});
-        let topPlaces = await TopPlace.remove({place: this._id});
-        let promos = await Promo.remove({place: this._id});
-        let multilangs = await Multilang.remove({place: this._id});
-        let fileHelper = require("../helpers/fileHelper");
+        let complaints = await Complaint.find({place: this._id});
+        let drinkApplications = await DrinkApplication.find({place: this._id});
+        let ratings = await Rating.find({place: this._id});
+        let departments = await Department.find({place: this._id});
+        let topPlaces = await TopPlace.find({place: this._id});
+        let promos = await Promo.find({place: this._id});
+        let multilangs = await Multilang.find({place: this._id});
+        for (const complaint of complaints) {
+            await complaint.remove();
+        }
+        for (const drinkApplication of drinkApplications) {
+            await drinkApplication.remove();
+        }
+        for (const rating of ratings) {
+            await rating.remove();
+        }
+        for (const department of departments) {
+            await department.remove();
+        }
+        for (const topPlace of topPlaces) {
+            await topPlace.remove();
+        }
+        for (const promo of promos) {
+            await promo.remove();
+        }
+        for (const multilang of multilangs) {
+            await multilang.remove();
+        }
 
+        let fileHelper = require("../helpers/fileHelper");
         await Client.update(
             {favoritePlaces: this._id},
             {$pull: {favoritePlaces: this._id}},
@@ -305,7 +327,7 @@ PlaceSchema.pre("remove", async function (next) {
         if (this.images.length > 0) {
             for (let i = 0; i < this.images.length; i++) {
                 let image = this.images[i];
-                let toDelete = path.join(__dirname, "../public", "upload", "place", image);
+                let toDelete = path.join(__dirname, "../public", image);
                 fileHelper.deleteFiles(toDelete);
             }
         }
