@@ -24,9 +24,7 @@ router.get('/google/callback',
 
 
 router.get('/principal', function (req, res) {
-    res.json({
-        user: req.user
-    });
+    res.json(req.user);
 });
 
 module.exports = router;

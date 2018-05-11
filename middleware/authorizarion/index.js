@@ -1,5 +1,3 @@
-
-
 function isAllowed(allowed, userRoles) {
     for (let role of userRoles) {
         if (allowed.indexOf(role) !== -1) {
@@ -11,7 +9,7 @@ function isAllowed(allowed, userRoles) {
 
 exports.roles = function (...roles) {
     return (req, res, next) => {
-        log('check roles');
+        log("check roles");
         if (!roles) {
             return next();
         }
@@ -26,7 +24,7 @@ exports.roles = function (...roles) {
             return next();
         }
         let error = new Error();
-        error.message = 'Forbidden';
+        error.message = "Forbidden";
         error.status = 403;
         return next(error);
     };

@@ -1,7 +1,7 @@
-let passport = require('passport');
+let passport = require("passport");
 module.exports = {
     signUp(req, res, next) {
-        passport.authenticate('local.signup', function (err, user) {
+        passport.authenticate("local.signup", function (err, user) {
             if (err) {
                 err.status = 400;
                 return next(err);
@@ -16,14 +16,12 @@ module.exports = {
                     err.status = 400;
                     return next(err);
                 }
-                return res.status(200).json({
-                    user: req.user
-                });
+                return res.status(200).json(req.user);
             });
         })(req, res, next);
     },
     signIn(req, res, next) {
-        passport.authenticate('local.signin', function (err, user) {
+        passport.authenticate("local.signin", function (err, user) {
             if (err) {
                 err.status = 400;
                 return next(err);
@@ -38,18 +36,14 @@ module.exports = {
                     err.status = 400;
                     return next(err);
                 }
-                return res.status(200).json({
-                    user: req.user
-                });
+                return res.status(200).json(req.user);
             });
         })(req, res, next);
     },
     facebookAuth(req, res, next) {
         if (req.user) {
-            return res.status(200).json({
-                user: req.user
-            });
-        }else {
+            return res.status(200).json(req.user);
+        } else {
             let e = new Error();
             e.status = 400;
             return next(e);
@@ -57,10 +51,8 @@ module.exports = {
     },
     googleAuth(req, res, next) {
         if (req.user) {
-            return res.status(200).json({
-                user: req.user
-            });
-        }else {
+            return res.status(200).json(req.user);
+        } else {
             let e = new Error();
             e.status = 400;
             return next(e);
@@ -68,6 +60,6 @@ module.exports = {
     },
     logout(req, res) {
         req.logout();
-        res.sendStatus(200);
+        res.json({ok: true})
     }
 };

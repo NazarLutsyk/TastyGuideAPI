@@ -38,7 +38,7 @@ let PlaceSchema = new Schema({
         type: String
     },
     location: {
-        ltg: {
+        lat: {
             type: Number,
         },
         lng: {

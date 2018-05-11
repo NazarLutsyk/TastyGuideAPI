@@ -3,14 +3,6 @@ let Schema = mongoose.Schema;
 let Promo = require('./Promo');
 
 let BonuseSchema = new Schema({
-    startDate: {
-        type: Date,
-        required: true
-    },
-    endDate: {
-        type: Date,
-        required: true,
-    },
 }, {
     discriminatorKey: 'kind'
 });

@@ -23,6 +23,13 @@ let Message = require("./models/Message");
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost/drinker", () => {
     mongoose.connection.db.dropDatabase();
+    dbInit()
+        .then(() => {
+            console.log("done");
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 let lang1;
@@ -88,8 +95,8 @@ let message2;
 
 
 async function createModels() {
-    lang1 = await Lang.create({name: "eng"});
     lang2 = await Lang.create({name: "ukr"});
+    lang1 = await Lang.create({name: "eng"});
     placeType1 = await PlaceType.create({});
     placeType2 = await PlaceType.create({});
     placeTypeM1 = await PlaceTypeMultilang.create({
@@ -395,11 +402,15 @@ async function createModels() {
         place: place2
     });
     news1 = await News.create({
+        startDate: Date(),
+        endDate: Date(),
         author: client1,
         place: place1,
         image: "/upload/promo/default.jpg"
     });
     news2 = await News.create({
+        startDate: Date(),
+        endDate: Date(),
         author: client2,
         place: place2,
         image: "/upload/promo/default.jpg"
@@ -419,11 +430,15 @@ async function createModels() {
         image: "/upload/promo/default.jpg"
     });
     event1 = await Event.create({
+        startDate: Date(),
+        endDate: Date(),
         author: client1,
         place: place1,
         image: "/upload/promo/default.jpg"
     });
     event2 = await Event.create({
+        startDate: Date(),
+        endDate: Date(),
         author: client2,
         place: place2,
         image: "/upload/promo/default.jpg"
@@ -512,11 +527,3 @@ async function createModels() {
 async function dbInit() {
     await createModels();
 }
-
-dbInit()
-    .then(() => {
-        console.log("done");
-    })
-    .catch((err) => {
-        console.log(err);
-    });

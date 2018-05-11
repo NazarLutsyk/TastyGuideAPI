@@ -14,6 +14,14 @@ let PromoSchema = new Schema({
         required: true
     },
     image: String,
+    startDate: {
+        type: Date,
+        required: true
+    },
+    endDate: {
+        type: Date,
+        required: true,
+    },
 }, {
     timestamps: true,
     discriminatorKey: "kind"
