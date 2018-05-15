@@ -1,8 +1,16 @@
 const express = require("express");
 const router = express.Router();
+const passportMiddleware = require("../middleware/passport");
 
 let query = require("../middleware/query");
 router.use(query.parseQuery);
+
+router.use((req, res, next) => {
+    res.locals.doCheck = ["post", "put", "delete"].indexOf(req.method.toLowerCase()) >= 0;
+    next();
+});
+
+router.use(passportMiddleware.isLoggedIn);
 
 router.use("/places", require("./place"));
 router.use("/clients", require("./client"));

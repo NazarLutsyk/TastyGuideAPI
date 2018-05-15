@@ -5,7 +5,7 @@ let objectHelper = require("../helpers/objectHelper");
 module.exports = {
     async getLangs(req, res, next) {
         try {
-            res.json(await Complaint.superfind(req.query));
+            res.json(await Lang.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);

@@ -14,8 +14,11 @@ module.exports = {
         transporter.sendMail({
             from: MAIL.BROKER.EMAIL,
             to: MAIL.ADMIN_EMAIL,
-            subject: 'Message',
-            text: 'I hope this message gets through!',
+            subject: 'Contact Us',
+            text: `
+                User email: ${res.body.email},
+                Message: '${res.body.message}'
+            `,
         }, (error, info) => {
             if (error) {
                 error.status = 400;

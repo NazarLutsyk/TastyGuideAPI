@@ -25,7 +25,7 @@ const app = express();
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/drinker');
 
-app.use(cors({credentials: true, origin: 'http://localhost:8100'}));
+app.use(cors({credentials: true, origin: ['http://localhost:8100','http://192.168.1.14:8100']}));
 app.use(helmet());
 app.use(express.static(path.join(__dirname,'public')));
 
@@ -33,7 +33,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(session({
+app.use(session({//todo
     secret: 'qweerasdxsd46s548454ad2as1d',
     resave: true,
     saveUninitialized: false,
@@ -45,9 +45,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', index);
-app.use('/api',passportMiddleware.isLoggedIn, api);
+app.use('/api', api);
 app.use('/auth',user);
-app.use('/mail',mail);
+app.use('/mail',passportMiddleware.isLoggedIn,mail);
 
 app.use(function (req, res, next) {
     let err = new Error('Not Found');
