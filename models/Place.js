@@ -28,7 +28,7 @@ let PlaceSchema = new Schema({
     },
     rating: {
         type: Number,
-        default: 0,
+        default: 0
     },
     allowed: {
         type: Boolean,
@@ -150,7 +150,6 @@ PlaceSchema.statics.superfind = async function (params) {
     let {target, fetch} = params;
     let res = [];
     let listOfMainModels = await universalFind(this, target);
-    await this.loadAsyncValues(listOfMainModels);
     if (fetch && listOfMainModels && !target.aggregate) {
         for (let mainModel of listOfMainModels) {
             let mainModelToResponse = mainModel.toObject();
@@ -202,25 +201,6 @@ PlaceSchema.statics.superfind = async function (params) {
     }
     return res;
 };
-PlaceSchema.statics.loadAsyncValues = async function (docs) {
-    let Rating = require("./Rating");
-    if (docs) {
-        if (!Array.isArray(docs))
-            docs = [docs];
-        log("load async values");
-        for (let doc of docs) {
-            let rating = await Rating.aggregate([
-                {$match: {place: doc._id}},
-                {$group: {_id: doc._id, avg: {$avg: "$value"}}}
-            ]);
-            if (rating && rating.length > 0)
-                doc.rating = rating[0].avg;
-            else
-                doc.rating = 0;
-        }
-    }
-};
-
 
 PlaceSchema.methods.supersave = async function () {
     let PlaceType = require("./PlaceType");

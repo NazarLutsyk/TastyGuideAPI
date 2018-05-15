@@ -29,7 +29,7 @@ module.exports = {
             } else {
                 req.body.client = req.user._id;
                 let rating = new Rating(req.body);
-                rating = await rating.supersave();
+                rating = await rating.supersave(Rating);
                 res.status(201).json(rating);
             }
         } catch (e) {
@@ -46,7 +46,7 @@ module.exports = {
             } else {
                 let rating = await Rating.findById(ratingId);
                 if (rating) {
-                    let updated = await rating.superupdate(req.body);
+                    let updated = await rating.superupdate(req.body,Rating);
                     res.status(201).json(updated);
                 } else {
                     let e = new Error();

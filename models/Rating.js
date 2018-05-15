@@ -58,31 +58,54 @@ RatingSchema.statics.superfind = async function (params) {
     }
     return res;
 };
-RatingSchema.methods.supersave = async function () {
-    let Place = require('./Place');
-    let Client = require('./Client');
+RatingSchema.methods.supersave = async function (context) {
+    let Place = require("./Place");
+    let Client = require("./Client");
 
     let client = await Client.findById(this.client);
     let place = await Place.findById(this.place);
 
     if (!client) {
-        throw new Error('Not found related model Client!');
+        throw new Error("Not found related model Client!");
     }
     if (!place) {
-        throw new Error('Not found related model Place!');
+        throw new Error("Not found related model Place!");
     }
     log("save Rating");
-    return await this.save();
+    let newRating = await this.save();
+
+    let rating = await context.aggregate([
+        {$match: {place: newRating.place}},
+        {$group: {_id: newRating.place, avg: {$avg: "$value"}}}
+    ]);
+    let placeAvg = 0;
+    if (rating && rating.length > 0)
+        placeAvg = rating[0].avg;
+    await Place.update({_id: newRating.place}, {rating: placeAvg});
+    return rating;
 };
 
-RatingSchema.methods.superupdate = async function (newDoc) {
+RatingSchema.methods.superupdate = async function (newDoc,context) {
     let objectHelper = require('../helpers/objectHelper');
+    let Place = require("./Place");
+
     if (newDoc.place || newDoc.client) {
         throw new Error('Can`t update relations!');
     }
     objectHelper.load(this, newDoc);
     log("update Rating");
-    return await this.save();
+    let newRating = await this.save();
+
+    let rating = await context.aggregate([
+        {$match: {place: newRating.place}},
+        {$group: {_id: newRating.place, avg: {$avg: "$value"}}}
+    ]);
+    let placeAvg = 0;
+    if (rating && rating.length > 0)
+        placeAvg = rating[0].avg;
+
+    await Place.update({_id: newRating.place}, {rating: placeAvg});
+    return newRating;
 };
 
 module.exports = mongoose.model('Rating', RatingSchema);
