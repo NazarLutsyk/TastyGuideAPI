@@ -4,7 +4,7 @@ let Department = require("../models/Department");
 let keysValidator = require("../validators/keysValidator");
 let ROLES = require("../config/roles");
 let upload = require("../middleware/multer")(path.join(__dirname, "../public", "upload", "place"));
-upload = upload.array("images");
+upload = upload.fields([{name: "avatar", maxCount: 1}, {name: "images", maxCount: 6}]);
 
 module.exports = {
     async getPlaces(req, res, next) {
@@ -46,9 +46,17 @@ module.exports = {
                         } else {
                             if (!place.images)
                                 place.images = [];
-                            for (let file in req.files) {
-                                let image = "/upload/place/" + req.files[file].filename;
-                                place.images.push(image);
+                            for (let field in req.files) {
+                                for (let fileKey in req.files[field]) {
+                                    if (req.files[field][fileKey].fieldname === "avatar") {
+                                        let image = "/upload/place/" + req.files[field][fileKey].filename;
+                                        place.avatar = image;
+                                    }
+                                    if (req.files[field][fileKey].fieldname === "images") {
+                                        let image = "/upload/place/" + req.files[field][fileKey].filename;
+                                        place.images.push(image);
+                                    }
+                                }
                             }
                             try {
                                 place = await place.supersave();
@@ -57,7 +65,6 @@ module.exports = {
                                     place: place._id,
                                     roles: [ROLES.PLACE_ROLES.BOSS_ROLE]
                                 });
-                                await Place.loadAsyncValues(place);
                                 res.status(201).json(place);
                             } catch (e) {
                                 e.status = 400;
@@ -87,14 +94,21 @@ module.exports = {
                             return next(err);
                         } else {
                             if (!req.body.images)
-                                req.body.images = [];
-                            for (let file in req.files) {
-                                let image = "/upload/place/" + req.files[file].filename;
-                                req.body.images.push(image);
+                                req.body.images = place.images;
+                            for (let field in req.files) {
+                                for (let fileKey in req.files[field]) {
+                                    if (req.files[field][fileKey].fieldname === "avatar") {
+                                        let image = "/upload/place/" + req.files[field][fileKey].filename;
+                                        req.body.avatar = image;
+                                    }
+                                    if (req.files[field][fileKey].fieldname === "images") {
+                                        let image = "/upload/place/" + req.files[field][fileKey].filename;
+                                        req.body.images.push(image);
+                                    }
+                                }
                             }
                             try {
                                 let updated = await place.superupdate(req.body);
-                                await Place.loadAsyncValues(updated);
                                 res.status(201).json(updated);
                             } catch (e) {
                                 e.status = 400;

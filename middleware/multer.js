@@ -17,7 +17,7 @@ module.exports = function (pathToDir) {
             let separator = originalname.lastIndexOf(".");
 
 
-            let extension = originalname.substring(separator);
+            let extension = originalname.substring(separator).toLowerCase();
             let id = Math.floor(Math.random() * (1000000 - 1) + 1);
 
             let resultFilename = id + "-" + Date.now() + extension;

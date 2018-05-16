@@ -250,6 +250,10 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
             }
         }
     }
+    if (typeof(newDoc.avatar) !== 'undefined') {
+        let toDelete = path.join(__dirname, "../public", this.avatar);
+        fileHelper.deleteFiles(toDelete);
+    }
     objectHelper.load(this, newDoc);
     log("update Place");
     return await this.save();
@@ -310,6 +314,10 @@ PlaceSchema.pre("remove", async function (next) {
                 let toDelete = path.join(__dirname, "../public", image);
                 fileHelper.deleteFiles(toDelete);
             }
+        }
+        if(this.avatar){
+            let toDelete = path.join(__dirname, "../public", this.avatar);
+            fileHelper.deleteFiles(toDelete);
         }
         log("remove Place");
         return next();
