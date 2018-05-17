@@ -276,7 +276,11 @@ async function createModels() {
     placeM1 = await PlaceMultilang.create({
         name: "ржавый башмак",
         description: "самый ржавый башмак на всем белом свете",
-        address: "Львів Пимоненка 19",
+        address: {
+            city: 'Львів',
+            address: 'Пимоненка',
+            number: '19'
+        },
         place: place1,
         lang: lang1
     });
@@ -284,21 +288,33 @@ async function createModels() {
         name: "row foot",
         description: "the most row foot all over the world",
         place: place1,
-        address: "Lviv Pymonenka 19",
+        address: {
+            city: 'Lviv',
+            address: 'Pymonenka',
+            number: '19'
+        },
         lang: lang2
     });
     placeM3 = await PlaceMultilang.create({
         name: "скрипучий стул",
         description: "стул скрипит, значит на нем сидят...жопа болит",
         place: place2,
-        address: "Львів Городоцька 16",
+        address: {
+            city: 'Львів',
+            address: 'Городоцька',
+            number: '77'
+        },
         lang: lang1
     });
     placeM4 = await PlaceMultilang.create({
         name: "screaming chair",
         description: "some screaming chair for your ass",
         place: place2,
-        address: "Lviv Gorodotska 16",
+        address: {
+            city: 'Lviv',
+            address: 'Gorodotska',
+            number: '77'
+        },
         lang: lang2
     });
     department1 = await Department.create({

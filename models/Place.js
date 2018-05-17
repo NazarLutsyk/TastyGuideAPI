@@ -35,14 +35,17 @@ let PlaceSchema = new Schema({
         default: false,
     },
     avatar: {
-        type: String
+        type: String,
+        default: "/upload/place/default.jpg"
     },
     location: {
         lat: {
             type: Number,
+            default: 0
         },
         lng: {
             type: Number,
+            default: 0
         },
     },
     features: {
@@ -64,7 +67,10 @@ let PlaceSchema = new Schema({
         }
     },
     topCategories: [String],
-    images: [String],
+    images: {
+        type: [String],
+        default: ['/upload/place/default.jpg']
+    },
     days: {
         1: {
             start: {
