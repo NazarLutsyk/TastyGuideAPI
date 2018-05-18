@@ -107,10 +107,19 @@ RatingSchema.methods.superupdate = async function (newDoc,context) {
     await Place.update({_id: newRating.place}, {rating: placeAvg});
     return newRating;
 };
-
-module.exports = mongoose.model('Rating', RatingSchema);
+let Model = mongoose.model('Rating', RatingSchema);
+module.exports = Model;
 
 RatingSchema.pre("remove", async function (next) {
+    let Place = require("./Place");
     log('remove Rating');
+    let rating = await Model.aggregate([
+        {$match: {place: this.place, _id: {$ne : this._id}}},
+        {$group: {_id: this.place, avg: {$avg: "$value"}}}
+    ]);
+    let placeAvg = 0;
+    if (rating && rating.length > 0)
+        placeAvg = rating[0].avg;
+    await Place.update({_id: this.place.toString()}, {rating: placeAvg},{new: true, multiple: true});
     return next();
 });
