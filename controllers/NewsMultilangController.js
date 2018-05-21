@@ -13,7 +13,7 @@ module.exports = {
     async getNewsMultilangById(req, res,next) {
         let newsMultilangId = req.params.id;
         try {
-            req.query.target.query._id = newsMultilangId;
+            req.query.query._id = newsMultilangId;
             let newsMultilang = await NewsMultilang.superfind(req.query);
             res.json(newsMultilang[0]);
         } catch (e) {

@@ -18,7 +18,7 @@ module.exports = {
     async getPlaceById(req, res, next) {
         let placeId = req.params.id;
         try {
-            req.query.target.query._id = placeId;
+            req.query.query._id = placeId;
             let place = await Place.superfind(req.query);
             place = place[0];
             if (place) {

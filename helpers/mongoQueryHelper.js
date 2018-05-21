@@ -6,7 +6,7 @@ module.exports.universalFind = async function (context, query) {
         modelQuery = context
             .find(query.query)
             .sort(query.sort)
-            .select(query.fields)
+            .select(query.select)
             .skip(query.skip)
             .limit(query.limit);
         if (query.populate) {

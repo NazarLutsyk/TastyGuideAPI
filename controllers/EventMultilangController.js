@@ -13,7 +13,7 @@ module.exports = {
     async getEventMultilangById(req, res,next) {
         let eventMultilangId = req.params.id;
         try {
-            req.query.target.query._id = eventMultilangId;
+            req.query.query._id = eventMultilangId;
             let eventMultilang = await EventMultilang.superfind(req.query);
             res.json(eventMultilang[0]);
         } catch (e) {

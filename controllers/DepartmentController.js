@@ -13,7 +13,7 @@ module.exports = {
     async getDepartmentById(req, res,next) {
         let departmentId = req.params.id;
         try {
-            req.query.target.query._id = departmentId;
+            req.query.query._id = departmentId;
             let department = await Department.superfind(req.query);
             res.json(department[0]);
         } catch (e) {

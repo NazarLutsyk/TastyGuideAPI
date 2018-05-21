@@ -4,7 +4,7 @@ let keysValidator = require("../validators/keysValidator");
 module.exports = {
     async getMessages(req, res, next) {
         try {
-            req.query.target.query.$or = [{receiver: req.user._id}, {sender: req.user._id}];
+            req.query.query.$or = [{receiver: req.user._id}, {sender: req.user._id}];
             res.json(await Message.superfind(req.query));
         } catch (e) {
             e.status = 400;
@@ -14,8 +14,8 @@ module.exports = {
     async getMessageById(req, res, next) {
         let messageId = req.params.id;
         try {
-            req.query.target.query._id = messageId;
-            req.query.target.query.$or = [{receiver: req.user._id}, {sender: req.user._id}];
+            req.query.query._id = messageId;
+            req.query.query.$or = [{receiver: req.user._id}, {sender: req.user._id}];
             let message = await Message.superfind(req.query);
             res.json(message[0]);
         } catch (e) {

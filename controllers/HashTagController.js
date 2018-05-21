@@ -14,7 +14,7 @@ module.exports = {
     async getHashTagById(req, res,next) {
         let hashTagId = req.params.id;
         try {
-            req.query.target.query._id = hashTagId;
+            req.query.query._id = hashTagId;
             let hashTag = await HashTag.superfind(req.query);
             res.json(hashTag[0]);
         } catch (e) {

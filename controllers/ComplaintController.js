@@ -13,7 +13,7 @@ module.exports = {
     async getComplaintById(req, res, next) {
         let complaintId = req.params.id;
         try {
-            req.query.target.query._id = complaintId;
+            req.query.query._id = complaintId;
             let complaint = await Complaint.superfind(req.query);
             res.json(complaint[0]);
         } catch (e) {

@@ -4,6 +4,22 @@ let Schema = mongoose.Schema;
 
 let PlaceTypeSchema = new Schema({}, {
     timestamps: true,
+    toJSON: {virtuals:true, getters: true},
+    toObject: {virtuals:true, getters: true},
+});
+
+PlaceTypeSchema.virtual('multilang', {
+    ref: 'PlaceTypeMultilang',
+    localField: '_id',
+    foreignField: 'placeType',
+    justOne: false
+});
+
+PlaceTypeSchema.virtual('places', {
+    ref: 'places',
+    localField: '_id',
+    foreignField: 'types',
+    justOne: false
 });
 
 PlaceTypeSchema.methods.supersave = async function () {
@@ -20,31 +36,7 @@ PlaceTypeSchema.methods.superupdate = async function (newDoc) {
 };
 PlaceTypeSchema.statics.superfind = async function (params) {
     let {universalFind} = require("../helpers/mongoQueryHelper");
-    let {target, fetch} = params;
-    let res = [];
-    let listOfMainModels = await universalFind(this, target);
-    if (fetch && listOfMainModels && !target.aggregate) {
-        for (let mainModel of listOfMainModels) {
-            let mainModelToResponse = mainModel.toObject();
-            if (mainModel._id) {
-                for (let fetchModel of fetch) {
-                    let fetchModelName = Object.keys(fetchModel)[0];
-                    if (fetchModelName.toLowerCase() === "placetypemultilang") {
-                        fetchModel[fetchModelName].query.placeType = mainModel._id.toString();
-                        mainModelToResponse.multilang = await universalFind(require("./PlaceTypeMultilang"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "place") {
-                        fetchModel[fetchModelName].query.types = mainModel._id.toString();
-                        mainModelToResponse.place = await universalFind(require("./Place"), fetchModel[fetchModelName]);
-                    }
-                }
-            }
-            res.push(mainModelToResponse);
-        }
-    } else if (target.aggregate) {
-        res.push(...listOfMainModels);
-    }
-    return res;
+    return await universalFind(this, params);
 };
 
 module.exports = mongoose.model("PlaceType", PlaceTypeSchema);

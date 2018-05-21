@@ -24,7 +24,9 @@ let PromoSchema = new Schema({
     },
 }, {
     timestamps: true,
-    discriminatorKey: "kind"
+    discriminatorKey: "kind",
+    toJSON: {virtuals:true, getters: true},
+    toObject: {virtuals:true, getters: true},
 });
 module.exports = mongoose.model("Promo", PromoSchema);
 PromoSchema.methods.supersave = async function () {

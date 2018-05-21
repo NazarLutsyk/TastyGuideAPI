@@ -13,7 +13,7 @@ module.exports = {
     async getPlaceMultilangById(req, res, next) {
         let placeMultilangId = req.params.id;
         try {
-            req.query.target.query._id = placeMultilangId;
+            req.query.query._id = placeMultilangId;
             let placeMultilang = await PlaceMultilang.superfind(req.query);
             res.json(placeMultilang[0]);
         } catch (e) {

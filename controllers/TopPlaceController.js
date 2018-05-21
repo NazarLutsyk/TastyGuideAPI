@@ -13,7 +13,7 @@ module.exports = {
     async getTopPlaceById(req, res, next) {
         let topPlaceId = req.params.id;
         try {
-            req.query.target.query._id = topPlaceId;
+            req.query.query._id = topPlaceId;
             let topPlace = await TopPlace.superfind(req.query);
             res.json(topPlace[0]);
         } catch (e) {

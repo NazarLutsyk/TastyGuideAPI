@@ -139,13 +139,72 @@ let PlaceSchema = new Schema({
     }],
 }, {
     timestamps: true,
-    toJSON: {
-        getters: true,
-    },
-    toObject: {
-        getters: true,
-    }
+    toJSON: {virtuals:true, getters: true},
+    toObject: {virtuals:true, getters: true},
 
+});
+
+PlaceSchema.virtual('multilang', {
+    ref: 'PlaceMultilang',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
+});
+
+PlaceSchema.virtual('tops', {
+    ref: 'TopPlace',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
+});
+
+PlaceSchema.virtual('news', {
+    ref: 'News',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
+});
+
+PlaceSchema.virtual('bonuses', {
+    ref: 'Bonuse',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
+});
+
+PlaceSchema.virtual('events', {
+    ref: 'Event',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
+});
+
+PlaceSchema.virtual('complaints', {
+    ref: 'Complaint',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
+});
+
+PlaceSchema.virtual('drinkApplications', {
+    ref: 'DrinkApplication',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
+});
+
+PlaceSchema.virtual('ratings', {
+    ref: 'Rating',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
+});
+
+PlaceSchema.virtual('departments', {
+    ref: 'Department',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
 });
 
 PlaceSchema.statics.notUpdatable = function () {
@@ -153,59 +212,7 @@ PlaceSchema.statics.notUpdatable = function () {
 };
 PlaceSchema.statics.superfind = async function (params) {
     let {universalFind} = require("../helpers/mongoQueryHelper");
-    let {target, fetch} = params;
-    let res = [];
-    let listOfMainModels = await universalFind(this, target);
-    if (fetch && listOfMainModels && !target.aggregate) {
-        for (let mainModel of listOfMainModels) {
-            let mainModelToResponse = mainModel.toObject();
-            if (mainModel._id) {
-                for (let fetchModel of fetch) {
-                    let fetchModelName = Object.keys(fetchModel)[0];
-                    if (fetchModelName.toLowerCase() === "complaint") {
-                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
-                        mainModelToResponse.complaints = await universalFind(require("./Complaint"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "drinkapplication") {
-                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
-                        mainModelToResponse.drinkApplications = await universalFind(require("./DrinkApplication"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "rating") {
-                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
-                        mainModelToResponse.ratings = await universalFind(require("./Rating"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "department") {
-                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
-                        mainModelToResponse.departments = await universalFind(require("./Department"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "hashtag") {
-                        fetchModel[fetchModelName].query._id = mainModel.hashTags;
-                        mainModelToResponse.hashTags = await universalFind(require("./HashTag"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "topplace") {
-                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
-                        mainModelToResponse.tops = await universalFind(require("./TopPlace"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "placetype") {
-                        fetchModel[fetchModelName].query._id = mainModel.types;
-                        mainModelToResponse.types = await universalFind(require("./PlaceType"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "placemultilang") {
-                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
-                        mainModelToResponse.multilang = await universalFind(require("./PlaceMultilang"), fetchModel[fetchModelName]);
-                    }
-                    if (fetchModelName.toLowerCase() === "promo") {
-                        fetchModel[fetchModelName].query.place = mainModel._id.toString();
-                        mainModelToResponse.promos = await universalFind(require("./Promo"), fetchModel[fetchModelName]);
-                    }
-                }
-            }
-            res.push(mainModelToResponse);
-        }
-    } else if (target.aggregate) {
-        res.push(...listOfMainModels);
-    }
-    return res;
+    return await universalFind(this, params);
 };
 
 PlaceSchema.methods.supersave = async function () {

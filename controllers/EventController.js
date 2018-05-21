@@ -15,7 +15,7 @@ module.exports = {
     async getEventById(req, res, next) {
         let eventId = req.params.id;
         try {
-            req.query.target.query._id = eventId;
+            req.query.query._id = eventId;
             let event = await Event.superfind(req.query);
             res.json(event[0]);
         } catch (e) {

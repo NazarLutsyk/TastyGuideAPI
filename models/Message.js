@@ -25,35 +25,14 @@ let MessageSchema = new Schema({
         ref: 'Client',
         required: true
     }
+},{
+    timestamps: true,
+    toJSON: {virtuals:true, getters: true},
+    toObject: {virtuals:true, getters: true},
 });
 MessageSchema.statics.superfind = async function (params) {
     let {universalFind} = require("../helpers/mongoQueryHelper");
-    let {target, fetch} = params;
-    let res = [];
-    let listOfMainModels = await universalFind(this, target);
-    if (fetch && listOfMainModels && !target.aggregate) {
-        for (let mainModel of listOfMainModels) {
-            let mainModelToResponse = mainModel.toObject();
-            if (mainModel._id) {
-                for (let fetchModel of fetch) {
-                    let fetchModelName = Object.keys(fetchModel)[0];
-                    //todo
-                    if (fetchModelName.toLowerCase() === "sender") {
-                        fetchModel[fetchModelName].query._id = mainModel.sender.toString();
-                        mainModelToResponse.sender = (await universalFind(require("./Client"), fetchModel[fetchModelName]))[0];
-                    }
-                    if (fetchModelName.toLowerCase() === "receiver") {
-                        fetchModel[fetchModelName].query._id = mainModel.receiver.toString();
-                        mainModelToResponse.receiver = (await universalFind(require("./Client"), fetchModel[fetchModelName]))[0];
-                    }
-                }
-            }
-            res.push(mainModelToResponse);
-        }
-    }else if(target.aggregate){
-        res.push(...listOfMainModels);
-    }
-    return res;
+    return await universalFind(this, params);
 };
 MessageSchema.methods.supersave = async function () {
     let Client = require('./Client');

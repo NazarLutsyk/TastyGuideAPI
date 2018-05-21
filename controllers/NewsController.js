@@ -15,7 +15,7 @@ module.exports = {
     async getNewsById(req, res, next) {
         let newsId = req.params.id;
         try {
-            req.query.target.query._id = newsId;
+            req.query.query._id = newsId;
             let news = await News.superfind(req.query);
             res.json(news[0]);
         } catch (e) {

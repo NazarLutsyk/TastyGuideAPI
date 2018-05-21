@@ -4,15 +4,6 @@ let keysValidator = require("../validators/keysValidator");
 module.exports = {
     async getClients(req, res, next) {
         try {
-            for (let fetchModel of req.query.fetch) {
-                let fetchModelName = Object.keys(fetchModel)[0];
-                if (fetchModelName === "SendedMessages") {
-                    fetchModel[fetchModelName].query.sender = req.user._id.toString();
-                }
-                if (fetchModelName === "ReceivedMessages") {
-                    fetchModel[fetchModelName].query.receiver = req.user._id.toString();
-                }
-            }
             res.json(await Client.superfind(req.query));
         } catch (e) {
             e.status = 400;
@@ -22,16 +13,7 @@ module.exports = {
     async getClientById(req, res, next) {
         let clientId = req.params.id;
         try {
-            req.query.target.query._id = clientId;
-            for (let fetchModel of req.query.fetch) {
-                let fetchModelName = Object.keys(fetchModel)[0];
-                if (fetchModelName === "SendedMessages") {
-                    fetchModel[fetchModelName].query.sender = req.user._id.toString();
-                }
-                if (fetchModelName === "ReceivedMessages") {
-                    fetchModel[fetchModelName].query.receiver = req.user._id.toString();
-                }
-            }
+            req.query.query._id = clientId;
             let client = await Client.superfind(req.query);
             res.json(client[0]);
         } catch (e) {

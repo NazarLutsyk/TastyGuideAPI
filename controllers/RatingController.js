@@ -13,7 +13,7 @@ module.exports = {
     async getRatingById(req, res, next) {
         let ratingId = req.params.id;
         try {
-            req.query.target.query._id = ratingId;
+            req.query.query._id = ratingId;
             let rating = await Rating.superfind(req.query);
             res.json(rating[0]);
         } catch (e) {

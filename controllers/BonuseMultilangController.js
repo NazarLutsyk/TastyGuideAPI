@@ -13,7 +13,7 @@ module.exports = {
     async getBonuseMultilangById(req, res,next) {
         let bonuseMultilangId = req.params.id;
         try {
-            req.query.target.query._id = bonuseMultilangId;
+            req.query.query._id = bonuseMultilangId;
             let bonuseMultilang = await BonuseMultilang.superfind(req.query);
             res.json(bonuseMultilang[0]);
         } catch (e) {

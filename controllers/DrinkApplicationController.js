@@ -13,7 +13,7 @@ module.exports = {
     async getDrinkApplicationById(req, res,next) {
         let drinkApplicationId = req.params.id;
         try {
-            req.query.target.query._id = drinkApplicationId;
+            req.query.query._id = drinkApplicationId;
             let drinkApp = await DrinkApplication.superfind(req.query);
             res.json(drinkApp[0]);
         } catch (e) {

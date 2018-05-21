@@ -15,7 +15,7 @@ module.exports = {
     async getBonuseById(req, res, next) {
         let bonuseId = req.params.id;
         try {
-            req.query.target.query._id = bonuseId;
+            req.query.query._id = bonuseId;
             let bonuse = await Bonuse.superfind(req.query);
             res.json(bonuse[0]);
         } catch (e) {
