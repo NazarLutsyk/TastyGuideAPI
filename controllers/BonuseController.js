@@ -74,7 +74,7 @@ module.exports = {
                                 req.body.image = "/upload/promo/" + req.file.filename;
                             }
                             try {
-                                let updated = await news.superupdate(req.body);
+                                let updated = await bonuse.superupdate(req.body);
                                 res.status(201).json(updated);
                             } catch (e) {
                                 e.status = 400;

@@ -6,7 +6,6 @@ let PromoSchema = new Schema({
     author: {
         type: Schema.Types.ObjectId,
         ref: "Client",
-        required: true
     },
     place: {
         type: Schema.Types.ObjectId,

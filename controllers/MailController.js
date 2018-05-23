@@ -16,8 +16,8 @@ module.exports = {
             to: MAIL.ADMIN_EMAIL,
             subject: 'Contact Us',
             text: `
-                User email: ${res.body.email},
-                Message: '${res.body.message}'
+                User email: ${req.body.email},
+                Message: '${req.body.message}'
             `,
         }, (error, info) => {
             if (error) {
