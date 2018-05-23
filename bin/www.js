@@ -1,18 +1,23 @@
 const app = require("../app");
 const debug = require("debug")("drinker:server");
-const https = require("https");
+// const https = require("https");
+let http = require("http");
 const fs = require("fs");
 let path = require("path");
 
-const privateKey = fs.readFileSync(path.join(process.env.HOMEDRIVE, "demo", "myRootCA.key")).toString();
-const certificate = fs.readFileSync(path.join(process.env.HOMEDRIVE, "demo", "myRootCA.pem")).toString();
+// const privateKey = fs.readFileSync(path.join(process.env.HOMEDRIVE, "demo", "myRootCA.key")).toString();
+// const certificate = fs.readFileSync(path.join(process.env.HOMEDRIVE, "demo", "myRootCA.pem")).toString();
 
 let port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
-const server = https.createServer({
-    key: privateKey,
-    cert: certificate
-}, app);
+
+let server = http.createServer(app);
+
+// const server = https.createServer({
+//     key: privateKey,
+//     cert: certificate
+// }, app);
+
 server.listen(port, onListening);
 server.on("error", onError);
 

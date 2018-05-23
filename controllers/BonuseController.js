@@ -97,7 +97,7 @@ module.exports = {
     async removeBonuse(req, res, next) {
         let bonuseId = req.params.id;
         try {
-            let bonuse = await Event.findById(bonuseId);
+            let bonuse = await Bonuse.findById(bonuseId);
             if (bonuse) {
                 bonuse = await bonuse.remove();
                 res.status(204).json(bonuse);

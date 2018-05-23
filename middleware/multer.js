@@ -16,12 +16,14 @@ module.exports = function (pathToDir) {
             let originalname = file.originalname;
             let separator = originalname.lastIndexOf(".");
 
-
             let extension = originalname.substring(separator).toLowerCase();
             let id = Math.floor(Math.random() * (1000000 - 1) + 1);
 
+            if (extension.indexOf(".") < 0)
+                extension = "." + extension;
+
             let resultFilename = id + "-" + Date.now() + extension;
-            if ([".jpg", ".jpeg", ".png", ".svg", ".gif"].indexOf(extension) != -1) {
+            if ([".jpg", ".jpeg", ".png", ".svg", ".gif", ".image"].indexOf(extension) !== -1) {
                 log(`save file ${resultFilename}`);
                 cb(null, resultFilename);
             } else {
