@@ -17,7 +17,6 @@ router.use("/clients", require("./client"));
 router.use("/langs", require("./lang"));
 router.use("/placeTypes", require("./placeType"));
 router.use("/topPlaces", require("./topPlace"));
-router.use("/hashTags", require("./hashTag"));
 router.use("/departments", require("./department"));
 router.use("/ratings", require("./rating"));
 router.use("/drinkApplications", require("./drinkApplication"));

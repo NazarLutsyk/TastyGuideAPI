@@ -35,7 +35,7 @@
 //+statistic reviews/aggregations
 //+disallow update secured fields
 //services and change url
-//don`t delete default images
+//npm sdon`t delete default images
 //todo change global config
 //todo register facebook&google&gmail accounts
 //todo ionic facebook

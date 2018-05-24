@@ -1,11 +1,11 @@
-let nodemailer = require('nodemailer');
-let MAIL = require('../config/mail');
+let nodemailer = require("nodemailer");
+let MAIL = require("../config/mail");
 
 //todo normal message format
 module.exports = {
     sendMail(req, res, next) {
         let transporter = nodemailer.createTransport({
-            service: 'gmail',
+            service: "gmail",
             auth: {
                 user: MAIL.BROKER.EMAIL,
                 pass: MAIL.BROKER.PASS
@@ -13,10 +13,10 @@ module.exports = {
         });
         transporter.sendMail({
             from: MAIL.BROKER.EMAIL,
-            to: MAIL.ADMIN_EMAIL,
-            subject: 'Contact Us',
+            to: req.body.email ? req.body.email : MAIL.ADMIN_EMAIL,
+            subject: "Contact Us",
             text: `
-                User email: ${req.body.email},
+                User email: ${req.body.clientEmail},
                 Message: '${req.body.message}'
             `,
         }, (error, info) => {

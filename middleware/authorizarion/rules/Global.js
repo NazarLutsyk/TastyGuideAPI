@@ -3,7 +3,7 @@ let objectHelper = require('../../../helpers/objectHelper');
 exports.updatable = function (notAllowed) {
     return async function (req, res, next) {
         try {
-            log('rule updatable');
+            log('rule updatable');zz
             if (req.body && objectHelper.someKeyContains(req.body, notAllowed)) {
                 let error = new Error();
                 error.message = 'Forbidden';

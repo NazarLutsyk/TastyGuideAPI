@@ -12,6 +12,10 @@ let PromoSchema = new Schema({
         ref: "Place",
         required: true
     },
+    topPromo: {
+        type: Boolean,
+        default: true
+    },
     image: String,
     startDate: {
         type: Date,
@@ -24,8 +28,8 @@ let PromoSchema = new Schema({
 }, {
     timestamps: true,
     discriminatorKey: "kind",
-    toJSON: {virtuals:true, getters: true},
-    toObject: {virtuals:true, getters: true},
+    toJSON: {virtuals: true, getters: true},
+    toObject: {virtuals: true, getters: true},
 });
 module.exports = mongoose.model("Promo", PromoSchema);
 PromoSchema.methods.supersave = async function () {

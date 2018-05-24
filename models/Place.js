@@ -133,10 +133,7 @@ let PlaceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "PlaceType",
     }],
-    hashTags: [{
-        type: Schema.Types.ObjectId,
-        ref: "HashTag"
-    }],
+    hashTags: [String],
 }, {
     timestamps: true,
     toJSON: {virtuals:true, getters: true},
@@ -217,14 +214,9 @@ PlaceSchema.statics.superfind = async function (params) {
 
 PlaceSchema.methods.supersave = async function () {
     let PlaceType = require("./PlaceType");
-    let HashTag = require("./HashTag");
 
     let placeTypeExists = await PlaceType.count({_id: this.types});
-    let hashTagExists = await HashTag.count({_id: this.hashTags});
 
-    if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== this.hashTags.length)) {
-        throw new Error("Not found related model HashTag!");
-    }
     if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== this.types.length)) {
         throw new Error("Not found related model PlaceType!");
     }
@@ -237,18 +229,10 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require("../helpers/objectHelper");
     let fileHelper = require("../helpers/fileHelper");
     let PlaceType = require("./PlaceType");
-    let HashTag = require("./HashTag");
     let path = require("path");
 
     let placeTypeExists = await PlaceType.count({_id: newDoc.types});
-    let hashTagExists = await HashTag.count({_id: newDoc.hashTags});
 
-
-    if (newDoc.hashTags && newDoc.hashTags.length > 0) {
-        if ((hashTagExists === 0 && this.hashTags.length !== 0) || (hashTagExists !== newDoc.hashTags.length)) {
-            throw new Error("Not found related model HashTag!");
-        }
-    }
     if (newDoc.types && newDoc.types.length > 0) {
         if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== newDoc.types.length)) {
             throw new Error("Not found related model PlaceType!");
@@ -280,7 +264,6 @@ let Rating = require("./Rating");
 let Department = require("./Department");
 let TopPlace = require("./TopPlace");
 let Promo = require("./Promo");
-let HashTag = require("./HashTag");
 let Multilang = require("./PlaceMultilang");
 let Client = require("./Client");
 let path = require("path");

@@ -11,7 +11,6 @@ let Event = require("./models/Event");
 let PlaceType = require("./models/PlaceType");
 let Lang = require("./models/Lang");
 let TopPlace = require("./models/TopPlace");
-let HashTag = require("./models/HashTag");
 let Place = require("./models/Place");
 let Complaint = require("./models/Complaint");
 let DrinkApplication = require("./models/DrinkApplication");
@@ -40,10 +39,6 @@ let topPlace1;
 let topPlace2;
 let topPlace3;
 let topPlace4;
-let hashTag1;
-let hashTag2;
-let hashTag3;
-let hashTag4;
 let news1;
 let news2;
 let bonuse1;
@@ -119,10 +114,6 @@ async function createModels() {
         placeType: placeType2,
         lang: lang2
     });
-    hashTag1 = await HashTag.create({value: "#hash"});
-    hashTag2 = await HashTag.create({value: "#buhar"});
-    hashTag3 = await HashTag.create({value: "#lalalala"});
-    hashTag4 = await HashTag.create({value: "#qqqq"});
     client1 = await Client.create({
         name: "Tasik",
         surname: "Panasik",
@@ -195,7 +186,8 @@ async function createModels() {
             }
         },
         types: [placeType1],
-        hashTags: [hashTag1, hashTag2]
+        hashTags: ['#buhalovka','#bomjatnik'],
+        topCategories: ['Best club for whores!']
     });
     place2 = await Place.create({
         phone: "355875545722",
@@ -243,7 +235,8 @@ async function createModels() {
             }
         },
         types: [placeType2],
-        hashTags: [hashTag3, hashTag4]
+        hashTags: ['#jumoreska','#pupok'],
+        topCategories: ['Best karaoke']
     });
     topPlace1 = await TopPlace.create({
         startDate: Date(),
