@@ -186,7 +186,7 @@ async function createModels() {
             }
         },
         types: [placeType1],
-        hashTags: ['#buhalovka','#bomjatnik'],
+        hashTags: ['buhalovka','bomjatnik'],
         topCategories: ['Best club for whores!']
     });
     place2 = await Place.create({
@@ -235,7 +235,7 @@ async function createModels() {
             }
         },
         types: [placeType2],
-        hashTags: ['#jumoreska','#pupok'],
+        hashTags: ['jumoreska','pupok'],
         topCategories: ['Best karaoke']
     });
     topPlace1 = await TopPlace.create({

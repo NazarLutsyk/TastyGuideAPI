@@ -6,7 +6,6 @@ module.exports = {
             try {
                 req.query = QueryHelper.normalizeQuery(req.query);
                 log("query ", req.query);
-                console.log(req.query);
                 return next();
             } catch (e) {
                 e.status = 400;
