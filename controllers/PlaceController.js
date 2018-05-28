@@ -1,5 +1,6 @@
 let path = require("path");
 let Place = require("../models/Place");
+let Review = require("../models/Review");
 let Department = require("../models/Department");
 let keysValidator = require("../validators/keysValidator");
 let ROLES = require("../config/roles");
@@ -21,7 +22,8 @@ module.exports = {
             req.query.query._id = placeId;
             let place = await Place.superfind(req.query);
             place = place[0];
-            if (place) {
+            if (place && req.user) {
+                await Review.create({place: place._id, client: req.user._id});
                 let toUpdate = await Place.findById(placeId);
                 toUpdate.reviews++;
                 await toUpdate.supersave();

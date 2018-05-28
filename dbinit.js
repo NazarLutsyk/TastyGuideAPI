@@ -144,7 +144,7 @@ async function createModels() {
         phone: "355875545722",
         email: "someemail@mail.com",
         averagePrice: 7000,
-        reviews: 300,
+        reviews: 0,
         allowed: true,
         location: {
             lat: 442,
@@ -193,7 +193,7 @@ async function createModels() {
         phone: "355875545722",
         email: "someemail@mail.com",
         averagePrice: 200,
-        reviews: 321,
+        reviews: 0,
         allowed: true,
         location: {
             lat: 442,
