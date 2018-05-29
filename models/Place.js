@@ -141,6 +141,13 @@ let PlaceSchema = new Schema({
 
 });
 
+PlaceSchema.virtual('statistic', {
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'place',
+    justOne: false
+});
+
 PlaceSchema.virtual('multilang', {
     ref: 'PlaceMultilang',
     localField: '_id',

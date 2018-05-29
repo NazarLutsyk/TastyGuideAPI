@@ -20,8 +20,8 @@ let DepartmentSchema = new Schema({
     }
 }, {
     timestamps: true,
-    toJSON: {virtuals:true, getters: true},
-    toObject: {virtuals:true, getters: true},
+    toJSON: {virtuals: true, getters: true},
+    toObject: {virtuals: true, getters: true},
 });
 
 DepartmentSchema.statics.superfind = async function (params) {
@@ -42,8 +42,16 @@ DepartmentSchema.methods.supersave = async function () {
     if (!place) {
         throw new Error("Not found related model Place!");
     }
-    log("save Department");
-    return await this.save();
+    let alreadyExists = await departmentModel.count({
+        client: this.client,
+        place: this.place,
+    });
+    if (alreadyExists) {
+        throw new Error("Already exists!");
+    } else {
+        log("save Department");
+        return await this.save();
+    }
 };
 
 DepartmentSchema.methods.superupdate = async function (newDoc) {
@@ -51,12 +59,22 @@ DepartmentSchema.methods.superupdate = async function (newDoc) {
     if (newDoc.place || newDoc.client) {
         throw new Error("Can`t update relations!");
     }
-    objectHelper.load(this, newDoc);
-    log("update Department");
-    return await this.save();
+
+    let alreadyExists = await departmentModel.count({
+        client: newDoc.client,
+        place: newDoc.place,
+    });
+    if (alreadyExists) {
+        throw new Error("Already exists!");
+    } else {
+        objectHelper.load(this, newDoc);
+        log("update Department");
+        return await this.save();
+    }
 };
 
-module.exports = mongoose.model("Department", DepartmentSchema);
+let departmentModel = mongoose.model("Department", DepartmentSchema);
+module.exports = departmentModel;
 
 DepartmentSchema.pre("remove", async function (next) {
     log("remove Department");
