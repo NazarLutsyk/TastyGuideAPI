@@ -1,11 +1,11 @@
-let Message = require('../../../models/Message');
+let DrinkApplicationComment = require('../../../models/DrinkApplicationComment');
 module.exports = {
     async deleteMessage(req, res, next) {
         try {
             log('rule delete Message');
             let user = req.user;
             let messageId = req.params.id;
-            let message = await Message.findById(messageId);
+            let message = await DrinkApplicationComment.findById(messageId);
             if (message && message.sender.equals(user._id)) {
                 return next();
             } else {

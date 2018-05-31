@@ -1,36 +1,34 @@
-let Message = require("../models/Message");
+let DrinkApplicationComment = require("../models/DrinkApplicationComment");
 let keysValidator = require("../validators/keysValidator");
 
 module.exports = {
-    async getMessages(req, res, next) {
+    async getDrinkApplicationComments(req, res, next) {
         try {
-            req.query.query.$or = [{receiver: req.user._id}, {sender: req.user._id}];
-            res.json(await Message.superfind(req.query));
+            res.json(await DrinkApplicationComment.superfind(req.query));
         } catch (e) {
             e.status = 400;
             return next(e);
         }
     },
-    async getMessageById(req, res, next) {
+    async getDrinkApplicationCommentById(req, res, next) {
         let messageId = req.params.id;
         try {
             req.query.query._id = messageId;
-            req.query.query.$or = [{receiver: req.user._id}, {sender: req.user._id}];
-            let message = await Message.superfind(req.query);
+            let message = await DrinkApplicationComment.superfind(req.query);
             res.json(message[0]);
         } catch (e) {
             e.status = 400;
             return next(e);
         }
     },
-    async createMessage(req, res, next) {
+    async createDrinkApplicationComment(req, res, next) {
         try {
-            let err = keysValidator.diff(Message.schema.tree, req.body);
+            let err = keysValidator.diff(DrinkApplicationComment.schema.tree, req.body);
             if (err) {
                 throw new Error("Unknown fields " + err);
             } else {
                 req.body.sender = req.user._id;
-                let message = new Message(req.body);
+                let message = new DrinkApplicationComment(req.body);
                 message = await message.supersave();
                 res.status(201).json(message);
             }
@@ -39,10 +37,10 @@ module.exports = {
             return next(e);
         }
     },
-    async removeMessage(req, res, next) {
+    async removeDrinkApplicationComment(req, res, next) {
         let messageId = req.params.id;
         try {
-            let message = await Message.findById(messageId);
+            let message = await DrinkApplicationComment.findById(messageId);
             if (message) {
                 await message.remove();
                 res.status(204).json(message);

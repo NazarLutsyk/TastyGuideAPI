@@ -29,7 +29,7 @@ router.use("/placeTypeMultilangs", require("./placeTypeMultilang"));
 router.use("/newsMultilangs", require("./newsMultilang"));
 router.use("/bonuseMultilangs", require("./bonuseMultilang"));
 router.use("/eventMultilangs", require("./eventMultilang"));
-router.use("/messages", require("./message"));
+router.use("/drinkApplicationComments", require("./drinkApplicationComment"));
 router.use("/reviews", require("./reviews"));
 
 module.exports = router;

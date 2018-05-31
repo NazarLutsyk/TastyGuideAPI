@@ -14,13 +14,7 @@ let PlaceSchema = new Schema({
     },
     averagePrice: {
         type: Number,
-        default: 0,
-        validate: {
-            validator: function (averagePrice) {
-                return averagePrice >= 0;
-            },
-            message: "Min avaragePrive eq 0"
-        }
+        default: 0
     },
     reviews: {
         type: Number,
@@ -212,7 +206,7 @@ PlaceSchema.virtual('departments', {
 });
 
 PlaceSchema.statics.notUpdatable = function () {
-    return ["rating", "reviews", "allowed", "topCategories"];
+    return ["rating", "reviews", "allowed", "topCategories", 'averagePrice'];
 };
 PlaceSchema.statics.superfind = async function (params) {
     let {universalFind} = require("../helpers/mongoQueryHelper");

@@ -26,6 +26,7 @@ module.exports = {
                 await Review.create({place: place._id, client: req.user._id});
                 let toUpdate = await Place.findById(placeId);
                 toUpdate.reviews++;
+                place.reviews++;
                 await toUpdate.supersave();
             }
             res.json(place);

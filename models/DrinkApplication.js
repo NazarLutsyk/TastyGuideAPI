@@ -41,6 +41,13 @@ let DrinkApplicationSchema = new Schema({
     toObject: {virtuals:true, getters: true},
 });
 
+DrinkApplicationSchema.virtual("comments", {
+    ref: "DrinkApplicationComment",
+    localField: "_id",
+    foreignField: "drinkApplication",
+    justOne: false
+});
+
 DrinkApplicationSchema.statics.superfind = async function (params) {
     let {universalFind} = require("../helpers/mongoQueryHelper");
     return await universalFind(this, params);

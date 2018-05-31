@@ -99,18 +99,12 @@ ClientSchema.virtual("departments", {
     justOne: false
 });
 
-/*ClientSchema.virtual("sendedMessages", {
-    ref: "Message",
+ClientSchema.virtual("drinkApplicationComments", {
+    ref: "DrinkApplicationComment",
     localField: "_id",
     foreignField: "sender",
     justOne: false
 });
-ClientSchema.virtual("receivedMessages", {
-    ref: "Message",
-    localField: "_id",
-    foreignField: "receiver",
-    justOne: false
-});*/
 
 ClientSchema.statics.notUpdatable = function () {
     return ["roles", "avatar", "facebookId", "googleId"];
@@ -151,7 +145,7 @@ let Complaint = require("./Complaint");
 let DrinkApplication = require("./DrinkApplication");
 let Rating = require("./Rating");
 let Department = require("./Department");
-let Message = require("./Message");
+let DrinkApplicationComment = require("./DrinkApplicationComment");
 let Promo = require("./Promo");
 ClientSchema.pre("remove", async function (next) {
     try {
@@ -159,8 +153,7 @@ ClientSchema.pre("remove", async function (next) {
         let drinkApps = await DrinkApplication.find({organizer: this._id});
         let ratings = await Rating.find({client: this._id});
         let departments = await Department.find({client: this._id});
-        let sended = await Message.find({sender: this._id});
-        let received = await Message.find({receiver: this._id});
+        let sended = await DrinkApplicationComment.find({sender: this._id});
         for (const complaint of complaints) {
             await complaint.remove();
         }
@@ -174,9 +167,6 @@ ClientSchema.pre("remove", async function (next) {
             await department.remove();
         }
         for (const message of sended) {
-            await message.remove();
-        }
-        for (const message of received) {
             await message.remove();
         }
         await Promo.update(

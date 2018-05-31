@@ -1,4 +1,4 @@
-let mongoose = require('mongoose');
+let mongoose = require("mongoose");
 
 let Schema = mongoose.Schema;
 
@@ -10,7 +10,7 @@ let RatingSchema = new Schema({
             validator: function (value) {
                 return value >= 0 && value <= 5;
             },
-            message: 'Value[min = 0,max = 5]'
+            message: "Value[min = 0,max = 5]"
         }
     },
     comment: String,
@@ -19,18 +19,18 @@ let RatingSchema = new Schema({
     },
     client: {
         type: Schema.Types.ObjectId,
-        ref: 'Client',
+        ref: "Client",
         required: true
     },
     place: {
         type: Schema.Types.ObjectId,
-        ref: 'Place',
+        ref: "Place",
         required: true
     },
 }, {
     timestamps: true,
-    toJSON: {virtuals:true, getters: true},
-    toObject: {virtuals:true, getters: true},
+    toJSON: {virtuals: true, getters: true},
+    toObject: {virtuals: true, getters: true},
 });
 RatingSchema.statics.superfind = async function (params) {
     let {universalFind} = require("../helpers/mongoQueryHelper");
@@ -56,19 +56,28 @@ RatingSchema.methods.supersave = async function (context) {
         {$match: {place: newRating.place}},
         {$group: {_id: newRating.place, avg: {$avg: "$value"}}}
     ]);
-    let placeAvg = 0;
+    let ratingAvg = 0;
     if (rating && rating.length > 0)
-        placeAvg = rating[0].avg;
-    await Place.update({_id: newRating.place}, {rating: placeAvg});
+        ratingAvg = rating[0].avg;
+
+    let price = await context.aggregate([
+        {$match: {place: newRating.place}},
+        {$group: {_id: newRating.place, avg: {$avg: "$price"}}}
+    ]);
+    let priceAvg = 0;
+    if (price && price.length > 0)
+        priceAvg = price[0].avg;
+
+    await Place.update({_id: newRating.place}, {rating: ratingAvg, averagePrice: priceAvg});
     return rating;
 };
 
-RatingSchema.methods.superupdate = async function (newDoc,context) {
-    let objectHelper = require('../helpers/objectHelper');
+RatingSchema.methods.superupdate = async function (newDoc, context) {
+    let objectHelper = require("../helpers/objectHelper");
     let Place = require("./Place");
 
     if (newDoc.place || newDoc.client) {
-        throw new Error('Can`t update relations!');
+        throw new Error("Can`t update relations!");
     }
     objectHelper.load(this, newDoc);
     log("update Rating");
@@ -78,26 +87,33 @@ RatingSchema.methods.superupdate = async function (newDoc,context) {
         {$match: {place: newRating.place}},
         {$group: {_id: newRating.place, avg: {$avg: "$value"}}}
     ]);
-    let placeAvg = 0;
+    let ratingAvg = 0;
     if (rating && rating.length > 0)
-        placeAvg = rating[0].avg;
+        ratingAvg = rating[0].avg;
+    let price = await context.aggregate([
+        {$match: {place: newRating.place}},
+        {$group: {_id: newRating.place, avg: {$avg: "$price"}}}
+    ]);
+    let priceAvg = 0;
+    if (price && price.length > 0)
+        priceAvg = price[0].avg;
 
-    await Place.update({_id: newRating.place}, {rating: placeAvg});
+    await Place.update({_id: newRating.place}, {rating: ratingAvg, averagePrice: priceAvg});
     return newRating;
 };
-let Model = mongoose.model('Rating', RatingSchema);
+let Model = mongoose.model("Rating", RatingSchema);
 module.exports = Model;
 
 RatingSchema.pre("remove", async function (next) {
     let Place = require("./Place");
-    log('remove Rating');
+    log("remove Rating");
     let rating = await Model.aggregate([
-        {$match: {place: this.place, _id: {$ne : this._id}}},
+        {$match: {place: this.place, _id: {$ne: this._id}}},
         {$group: {_id: this.place, avg: {$avg: "$value"}}}
     ]);
-    let placeAvg = 0;
+    let ratingAvg = 0;
     if (rating && rating.length > 0)
-        placeAvg = rating[0].avg;
-    await Place.update({_id: this.place.toString()}, {rating: placeAvg},{new: true, multiple: true});
+        ratingAvg = rating[0].avg;
+    await Place.update({_id: this.place.toString()}, {rating: ratingAvg}, {new: true, multiple: true});
     return next();
 });

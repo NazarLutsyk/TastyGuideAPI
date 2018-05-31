@@ -17,7 +17,7 @@ let DrinkApplication = require("./models/DrinkApplication");
 let Rating = require("./models/Rating");
 let Department = require("./models/Department");
 let Client = require("./models/Client");
-let Message = require("./models/Message");
+let DrinkApplicationComment = require("./models/DrinkApplicationComment");
 
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost/drinker", () => {
@@ -87,6 +87,12 @@ let client1;
 let client2;
 let message1;
 let message2;
+let message3;
+let message4;
+let message5;
+let message6;
+let message7;
+let message8;
 
 
 async function createModels() {
@@ -130,20 +136,9 @@ async function createModels() {
         email: "someemail@mail.com",
         avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNLzZszQbQf6jkknIGI8A3rj-0BoEngyi9156njfrCjPED9_b2vw"
     });
-    message1 = await Message.create({
-        value: "Idi suka nahui!",
-        sender: client2,
-        receiver: client1,
-    });
-    message2 = await Message.create({
-        value: "Sam idi!",
-        sender: client1,
-        receiver: client2,
-    });
     place1 = await Place.create({
         phone: "355875545722",
         email: "someemail@mail.com",
-        averagePrice: 7000,
         reviews: 0,
         allowed: true,
         location: {
@@ -186,13 +181,12 @@ async function createModels() {
             }
         },
         types: [placeType1],
-        hashTags: ['buhalovka','bomjatnik'],
-        topCategories: ['Best club for whores!']
+        hashTags: ["buhalovka", "bomjatnik"],
+        topCategories: ["Best club for whores!"]
     });
     place2 = await Place.create({
         phone: "355875545722",
         email: "someemail@mail.com",
-        averagePrice: 200,
         reviews: 0,
         allowed: true,
         location: {
@@ -235,34 +229,34 @@ async function createModels() {
             }
         },
         types: [placeType2],
-        hashTags: ['jumoreska','pupok'],
-        topCategories: ['Best karaoke']
+        hashTags: ["jumoreska", "pupok"],
+        topCategories: ["Best karaoke"]
     });
     topPlace1 = await TopPlace.create({
         startDate: Date(),
         endDate: Date(),
-        price: 10000,
+        price: 0,
         actual: true,
         place: place1
     });
     topPlace2 = await TopPlace.create({
         startDate: Date(),
         endDate: Date(),
-        price: 888,
+        price: 0,
         actual: true,
         place: place1
     });
     topPlace3 = await TopPlace.create({
         startDate: Date(),
         endDate: Date(),
-        price: 755,
+        price: 0,
         actual: true,
         place: place2
     });
     topPlace4 = await TopPlace.create({
         startDate: Date(),
         endDate: Date(),
-        price: 9999,
+        price: 0,
         actual: false,
         place: place2
     });
@@ -270,9 +264,9 @@ async function createModels() {
         name: "ржавый башмак",
         description: "самый ржавый башмак на всем белом свете",
         address: {
-            city: 'Львів',
-            address: 'Пимоненка',
-            number: '19'
+            city: "Львів",
+            address: "Пимоненка",
+            number: "19"
         },
         place: place1,
         lang: lang1
@@ -282,9 +276,9 @@ async function createModels() {
         description: "the most row foot all over the world",
         place: place1,
         address: {
-            city: 'Lviv',
-            address: 'Pymonenka',
-            number: '19'
+            city: "Lviv",
+            address: "Pymonenka",
+            number: "19"
         },
         lang: lang2
     });
@@ -293,9 +287,9 @@ async function createModels() {
         description: "стул скрипит, значит на нем сидят...жопа болит",
         place: place2,
         address: {
-            city: 'Львів',
-            address: 'Городоцька',
-            number: '77'
+            city: "Львів",
+            address: "Городоцька",
+            number: "77"
         },
         lang: lang1
     });
@@ -304,9 +298,9 @@ async function createModels() {
         description: "some screaming chair for your ass",
         place: place2,
         address: {
-            city: 'Lviv',
-            address: 'Gorodotska',
-            number: '77'
+            city: "Lviv",
+            address: "Gorodotska",
+            number: "77"
         },
         lang: lang2
     });
@@ -382,31 +376,71 @@ async function createModels() {
         organizer: client2,
         place: place2
     });
+    message1 = await DrinkApplicationComment.create({
+        value: "Hello!",
+        sender: client2,
+        drinkApplication: app1,
+    });
+    message2 = await DrinkApplicationComment.create({
+        value: "Hi!",
+        sender: client1,
+        drinkApplication: app1,
+    });
+    message3 = await DrinkApplicationComment.create({
+        value: "Hello!",
+        sender: client2,
+        drinkApplication: app2,
+    });
+    message4 = await DrinkApplicationComment.create({
+        value: "Hi!",
+        sender: client1,
+        drinkApplication: app2,
+    });
+    message5 = await DrinkApplicationComment.create({
+        value: "Hello!",
+        sender: client2,
+        drinkApplication: app3,
+    });
+    message6 = await DrinkApplicationComment.create({
+        value: "Hi!",
+        sender: client1,
+        drinkApplication: app3,
+    });
+    message7 = await DrinkApplicationComment.create({
+        value: "Hello!",
+        sender: client2,
+        drinkApplication: app4,
+    });
+    message8 = await DrinkApplicationComment.create({
+        value: "Hi!",
+        sender: client1,
+        drinkApplication: app4,
+    });
     rating1 = await Rating.create({
         value: 5,
         comment: "Duze faino",
-        price: 200,
+        price: 0,
         client: client1,
         place: place1
     });
     rating2 = await Rating.create({
         value: 2,
         comment: "Duze faino",
-        price: 150,
+        price: 0,
         client: client1,
         place: place1
     });
     rating3 = await Rating.create({
         value: 4,
         comment: "Duze faino",
-        price: 200,
+        price: 0,
         client: client2,
         place: place2
     });
     rating4 = await Rating.create({
         value: 3,
         comment: "Duze faino",
-        price: 300,
+        price: 0,
         client: client2,
         place: place2
     });
