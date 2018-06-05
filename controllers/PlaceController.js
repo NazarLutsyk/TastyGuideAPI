@@ -7,9 +7,24 @@ let ROLES = require("../config/roles");
 let upload = require("../middleware/multer")(path.join(__dirname, "../public", "upload", "place"));
 upload = upload.fields([{name: "avatar", maxCount: 1}, {name: "images", maxCount: 6}]);
 
+let mongoose = require("mongoose");
+
 module.exports = {
     async getPlaces(req, res, next) {
         try {
+            function iterate(obj, stack) {
+                for (let property in obj) {
+                    if (obj.hasOwnProperty(property)) {
+                        if (typeof obj[property] === "object") {
+                            iterate(obj[property], stack + "." + property);
+                        } else if (typeof obj[property] === "string" && obj[property].match(/^[0-9a-fA-F]{24}$/)) {
+                            obj[property] = mongoose.Types.ObjectId(obj[property]);
+                        }
+                    }
+                }
+            }
+
+            iterate(req.query, "");
             res.json(await Place.superfind(req.query));
         } catch (e) {
             e.status = 400;
