@@ -58,7 +58,16 @@ module.exports = {
             return next(e);
         }
     },
-    social() {
+    googleNative(req, res, next){
+        if (req.user) {
+            return res.status(200).json(req.user);
+        } else {
+            let e = new Error();
+            e.status = 400;
+            return next(e);
+        }
+    },
+    facebookNative(req, res, next){
         if (req.user) {
             return res.status(200).json(req.user);
         } else {
