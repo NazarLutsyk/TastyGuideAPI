@@ -1,9 +1,10 @@
 let Client = require("../../models/Client");
-var GoogleTokenStrategy = require("passport-google-token");
+let GoogleTokenStrategy = require("passport-google-token").Strategy;
+let SOCIAL = require('../social');
 
 module.exports.Auth = new GoogleTokenStrategy({
-    clientID: '637559649087-ev0cud8le919q9ffi8cn644sgp206687.apps.googleusercontent.com',
-    clientSecret: 'AIzaSyDC92JdAld7twBLILsYN5J1NXZ1yJ2VIw8'
+    clientID: SOCIAL.GOOGLE.CLIENT_ID,
+    clientSecret: SOCIAL.GOOGLE.CLIENT_SECRET
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         console.log(profile);
@@ -16,23 +17,23 @@ module.exports.Auth = new GoogleTokenStrategy({
             });
             user.name = profile.name.givenName;
             user.surname = profile.name.familyName;
-            user.email = profile.emails[0].value || "";
-            user.avatar = profile._json.image.url;
+            user.email = profile.emails[0] ? profile.emails[0].value : '';
+            user.avatar = profile._json.picture;
             user = await user.save();
-            return cb(null, user);
+            return done(null, user);
         } else {
             let user = await Client.create({
                 name: profile.name.givenName,
                 surname: profile.name.familyName,
                 googleId: profile.id,
-                email: profile.emails[0].value || "",
-                avatar: profile._json.image.url
+                email: profile.emails[0] ? profile.emails[0].value : '',
+                avatar: profile._json.picture
             });
             log("create client");
-            return cb(null, user);
+            return done(null, user);
         }
     } catch (e) {
-        cb(e);
+        done(e);
     }
 
 });

@@ -9,22 +9,6 @@ router.post("/local/signup", PassportMiddleware.notLoggedIn, UserController.sign
 router.post("/local/signin", PassportMiddleware.notLoggedIn, UserController.signIn);
 router.get("/logout", PassportMiddleware.isLoggedIn, UserController.logout);
 
-router.get("/facebook", passport.authenticate("facebook"));
-router.get("/facebook/callback",
-    PassportMiddleware.notLoggedIn,
-    passport.authenticate("facebook"),
-    UserController.facebookAuth);
-
-router.get("/google", passport.authenticate("google", {
-    scope:
-        ["https://www.googleapis.com/auth/plus.login", "https://www.googleapis.com/auth/plus.profile.emails.read"]
-}));
-router.get("/google/callback",
-    PassportMiddleware.notLoggedIn,
-    passport.authenticate("google"),
-    UserController.googleAuth);
-
-
 router.post('/google-native',passport.authenticate('google-token'), UserController.googleNative);
 router.post('/facebook-native',passport.authenticate('facebook-token'), UserController.facebookNative);
 

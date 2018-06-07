@@ -40,24 +40,6 @@ module.exports = {
             });
         })(req, res, next);
     },
-    facebookAuth(req, res, next) {
-        if (req.user) {
-            return res.status(200).json(req.user);
-        } else {
-            let e = new Error();
-            e.status = 400;
-            return next(e);
-        }
-    },
-    googleAuth(req, res, next) {
-        if (req.user) {
-            return res.status(200).json(req.user);
-        } else {
-            let e = new Error();
-            e.status = 400;
-            return next(e);
-        }
-    },
     googleNative(req, res, next){
         if (req.user) {
             return res.status(200).json(req.user);

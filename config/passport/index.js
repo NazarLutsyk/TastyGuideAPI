@@ -1,7 +1,5 @@
 let passport = require('passport');
 let LocalStrategy = require('./LocalStrategy');
-let FacebookStrategy = require('./FacebookStrategy');
-let GoogleStrategy = require('./GoogleStrategy');
 let GoogleNativeStrategy = require('./GoogleNativeStrategy');
 let FacebookNativeStrategy = require('./FacebookNativeStrategy');
 let Client = require('../../models/Client');
@@ -22,7 +20,5 @@ passport.deserializeUser(async function (id, done) {
 
 passport.use('local.signup',LocalStrategy.LocalSignup);
 passport.use('local.signin',LocalStrategy.LocalSignin);
-passport.use(FacebookStrategy.Auth);
-passport.use(GoogleStrategy.Auth);
 passport.use(GoogleNativeStrategy.Auth);
 passport.use(FacebookNativeStrategy.Auth);

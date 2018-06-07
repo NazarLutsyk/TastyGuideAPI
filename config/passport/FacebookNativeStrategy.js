@@ -1,9 +1,10 @@
 let Client = require("../../models/Client");
-var FacebookTokenStrategy = require("passport-facebook-token");
+let FacebookTokenStrategy = require("passport-facebook-token");
+let SOCIAL = require('../social');
 
 module.exports.Auth = new FacebookTokenStrategy({
-    clientID: '387568105079528',
-    clientSecret: 'e946faaa954c2ed74167d9d0ea4e8383'
+    clientID: SOCIAL.FACEBOOK.CLIENT_ID,
+    clientSecret: SOCIAL.FACEBOOK.CLIENT_SECRET
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         console.log(profile);
@@ -16,22 +17,22 @@ module.exports.Auth = new FacebookTokenStrategy({
             });
             user.name = profile.name.givenName;
             user.surname = profile.name.familyName;
-            user.email = profile.email || '';
-            user.avatar = profile._json.picture.data.url;
+            user.email = profile.emails[0] ? profile.emails[0].value : '';
+            user.avatar = profile.photos[0] ? profile.photos[0].value : '';
             user = await user.save();
-            return cb(null, user);
+            return done(null, user);
         } else {
             let user = await Client.create({
                 name: profile.name.givenName,
                 surname: profile.name.familyName,
                 facebookId: profile.id,
-                email: profile.email || '',
-                avatar : profile._json.picture.data.url
+                email: profile.emails[0] ? profile.emails[0].value : '',
+                avatar : profile.photos[0] ? profile.photos[0].value : '',
             });
             log('create client');
-            return cb(null, user);
+            return done(null, user);
         }
     } catch (e) {
-        cb(e);
+        done(e);
     }
 });
