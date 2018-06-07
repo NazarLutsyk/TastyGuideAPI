@@ -2,6 +2,7 @@ let passport = require('passport');
 let LocalStrategy = require('./LocalStrategy');
 let FacebookStrategy = require('./FacebookStrategy');
 let GoogleStrategy = require('./GoogleStrategy');
+let JwtStrategy = require('./JwtStrategy');
 let Client = require('../../models/Client');
 
 passport.serializeUser(function (user, done) {
@@ -22,3 +23,4 @@ passport.use('local.signup',LocalStrategy.LocalSignup);
 passport.use('local.signin',LocalStrategy.LocalSignin);
 passport.use(FacebookStrategy.Auth);
 passport.use(GoogleStrategy.Auth);
+passport.use(JwtStrategy.Auth);

@@ -58,8 +58,17 @@ module.exports = {
             return next(e);
         }
     },
+    social() {
+        if (req.user) {
+            return res.status(200).json(req.user);
+        } else {
+            let e = new Error();
+            e.status = 400;
+            return next(e);
+        }
+    },
     logout(req, res) {
         req.logout();
-        res.json({ok: true})
+        res.json({ok: true});
     }
 };

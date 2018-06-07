@@ -3,11 +3,16 @@ let passport = require("passport");
 let PassportMiddleware = require("../middleware/passport");
 let UserController = require("../controllers/UserController");
 let query = require("../middleware/query");
-let Client = require('../models/Client');
+let Client = require("../models/Client");
 
 router.post("/local/signup", PassportMiddleware.notLoggedIn, UserController.signUp);
 router.post("/local/signin", PassportMiddleware.notLoggedIn, UserController.signIn);
 router.get("/logout", PassportMiddleware.isLoggedIn, UserController.logout);
+
+router.post("/social",
+    PassportMiddleware.notLoggedIn,
+    passport.authenticate("jwt"),
+    UserController.social);
 
 router.get("/facebook", passport.authenticate("facebook"));
 router.get("/facebook/callback",
