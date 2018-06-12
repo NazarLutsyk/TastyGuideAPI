@@ -42,8 +42,8 @@ TopPlaceSchema.methods.supersave = async function () {
         throw new Error("Not found related model Place!");
     }
 
-    let alreadyExists = await topPlaceModel.count({place: place._id, actual: true});
-    if (alreadyExists) {
+    let alreadyExists = await topPlaceModel.count({place: this.place, actual: true});
+    if (this.actual && alreadyExists && this.actual + "" == "true") {
         throw new Error("Already exists!");
     } else {
         log("save TopPlace");
@@ -55,8 +55,8 @@ TopPlaceSchema.methods.superupdate = async function (newDoc) {
     if (newDoc.place) {
         throw new Error("Can`t update relations!");
     }
-    let alreadyExists = await topPlaceModel.count({place: newDoc._id, actual: true});
-    if (newDoc.actual && newDoc.actual == true && alreadyExists) {
+    let alreadyExists = await topPlaceModel.count({place: this.place, actual: true});
+    if (newDoc.actual && newDoc.actual + "" == "true" && alreadyExists) {
         throw new Error("Already exists!");
     } else {
         objectHelper.load(this, newDoc);
