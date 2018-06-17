@@ -1,5 +1,5 @@
 let path = require("path");
-let fileHelper = require('../helpers/fileHelper');
+let fileHelper = require("../helpers/fileHelper");
 let Place = require("../models/Place");
 let Review = require("../models/Review");
 let Department = require("../models/Department");
@@ -38,8 +38,8 @@ module.exports = {
             req.query.query._id = placeId;
             let place = await Place.superfind(req.query);
             place = place[0];
-            if (place && req.user) {
-                await Review.create({place: place._id, client: req.user._id});
+            if (place) {
+                await Review.create({place: place._id, client: req.user ? req.user._id : null});
                 let toUpdate = await Place.findById(placeId);
                 toUpdate.reviews++;
                 place.reviews++;
