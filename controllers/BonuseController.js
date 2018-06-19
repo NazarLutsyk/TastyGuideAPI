@@ -1,11 +1,28 @@
 let Bonuse = require("../models/Bonuse");
 let path = require("path");
 let keysValidator = require("../validators/keysValidator");
+let mongoose = require("mongoose");
 let upload = require("../middleware/multer")(path.join(__dirname, "../public", "upload", "promo"));
 upload = upload.single("image");
 module.exports = {
     async getBonuses(req, res, next) {
         try {
+            if (JSON.stringify(req.query).search(/^[0-9a-fA-F]{24}$/)) {
+                console.log('here');
+                function iterate(obj, stack) {
+                    for (let property in obj) {
+                        if (obj.hasOwnProperty(property)) {
+                            if (typeof obj[property] === "object") {
+                                iterate(obj[property], stack + "." + property);
+                            } else if (typeof obj[property] === "string" && obj[property].match(/^[0-9a-fA-F]{24}$/)) {
+                                obj[property] = mongoose.Types.ObjectId(obj[property]);
+                            }
+                        }
+                    }
+                }
+
+                iterate(req.query, "");
+            }
             res.json(await Bonuse.superfind(req.query));
         } catch (e) {
             e.status = 400;

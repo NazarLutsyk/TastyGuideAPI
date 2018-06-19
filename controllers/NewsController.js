@@ -1,11 +1,27 @@
 let News = require("../models/News");
 let path = require("path");
+let mongoose = require("mongoose");
 let keysValidator = require("../validators/keysValidator");
 let upload = require("../middleware/multer")(path.join(__dirname, "../public", "upload", "promo"));
 upload = upload.single("image");
 module.exports = {
     async getNews(req, res, next) {
         try {
+            if (JSON.stringify(req.query).search(/^[0-9a-fA-F]{24}$/)) {
+                function iterate(obj, stack) {
+                    for (let property in obj) {
+                        if (obj.hasOwnProperty(property)) {
+                            if (typeof obj[property] === "object") {
+                                iterate(obj[property], stack + "." + property);
+                            } else if (typeof obj[property] === "string" && obj[property].match(/^[0-9a-fA-F]{24}$/)) {
+                                obj[property] = mongoose.Types.ObjectId(obj[property]);
+                            }
+                        }
+                    }
+                }
+
+                iterate(req.query, "");
+            }
             res.json(await News.superfind(req.query));
         } catch (e) {
             e.status = 400;
@@ -68,7 +84,7 @@ module.exports = {
                         } else {
                             if (err) {
                                 return res.status(400).send(err.toString());
-                            } else if(req.file){
+                            } else if (req.file) {
                                 req.body.image = "/upload/promo/" + req.file.filename;
                             }
                             try {
