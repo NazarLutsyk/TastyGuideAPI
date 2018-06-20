@@ -128,16 +128,24 @@ module.exports = {
                     }
                 }
                 try {
-                    let toUpdate = {};
-                    let place = await Place.findById(req.params.id);
-                    if (req.body.avatar) {
-                        toUpdate.avatar = req.body.avatar;
+                    let query = {};
+                    if (req.body.avatar && req.body.images && req.body.images.length > 0) {
+                        let place = await Place.findById(req.params.id);
+                        if (req.body.avatar) {
+                            query.avatar = req.body.avatar;
+                            if (place.avatar) {
+                                let toDelete = path.join(__dirname, "../public", place.avatar);
+                                fileHelper.deleteFiles(toDelete);
+                            }
+                        }
+                        if (req.body.images) {
+                            query.$push = {images: req.body.images};
+                        }
+                        let placeRes = await Place.findByIdAndUpdate(req.params.id, query, {new: true});
+                        res.status(201).json(placeRes);
+                    } else {
+                        res.sendStatus(201);
                     }
-                    if (req.body.images) {
-                        toUpdate.images = req.body.images;
-                    }
-                    let placeRes = await place.superupdate(toUpdate);
-                    res.status(201).json(placeRes);
                 } catch (e) {
                     e.status = 400;
                     return next(e);

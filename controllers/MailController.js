@@ -13,10 +13,10 @@ module.exports = {
         });
         transporter.sendMail({
             from: MAIL.BROKER.EMAIL,
-            to: req.body.email ? req.body.email : MAIL.ADMIN_EMAIL,
+            to: req.body.to ? req.body.to : MAIL.ADMIN_EMAIL,
             subject: "Contact Us",
             text: `
-                User email: ${req.body.clientEmail},
+                User email: ${req.body.from},
                 Message: '${req.body.message}'
             `,
         }, (error, info) => {
