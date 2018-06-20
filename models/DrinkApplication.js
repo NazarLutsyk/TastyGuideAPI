@@ -5,15 +5,15 @@ let Schema = mongoose.Schema;
 let DrinkApplicationSchema = new Schema({
     friends: {
         type: String,
-        default: 'NONE'
+        required: true
     },
     goal: {
         type: String,
-        default: 'NONE'
+        required: true
     },
     budged: {
         type: Number,
-        default: 0,
+        required: true,
         validate: {
             validator: function (budged) {
                 return budged >= 0;

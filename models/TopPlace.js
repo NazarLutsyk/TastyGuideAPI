@@ -56,7 +56,7 @@ TopPlaceSchema.methods.superupdate = async function (newDoc) {
         throw new Error("Can`t update relations!");
     }
     let alreadyExists = await topPlaceModel.count({place: this.place, actual: true});
-    if (newDoc.actual && newDoc.actual + "" == "true" && alreadyExists) {
+    if (newDoc.actual > 1 && newDoc.actual + "" == "true" && alreadyExists) {
         throw new Error("Already exists!");
     } else {
         objectHelper.load(this, newDoc);

@@ -9,7 +9,7 @@ module.exports = {
             for (let file in files) {
                 let fileName = files[file].toString();
                 fs.exists(fileName, function (exists) {
-                    if (exists && fileName.indexOf('default.jpg') < 0) {
+                    if (exists) {
                         log(`File exists ${fileName}`);
                         fs.unlink(fileName, function (err) {
                             if (err) {
