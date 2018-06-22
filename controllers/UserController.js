@@ -18,7 +18,7 @@ module.exports = {
                 let encoded = Buffer.from(bodyJson).toString("base64");
                 let url = globalConfig.HOST + "auth/local/signup/callback?data=" + encoded;
                 await mail.sendMail(body.email, "Sign Up", url);
-                return res.json({ok : true});
+                return res.json({ok: true});
             }
         } catch (e) {
             return next(e);
@@ -31,16 +31,23 @@ module.exports = {
                 let decoded = Buffer.from(req.query.data, "base64").toString("utf8");
                 let user = JSON.parse(decoded);
 
-                let client = new Client({
-                    name: user.name,
-                    surname: user.surname,
-                    email: user.email,
-                    login: user.login,
-                });
-                client.password = client.encryptPassword(user.password);
-                client = await client.save();
+                let alreadyExists = await Client.count({$or: [{login: user.login}, {email: user.email}]});
 
-                res.sendStatus(200);
+                if (alreadyExists <= 0) {
+                    let client = new Client({
+                        name: user.name,
+                        surname: user.surname,
+                        email: user.email,
+                        login: user.login,
+                    });
+                    client.password = client.encryptPassword(user.password);
+                    client = await client.save();
+                    res.sendStatus(200);
+                } else {
+                    let error = new Error();
+                    error.status = 400;
+                    return next(error);
+                }
             } else {
                 let error = new Error();
                 error.status = 400;
