@@ -1,4 +1,4 @@
-let mongoose = require('mongoose');
+let mongoose = require("mongoose");
 
 let Schema = mongoose.Schema;
 
@@ -18,7 +18,7 @@ let DrinkApplicationSchema = new Schema({
             validator: function (budged) {
                 return budged >= 0;
             },
-            message: 'Min budget eq 0'
+            message: "Min budget eq 0"
         }
     },
     date: {
@@ -27,18 +27,18 @@ let DrinkApplicationSchema = new Schema({
     },
     organizer: {
         type: Schema.Types.ObjectId,
-        ref: 'Client',
+        ref: "Client",
         required: true
     },
     place: {
         type: Schema.Types.ObjectId,
-        ref: 'Place',
+        ref: "Place",
         required: true
     },
 }, {
     timestamps: true,
-    toJSON: {virtuals:true, getters: true},
-    toObject: {virtuals:true, getters: true},
+    toJSON: {virtuals: true, getters: true},
+    toObject: {virtuals: true, getters: true},
 });
 
 DrinkApplicationSchema.virtual("comments", {
@@ -54,44 +54,49 @@ DrinkApplicationSchema.statics.superfind = async function (params) {
 };
 
 DrinkApplicationSchema.methods.supersave = async function () {
-    let Place = require('./Place');
-    let Client = require('./Client');
+    let Place = require("./Place");
+    let Client = require("./Client");
 
     let organizer = await Client.findById(this.organizer);
     let place = await Place.findById(this.place);
 
     if (!organizer) {
-        throw new Error('Not found related model Client!');
+        throw new Error("Not found related model Client!");
     }
     if (!place) {
-        throw new Error('Not found related model Place!');
+        throw new Error("Not found related model Place!");
     }
-    log('save DrinkApp');
+    log("save DrinkApp");
     return await this.save();
 };
 
 DrinkApplicationSchema.methods.superupdate = async function (newDoc) {
-    let objectHelper = require('../helpers/objectHelper');
-    let Place = require('./Place');
+    let objectHelper = require("../helpers/objectHelper");
+    let Place = require("./Place");
 
     if (newDoc.organizer) {
-        throw new Error('Can`t update relations!');
+        throw new Error("Can`t update relations!");
     }
-    if (newDoc.hasOwnProperty('place')) {
+    if (newDoc.hasOwnProperty("place")) {
         let place = await Place.count({_id: newDoc.place});
         if (!place) {
-            throw new Error('Not found related model Place!');
+            throw new Error("Not found related model Place!");
         }
     }
     objectHelper.load(this, newDoc);
-    log('update DrinkApp');
-    return await this.save()
+    log("update DrinkApp");
+    return await this.save();
 };
 
-module.exports = mongoose.model('DrinkApplication', DrinkApplicationSchema);
+module.exports = mongoose.model("DrinkApplication", DrinkApplicationSchema);
 
-
+let DAK = require("./DrinkApplicationComment");
 DrinkApplicationSchema.pre("remove", async function (next) {
-    log('remove DrinkApp');
-    return next();
+    log("remove DrinkApp");
+    try {
+        await DAK.remove({drinkApplication: this._id});
+        return next();
+    } catch (e) {
+        return next(e);
+    }
 });

@@ -18,7 +18,6 @@ passport.deserializeUser(async function (id, done) {
     }
 });
 
-passport.use('local.signup',LocalStrategy.LocalSignup);
 passport.use('local.signin',LocalStrategy.LocalSignin);
 passport.use(GoogleNativeStrategy.Auth);
 passport.use(FacebookNativeStrategy.Auth);

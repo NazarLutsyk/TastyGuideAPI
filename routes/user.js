@@ -6,6 +6,7 @@ let query = require("../middleware/query");
 let Client = require("../models/Client");
 
 router.post("/local/signup", PassportMiddleware.notLoggedIn, UserController.signUp);
+router.get("/local/signup/callback", PassportMiddleware.notLoggedIn, UserController.register);
 router.post("/local/signin", PassportMiddleware.notLoggedIn, UserController.signIn);
 router.get("/logout", PassportMiddleware.isLoggedIn, UserController.logout);
 

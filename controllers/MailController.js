@@ -1,30 +1,18 @@
-let nodemailer = require("nodemailer");
+let mail = require("../helpers/mailHelper");
 let MAIL = require("../config/mail");
 
 //todo normal message format
 module.exports = {
-    sendMail(req, res, next) {
-        let transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: MAIL.BROKER.EMAIL,
-                pass: MAIL.BROKER.PASS
-            }
-        });
-        transporter.sendMail({
-            from: MAIL.BROKER.EMAIL,
-            to: req.body.to ? req.body.to : MAIL.ADMIN_EMAIL,
-            subject: "Contact Us",
-            text: `
-                User email: ${req.body.from},
-                Message: '${req.body.message}'
-            `,
-        }, (error, info) => {
-            if (error) {
-                error.status = 400;
-                return next(error);
-            }
-            res.json(info);
-        });
+    async sendMail(req, res, next) {
+        try {
+            let to = req.body.to ? req.body.to : MAIL.ADMIN_EMAIL;
+            let subject = "Contact Us";
+            let text = `User email: ${req.body.from},
+                        Message: ${req.body.message}`;
+            let mailResult = await mail.sendMail(to, subject, text);
+            return res.json(mailResult);
+        } catch (e) {
+            return next(e);
+        }
     }
 };
