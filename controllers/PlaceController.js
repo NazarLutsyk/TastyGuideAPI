@@ -129,7 +129,7 @@ module.exports = {
                 }
                 try {
                     let query = {};
-                    if (req.body.avatar && req.body.images && req.body.images.length > 0) {
+                    if (req.body.avatar || req.body.images.length > 0) {
                         let place = await Place.findById(req.params.id);
                         if (req.body.avatar) {
                             query.avatar = req.body.avatar;
@@ -139,11 +139,13 @@ module.exports = {
                             }
                         }
                         if (req.body.images) {
+                            console.log("here");
                             query.$push = {images: req.body.images};
                         }
+                        console.log(query);
                         let placeRes = await Place.findByIdAndUpdate(req.params.id, query, {new: true});
                         res.status(201).json(placeRes);
-                    } else {
+                    }else {
                         res.sendStatus(201);
                     }
                 } catch (e) {
