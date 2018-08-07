@@ -29,7 +29,8 @@ app.use(cors({
     credentials: true, origin: [
         "http://localhost:8100",
         "http://192.168.1.14:8100",
-        "http://192.168.1.38:8100"
+        "http://192.168.1.38:8100",
+        "http://192.168.0.100:8100",
     ]
 }));
 app.use(helmet());
@@ -39,7 +40,7 @@ app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(session({//todo
+app.use(session({
     secret: "qweerasdxsd46s548454ad2as1d",
     resave: true,
     saveUninitialized: false,

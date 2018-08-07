@@ -23,7 +23,6 @@ module.exports = Promo.discriminator('News', NewsSchema);
 
 let Multilang = require('./NewsMultilang');
 NewsSchema.pre('remove', async function (next) {
-    console.log("remove news");
     try {
         let multilangs = await Multilang.find({promo: this._id});
         for (const multilang of multilangs) {

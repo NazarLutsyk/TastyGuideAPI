@@ -25,7 +25,6 @@ module.exports = {
                         }
                     }
                 }
-
                 iterate(req.query, "");
             }
             res.json(await Place.superfind(req.query));

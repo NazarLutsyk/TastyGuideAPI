@@ -69,7 +69,6 @@ PromoSchema.methods.superupdate = async function (newDoc) {
 PromoSchema.pre("remove", async function (next) {
     let fileHelper = require("../helpers/fileHelper");
     let path = require("path");
-    console.log("remove promo");
     try {
         if (this.image) {
             let toDelete = path.join(__dirname, "../public", this.image);

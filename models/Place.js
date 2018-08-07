@@ -129,83 +129,83 @@ let PlaceSchema = new Schema({
     hashTags: [String],
 }, {
     timestamps: true,
-    toJSON: {virtuals:true, getters: true},
-    toObject: {virtuals:true, getters: true},
+    toJSON: {virtuals: true, getters: true},
+    toObject: {virtuals: true, getters: true},
 
 });
 
-PlaceSchema.virtual('statistic', {
-    ref: 'Review',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("statistic", {
+    ref: "Review",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
-PlaceSchema.virtual('multilang', {
-    ref: 'PlaceMultilang',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("multilang", {
+    ref: "PlaceMultilang",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
-PlaceSchema.virtual('tops', {
-    ref: 'TopPlace',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("tops", {
+    ref: "TopPlace",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
-PlaceSchema.virtual('news', {
-    ref: 'News',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("news", {
+    ref: "News",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
-PlaceSchema.virtual('bonuses', {
-    ref: 'Bonuse',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("bonuses", {
+    ref: "Bonuse",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
-PlaceSchema.virtual('events', {
-    ref: 'Event',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("events", {
+    ref: "Event",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
-PlaceSchema.virtual('complaints', {
-    ref: 'Complaint',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("complaints", {
+    ref: "Complaint",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
-PlaceSchema.virtual('drinkApplications', {
-    ref: 'DrinkApplication',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("drinkApplications", {
+    ref: "DrinkApplication",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
-PlaceSchema.virtual('ratings', {
-    ref: 'Rating',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("ratings", {
+    ref: "Rating",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
-PlaceSchema.virtual('departments', {
-    ref: 'Department',
-    localField: '_id',
-    foreignField: 'place',
+PlaceSchema.virtual("departments", {
+    ref: "Department",
+    localField: "_id",
+    foreignField: "place",
     justOne: false
 });
 
 PlaceSchema.statics.notUpdatable = function () {
-    return ["rating", "reviews", "allowed", "topCategories", 'averagePrice'];
+    return ["rating", "reviews", "allowed", "topCategories", "averagePrice"];
 };
 PlaceSchema.statics.superfind = async function (params) {
     let {universalFind} = require("../helpers/mongoQueryHelper");
@@ -247,7 +247,7 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
             }
         }
     }
-    if (typeof(newDoc.avatar) !== 'undefined') {
+    if (typeof(newDoc.avatar) !== "undefined") {
         let toDelete = path.join(__dirname, "../public", this.avatar);
         fileHelper.deleteFiles(toDelete);
     }
@@ -311,7 +311,7 @@ PlaceSchema.pre("remove", async function (next) {
                 fileHelper.deleteFiles(toDelete);
             }
         }
-        if(this.avatar){
+        if (this.avatar) {
             let toDelete = path.join(__dirname, "../public", this.avatar);
             fileHelper.deleteFiles(toDelete);
         }
