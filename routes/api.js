@@ -31,5 +31,12 @@ router.use("/bonuseMultilangs", require("./bonuseMultilang"));
 router.use("/eventMultilangs", require("./eventMultilang"));
 router.use("/drinkApplicationComments", require("./drinkApplicationComment"));
 router.use("/reviews", require("./reviews"));
+router.use("/topCategories", require("./topCategories"));
+router.use("/topCategoryMultilangs", require("./topCategoryMultilangs"));
+router.use("/kitchens", require("./kitchen"));
+router.use("/kitchenMultilangs", require("./kitchenMultilang"));
+router.use("/cities", require("./city"));
+router.use("/cityMultilangs", require("./cityMultilang"));
+router.use("/promos", require("./promo"));
 
 module.exports = router;

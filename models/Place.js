@@ -60,7 +60,6 @@ let PlaceSchema = new Schema({
             default: false
         }
     },
-    topCategories: [String],
     images: {
         type: [String],
     },
@@ -126,6 +125,18 @@ let PlaceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "PlaceType",
     }],
+    topCategories: [{
+        type: Schema.Types.ObjectId,
+        ref: "TopCategory",
+    }],
+    kitchens: [{
+        type: Schema.Types.ObjectId,
+        ref: "Kitchen",
+    }],
+    city: {
+        type: Schema.Types.ObjectId,
+        ref: "City",
+    },
     hashTags: [String],
 }, {
     timestamps: true,
@@ -214,11 +225,26 @@ PlaceSchema.statics.superfind = async function (params) {
 
 PlaceSchema.methods.supersave = async function () {
     let PlaceType = require("./PlaceType");
+    let TopCategory = require("./TopCategory");
+    let Kitchen = require("./Kitchen");
+    let City = require("./City");
 
     let placeTypeExists = await PlaceType.count({_id: this.types});
+    let topCategoryExists = await TopCategory.count({_id: this.topCategories});
+    let kithcenExists = await Kitchen.count({_id: this.kitchens});
+    let cityExists = await City.count({_id: this.city});
 
     if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== this.types.length)) {
         throw new Error("Not found related model PlaceType!");
+    }
+    if ((kithcenExists === 0 && this.kitchens.length !== 0) || (kithcenExists !== this.kitchens.length)) {
+        throw new Error("Not found related model Kitchen!");
+    }
+    if ((topCategoryExists === 0 && this.topCategories.length !== 0) || (topCategoryExists !== this.topCategories.length)) {
+        throw new Error("Not found related model TopCategory!");
+    }
+    if (cityExists === 0 && this.city) {
+        throw new Error("Not found related model City!");
     }
     log("save Place");
     return await this.save();
@@ -229,14 +255,33 @@ PlaceSchema.methods.superupdate = async function (newDoc) {
     let objectHelper = require("../helpers/objectHelper");
     let fileHelper = require("../helpers/fileHelper");
     let PlaceType = require("./PlaceType");
+    let TopCategory = require("./TopCategory");
+    let Kitchen = require("./Kitchen");
+    let City = require("./City");
     let path = require("path");
 
     let placeTypeExists = await PlaceType.count({_id: newDoc.types});
+    let topCategoryExists = await TopCategory.count({_id: newDoc.topCategories});
+    let kithcenExists = await Kitchen.count({_id: newDoc.kitchens});
+    let cityExists = await City.count({_id: newDoc.city});
 
     if (newDoc.types && newDoc.types.length > 0) {
         if ((placeTypeExists === 0 && this.types.length !== 0) || (placeTypeExists !== newDoc.types.length)) {
             throw new Error("Not found related model PlaceType!");
         }
+    }
+    if (newDoc.kitchens && newDoc.kitchens.length > 0) {
+        if ((kithcenExists === 0 && this.kitchens.length !== 0) || (kithcenExists !== newDoc.kitchens.length)) {
+            throw new Error("Not found related model Kitchen!");
+        }
+    }
+    if (newDoc.topCategories && newDoc.topCategories.length > 0) {
+        if ((topCategoryExists === 0 && this.topCategories.length !== 0) || (topCategoryExists !== newDoc.topCategories.length)) {
+            throw new Error("Not found related model TopCategory!");
+        }
+    }
+    if (newDoc.city && cityExists === 0) {
+        throw new Error("Not found related model City!");
     }
     if (newDoc.images) {
         for (let i = 0; i < this.images.length; i++) {

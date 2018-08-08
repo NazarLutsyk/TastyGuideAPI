@@ -59,16 +59,17 @@ app.use("/mail", passportMiddleware.isLoggedIn, mail);
 app.use(function (req, res, next) {
     let err = new Error("Not Found");
     err.status = 404;
-    next(err);
+    return next(err);
 });
 
-app.use(function (err, req, res) {
+app.use(function (err, req, res, next) {
     res.status(err.status || 500);
-    res.json({
+    let errToResponse = {
         message: err.message,
         status: err.status,
-        trace: err.trace
-    });
+        stack: err.stack
+    };
+    res.json(errToResponse);
 });
 
 module.exports = app;

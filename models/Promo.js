@@ -31,7 +31,11 @@ let PromoSchema = new Schema({
     toJSON: {virtuals: true, getters: true},
     toObject: {virtuals: true, getters: true},
 });
-module.exports = mongoose.model("Promo", PromoSchema);
+PromoSchema.statics.superfind = async function (params) {
+    let {universalFind} = require("../helpers/mongoQueryHelper");
+    return await universalFind(this, params);
+};
+
 PromoSchema.methods.supersave = async function () {
     let Place = require("./Place");
     let Client = require("./Client");
@@ -66,6 +70,9 @@ PromoSchema.methods.superupdate = async function (newDoc) {
     log("update Promo");
     return await this.save();
 };
+module.exports = mongoose.model("Promo", PromoSchema);
+
+
 PromoSchema.pre("remove", async function (next) {
     let fileHelper = require("../helpers/fileHelper");
     let path = require("path");
