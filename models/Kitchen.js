@@ -40,7 +40,7 @@ KitchenSchema.methods.superupdate = async function (newDoc) {
     return await this.save();
 };
 
-module.exports = mongoose.model("Kitchen", KitchenSchema);
+module.exports = mongoose.model("kitchen", KitchenSchema);
 
 let Place = require("./Place");
 let Multilang = require("./KitchenMultilang");

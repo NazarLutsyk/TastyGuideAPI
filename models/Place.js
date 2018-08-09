@@ -131,7 +131,7 @@ let PlaceSchema = new Schema({
     }],
     kitchens: [{
         type: Schema.Types.ObjectId,
-        ref: "Kitchen",
+        ref: "kitchen",
     }],
     city: {
         type: Schema.Types.ObjectId,

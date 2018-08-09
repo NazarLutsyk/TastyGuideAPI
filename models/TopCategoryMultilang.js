@@ -9,7 +9,7 @@ let TopCategoryMultilangSchema = new Schema({
     },
     topCategory: {
         type: Schema.Types.ObjectId,
-        ref: "topCategoty"
+        ref: "TopCategory"
     }
 }, {
     discriminatorKey: "kind",
