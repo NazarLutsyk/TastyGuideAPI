@@ -1,10 +1,24 @@
 let Promo = require("../models/Promo");
-let keysValidator = require("../validators/keysValidator");
-let objectHelper = require("../helpers/objectHelper");
+let mongoose = require('mongoose');
 
 module.exports = {
     async getPromos(req, res, next) {
         try {
+            if (JSON.stringify(req.query).search(/^[0-9a-fA-F]{24}$/)) {
+                function iterate(obj, stack) {
+                    for (let property in obj) {
+                        if (obj.hasOwnProperty(property)) {
+                            if (typeof obj[property] === "object") {
+                                iterate(obj[property], stack + "." + property);
+                            } else if (typeof obj[property] === "string" && obj[property].match(/^[0-9a-fA-F]{24}$/)) {
+                                obj[property] = mongoose.Types.ObjectId(obj[property]);
+                            }
+                        }
+                    }
+                }
+
+                iterate(req.query, "");
+            }
             res.json(await Promo.superfind(req.query));
         } catch (e) {
             e.status = 400;

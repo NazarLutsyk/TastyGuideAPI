@@ -58,6 +58,14 @@ let PlaceSchema = new Schema({
         karaoke: {
             type: Boolean,
             default: false
+        },
+        businessLunch: {
+            type: Boolean,
+            default: false
+        },
+        dayAndNight: {
+            type: Boolean,
+            default: false
         }
     },
     images: {
