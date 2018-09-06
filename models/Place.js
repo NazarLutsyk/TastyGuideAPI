@@ -42,32 +42,32 @@ let PlaceSchema = new Schema({
             default: 0
         },
     },
-    features: {
-        wifi: {
-            type: Boolean,
-            default: false
-        },
-        parking: {
-            type: Boolean,
-            default: false
-        },
-        vipRoom: {
-            type: Boolean,
-            default: false
-        },
-        karaoke: {
-            type: Boolean,
-            default: false
-        },
-        businessLunch: {
-            type: Boolean,
-            default: false
-        },
-        dayAndNight: {
-            type: Boolean,
-            default: false
-        }
-    },
+    // features: {
+    //     wifi: {
+    //         type: Boolean,
+    //         default: false
+    //     },
+    //     parking: {
+    //         type: Boolean,
+    //         default: false
+    //     },
+    //     vipRoom: {
+    //         type: Boolean,
+    //         default: false
+    //     },
+    //     karaoke: {
+    //         type: Boolean,
+    //         default: false
+    //     },
+    //     businessLunch: {
+    //         type: Boolean,
+    //         default: false
+    //     },
+    //     dayAndNight: {
+    //         type: Boolean,
+    //         default: false
+    //     }
+    // },
     images: {
         type: [String],
     },

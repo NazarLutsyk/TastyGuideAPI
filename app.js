@@ -54,7 +54,7 @@ app.use(passport.session());
 app.use("/", index);
 app.use("/api", api);
 app.use("/auth", user);
-app.use("/mail", passportMiddleware.isLoggedIn, mail);
+app.use("/mail", mail);
 
 app.use(function (req, res, next) {
     let err = new Error("Not Found");
