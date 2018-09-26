@@ -319,9 +319,9 @@ let TopPlace = require("./TopPlace");
 let Promo = require("./Promo");
 let Multilang = require("./PlaceMultilang");
 let Client = require("./Client");
+let Review = require("./Review");
 let path = require("path");
 PlaceSchema.pre("remove", async function (next) {
-    console.log("remove place");
     try {
         let complaints = await Complaint.find({place: this._id});
         let drinkApplications = await DrinkApplication.find({place: this._id});
@@ -330,6 +330,8 @@ PlaceSchema.pre("remove", async function (next) {
         let topPlaces = await TopPlace.find({place: this._id});
         let promos = await Promo.find({place: this._id});
         let multilangs = await Multilang.find({place: this._id});
+        await Review.deleteMany({place: this._id});
+
         for (const complaint of complaints) {
             await complaint.remove();
         }
