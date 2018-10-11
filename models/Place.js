@@ -224,7 +224,7 @@ PlaceSchema.virtual("departments", {
 });
 
 PlaceSchema.statics.notUpdatable = function () {
-    return ["rating", "reviews", "allowed", "topCategories", "averagePrice"];
+    return ["rating", "reviews", "allowed", "averagePrice"];
 };
 PlaceSchema.statics.superfind = async function (params) {
     let {universalFind} = require("../helpers/mongoQueryHelper");

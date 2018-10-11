@@ -9,7 +9,6 @@ let PlaceMultilangSchema = new Schema({
     },
     description: {
         type: String,
-        required: true
     },
     address: {
         street: String,

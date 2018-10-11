@@ -26,12 +26,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost/drinker");
 
 app.use(cors({
-    credentials: true, origin: [
-        "http://localhost:8100",
-        "http://192.168.1.14:8100",
-        "http://192.168.1.38:8100",
-        "http://192.168.0.100:8100",
-    ]
+    credentials: true, origin: true
 }));
 app.use(helmet());
 app.use(express.static(path.join(__dirname, "public")));

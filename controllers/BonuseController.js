@@ -8,7 +8,6 @@ module.exports = {
     async getBonuses(req, res, next) {
         try {
             if (JSON.stringify(req.query).search(/^[0-9a-fA-F]{24}$/)) {
-                console.log('here');
                 function iterate(obj, stack) {
                     for (let property in obj) {
                         if (obj.hasOwnProperty(property)) {
