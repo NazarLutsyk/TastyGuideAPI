@@ -4,13 +4,13 @@ let mongoose = require("mongoose");
 let Schema = mongoose.Schema;
 
 let PlaceSchema = new Schema({
-    phone: {
-        type: String,
-        match: /^(1[ \-\+]{0,3}|\+1[ -\+]{0,3}|\+1|\+)?((\(\+?1-[2-9][0-9]{1,2}\))|(\(\+?[2-8][0-9][0-9]\))|(\(\+?[1-9][0-9]\))|(\(\+?[17]\))|(\([2-9][2-9]\))|([ \-\.]{0,3}[0-9]{2,4}))?([ \-\.][0-9])?([ \-\.]{0,3}[0-9]{2,4}){2,3}$/
+    phones: {
+        type: [String],
+        default: []
     },
-    email: {
-        type: String,
-        match: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    emails: {
+        type: [String],
+        default: []
     },
     site: String,
     averagePrice: {
@@ -42,32 +42,6 @@ let PlaceSchema = new Schema({
             default: 0
         },
     },
-    // features: {
-    //     wifi: {
-    //         type: Boolean,
-    //         default: false
-    //     },
-    //     parking: {
-    //         type: Boolean,
-    //         default: false
-    //     },
-    //     vipRoom: {
-    //         type: Boolean,
-    //         default: false
-    //     },
-    //     karaoke: {
-    //         type: Boolean,
-    //         default: false
-    //     },
-    //     businessLunch: {
-    //         type: Boolean,
-    //         default: false
-    //     },
-    //     dayAndNight: {
-    //         type: Boolean,
-    //         default: false
-    //     }
-    // },
     images: {
         type: [String],
     },
