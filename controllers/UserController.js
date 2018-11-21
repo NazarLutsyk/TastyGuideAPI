@@ -3,6 +3,7 @@ let Client = require("../models/Client");
 let mail = require("../helpers/mailHelper");
 let crypto = require("crypto");
 let globalConfig = require("../config/global");
+let {sendMail} = require('../helpers/mailHelper');
 
 module.exports = {
     async signUp(req, res, next) {
@@ -17,7 +18,13 @@ module.exports = {
                 let bodyJson = JSON.stringify(body);
                 let encoded = Buffer.from(bodyJson).toString("base64");
                 let url = globalConfig.HOST + "auth/local/signup/callback?data=" + encoded;
-                await mail.sendMail(body.email, "Sign Up", url);
+                await mail.sendMail(body.email, "Sign Up", `
+                    <h3>Congratulations on your registration with the Tasty guide application.</h3> 
+                    <p>To complete the registration, follow the link and log in using your nickname and password.</p>
+                    =================================================================================================<br>
+                    ${url} <br/>
+                    =================================================================================================<br>
+                `);
                 return res.json({ok: true});
             }
         } catch (e) {
@@ -98,5 +105,55 @@ module.exports = {
     logout(req, res) {
         req.logout();
         res.json({ok: true});
+    },
+    async generateRecoverCode(req, res) {
+        try {
+            let email = req.body.email;
+            let login = req.body.login;
+            let clientExists = await Client.count({email, login});
+            if (clientExists) {
+                let code = Math.floor(Math.random() * (999999 - 100000) + 100000);
+                req.session.recoverCode = code;
+                await sendMail(email, 'Recover password', 'Recover code: ' + code);
+                return res.json(true);
+            } else {
+                return res.json(false);
+            }
+        } catch (e) {
+            return next(e);
+        }
+    },
+    verifyRecoverCode(req, res) {
+        try {
+            let inputtedCode = (req.body.code + '').trim();
+            let realCode = req.session.recoverCode ? req.session.recoverCode : Math.floor(Math.random() * (999999 - 100000) + 100000);
+            if (inputtedCode == realCode) {
+                delete req.session.recoverCode;
+                return res.json(true);
+            } else {
+                return res.json(false);
+            }
+        } catch (e) {
+            return next(e);
+        }
+    },
+    async changePassword(req, res) {
+        try {
+            let newPassword = req.body.password;
+            let login = req.body.login;
+            let email = req.body.email;
+
+            let client = await Client.findOne({email, login});
+
+            if (client && newPassword && newPassword.length >= 4) {
+                client.password = client.encryptPassword(newPassword);
+                await client.save();
+                return res.json(true);
+            } else {
+                return res.json(false);
+            }
+        } catch (e) {
+            return next(e);
+        }
     }
 };

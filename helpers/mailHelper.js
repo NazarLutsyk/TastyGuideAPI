@@ -15,7 +15,7 @@ exports.sendMail = function (to, subject, text) {
                 from: MAIL.BROKER.EMAIL,
                 to: to,
                 subject: subject,
-                text: text,
+                html: text,
             }, (error, info) => {
                 if (error) {
                     error.status = 400;

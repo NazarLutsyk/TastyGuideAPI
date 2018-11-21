@@ -23,4 +23,9 @@ router.get("/principal", query.parseQuery, async function (req, res) {
     }
 });
 
+router.post("/generateRecoverCode", PassportMiddleware.notLoggedIn, UserController.generateRecoverCode);
+router.post("/verifyRecoverCode", PassportMiddleware.notLoggedIn, UserController.verifyRecoverCode);
+router.post("/changePassword", PassportMiddleware.notLoggedIn, UserController.changePassword);
+
+
 module.exports = router;
