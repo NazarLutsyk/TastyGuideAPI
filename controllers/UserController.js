@@ -9,7 +9,7 @@ module.exports = {
     async signUp(req, res, next) {
         let body = req.body;
         try {
-            if (await Client.count({$or: [{login: body.login}, {email: body.email}]})
+            if (await Client.count({$or: [{login: body.login}, {email: body.email, login: {$ne: '', $exists: true}}]})
                 || !body.email || !body.password || !body.name || !body.surname || !body.login) {
                 let e = new Error();
                 e.status = 400;
@@ -38,7 +38,12 @@ module.exports = {
                 let decoded = Buffer.from(req.query.data, "base64").toString("utf8");
                 let user = JSON.parse(decoded);
 
-                let alreadyExists = await Client.count({$or: [{login: user.login}, {email: user.email}]});
+                let alreadyExists = await Client.count({
+                    $or: [{login: user.login}, {
+                        email: user.email,
+                        login: {$ne: '', $exists: true}
+                    }]
+                });
 
                 if (alreadyExists <= 0) {
                     let client = new Client({
@@ -109,12 +114,12 @@ module.exports = {
     async generateRecoverCode(req, res) {
         try {
             let email = req.body.email;
-            let login = req.body.login;
-            let clientExists = await Client.count({email, login});
+            let clientExists = await Client.count({email, login: {$ne: '', $exists: true}});
+            let client = await Client.findOne({email, login: {$ne: '', $exists: true}});
             if (clientExists) {
                 let code = Math.floor(Math.random() * (999999 - 100000) + 100000);
                 req.session.recoverCode = code;
-                await sendMail(email, 'Recover password', 'Recover code: ' + code);
+                await sendMail(email, 'Recover password', `Login: ${client.login} <br/> Recover code: ${code}`);
                 return res.json(true);
             } else {
                 return res.json(false);
@@ -140,10 +145,9 @@ module.exports = {
     async changePassword(req, res) {
         try {
             let newPassword = req.body.password;
-            let login = req.body.login;
             let email = req.body.email;
 
-            let client = await Client.findOne({email, login});
+            let client = await Client.findOne({email, login: {$ne: '', $exists: true}});
 
             if (client && newPassword && newPassword.length >= 4) {
                 client.password = client.encryptPassword(newPassword);
