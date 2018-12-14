@@ -12,7 +12,7 @@ router.use((req, res, next) => {
 
 router.use(passportMiddleware.isLoggedIn);
 
-router.use("/places", require("./place"));
+router.use("/places" ,require("./place"));
 router.use("/clients", require("./client"));
 router.use("/langs", require("./lang"));
 router.use("/placeTypes", require("./placeType"));

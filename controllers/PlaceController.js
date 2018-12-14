@@ -25,6 +25,7 @@ module.exports = {
                         }
                     }
                 }
+
                 iterate(req.query, "");
             }
             res.json(await Place.superfind(req.query));
@@ -144,7 +145,7 @@ module.exports = {
                         console.log(query);
                         let placeRes = await Place.findByIdAndUpdate(req.params.id, query, {new: true});
                         res.status(201).json(placeRes);
-                    }else {
+                    } else {
                         res.sendStatus(201);
                     }
                 } catch (e) {
@@ -172,4 +173,46 @@ module.exports = {
             return next(e);
         }
     },
+    async getStatistic(req, res, next) {
+        try {
+            let places = await Place
+                .find({})
+                .populate({
+                    path: 'departments',
+                    populate: {path: 'client'}
+                })
+                .populate({
+                    path: 'multilang'
+                });
+
+            let toSend = [];
+            for (const place of places) {
+                let toSendObj = {
+                    placeEmails: [],
+                    placePhones: [],
+                    admins: []
+                };
+                let placeEmails = place.emails;
+                let placePhones = place.phones;
+
+                toSendObj.name = place.multilang[0].name;
+                toSendObj.placeEmails = placeEmails;
+                toSendObj.placePhones = placePhones;
+
+                for (const department of place.departments) {
+                    let adminInfo = {};
+                    adminInfo.email = department.client.email ? department.client.email : '';
+                    adminInfo.phone = department.client.phone ? department.client.phone : '';
+                    adminInfo.name = department.client.name ? department.client.name : '';
+                    adminInfo.surname = department.client.surname ? department.client.surname : '';
+                    toSendObj.admins.push(adminInfo);
+                }
+
+                toSend.push(toSendObj);
+            }
+            res.json(toSend);
+        } catch (e) {
+            console.log(e);
+        }
+    }
 };

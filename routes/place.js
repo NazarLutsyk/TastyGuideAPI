@@ -8,6 +8,8 @@ const express = require("express");
 
 const router = express.Router();
 
+router.get('/statistic', permission.roles(ROLES.GLOBAL_ROLES.ADMIN_ROLE), PlaceController.getStatistic);
+
 router.route("/")
     .get(PlaceController.getPlaces)
     .post(
@@ -29,4 +31,5 @@ router.put("/:id/upload",
     permission.rule(PlaceRule.updatePlace, ROLES.GLOBAL_ROLES.ADMIN_ROLE),
     PlaceController.upload
 );
+
 module.exports = router;
