@@ -26,7 +26,8 @@
     "passport-google-oauth20": "^1.0.0",
     "passport-google-token": "^0.1.2",
     "passport-local": "^1.0.0",
-    "winston": "^2.4.0"
+    "winston": "^2.4.0",
+    "xlsx": "^0.14.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",

@@ -1,7 +1,7 @@
 let nodemailer = require("nodemailer");
 let MAIL = require("../config/mail");
 
-exports.sendMail = function (to, subject, text) {
+exports.sendMail = function (to, subject, text, attachments = []) {
     let transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -16,6 +16,7 @@ exports.sendMail = function (to, subject, text) {
                 to: to,
                 subject: subject,
                 html: text,
+                attachments: attachments
             }, (error, info) => {
                 if (error) {
                     error.status = 400;

@@ -7,6 +7,10 @@ let keysValidator = require("../validators/keysValidator");
 let ROLES = require("../config/roles");
 let upload = require("../middleware/multer")(path.join(__dirname, "../public", "upload", "place"));
 upload = upload.fields([{name: "avatar", maxCount: 1}, {name: "images", maxCount: 6}]);
+let xlsx = require('xlsx');
+let mailManager = require('../helpers/mailHelper');
+let mailConfig = require('../config/mail');
+let fs = require('fs');
 
 let mongoose = require("mongoose");
 
@@ -175,11 +179,17 @@ module.exports = {
     },
     async getStatistic(req, res, next) {
         try {
+            res.json({});
+
             let places = await Place
                 .find({})
                 .populate({
                     path: 'departments',
                     populate: {path: 'client'}
+                })
+                .populate({
+                    path: 'city',
+                    populate: {path: 'multilang'}
                 })
                 .populate({
                     path: 'multilang'
@@ -188,29 +198,54 @@ module.exports = {
             let toSend = [];
             for (const place of places) {
                 let toSendObj = {
+                    name: '',
                     placeEmails: [],
                     placePhones: [],
-                    admins: []
+                    address: ''
                 };
-                let placeEmails = place.emails;
-                let placePhones = place.phones;
 
-                toSendObj.name = place.multilang[0].name;
-                toSendObj.placeEmails = placeEmails;
-                toSendObj.placePhones = placePhones;
+                if (place.city && place.city.multilang && place.city.multilang.length > 0) {
+                    toSendObj.address = `${place.city.multilang[0].name}`;
+                }
+                if (place.multilang && place.multilang.length > 0) {
+                    toSendObj.name = place.multilang[0].name;
+                    toSendObj.address += ` ${place.multilang[0].address.street} ${place.multilang[0].address.number}`
+                }
+                toSendObj.placeEmails = place.emails ? place.emails : [];
+                toSendObj.placePhones = place.phones ? place.phones : [];
 
                 for (const department of place.departments) {
-                    let adminInfo = {};
-                    adminInfo.email = department.client.email ? department.client.email : '';
-                    adminInfo.phone = department.client.phone ? department.client.phone : '';
-                    adminInfo.name = department.client.name ? department.client.name : '';
-                    adminInfo.surname = department.client.surname ? department.client.surname : '';
-                    toSendObj.admins.push(adminInfo);
+                    if (department && department.client) {
+                        department.client.email ? toSendObj.placeEmails.push(department.client.email) : '';
+                        department.client.phone ? toSendObj.placePhones.push(department.client.phone) : '';
+                    }
                 }
+                toSendObj.placeEmails = toSendObj.placeEmails.join(',');
+                toSendObj.placePhones = toSendObj.placePhones.join(',');
 
                 toSend.push(toSendObj);
             }
-            res.json(toSend);
+            const xlsxPath = path.join(__dirname, '../places.xlsx');
+
+            let workSheet = xlsx.utils.json_to_sheet(toSend, {});
+            let workBook = xlsx.utils.book_new();
+            xlsx.utils.book_append_sheet(workBook, workSheet, 'PLACES');
+            xlsx.writeFile(workBook, xlsxPath, {});
+
+            await mailManager.sendMail(
+                mailConfig.ADMIN_EMAIL,
+                'PLACES REPORT',
+                'PLACES REPORT',
+                [{
+                    filename: 'PLACES.xlsx',
+                    path: xlsxPath
+                }]
+            );
+
+            fs.unlink(xlsxPath, (err) => {
+                if (err)
+                    console.log(err);
+            });
         } catch (e) {
             console.log(e);
         }
